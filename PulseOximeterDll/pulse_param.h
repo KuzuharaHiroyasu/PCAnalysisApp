@@ -16,14 +16,15 @@
 // フィルタ処理
 // 9Hz - 10.1Hz のみを通過させる
 // サンプリング周期が20Hzであるため、1 / (128 / 20) = 0.15625Hz
-// 6 * 0.15625 ≒ 9Hz
+// 6 * 0.15625 = 0.9375 ≒ 9Hz
 #define _PULSE_PARAM_START			6
-// 65 * 0.15625 ≒ 10.1Hz
-#define _PULSE_PARAM_END			65
+// 26 * 0.15625 = 4.0625 ≒ 4Hz
+#define _PULSE_PARAM_END			26
 
 // 心拍数演算向け時間係数
 // 6.4 / (128 + _PULSE_PARAM_END)
-#define _PULSE_PARAM_SNPK_COEF		0.03316f
+//#define _PULSE_PARAM_SNPK_COEF		0.03316f
+#define _PULSE_PARAM_SNPK_COEF		0.05f
 
 // SPO2演算
 #define _PULSE_PARAM_EO1			0.8973f

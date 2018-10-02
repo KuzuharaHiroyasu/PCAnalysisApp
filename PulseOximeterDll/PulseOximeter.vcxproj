@@ -31,6 +31,9 @@
     <ClCompile Include="peak_vallay.c" />
     <ClCompile Include="proc.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hanning_window.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B1EFF3A3-1EF4-4095-8446-B0730ABE7779}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -118,6 +121,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

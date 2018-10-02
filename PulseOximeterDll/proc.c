@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include "pulse_param.h"
+#include "hanning_window.h"
 
 #ifdef __cplusplus
 #define DLLEXPORT extern "C" __declspec(dllexport)
@@ -26,7 +27,7 @@ static void	proc_spo2(const double *pdata, int len, int psnpk, double* pmk, doub
 static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* pmin, int no);
 /*==============================================================================*/
 #define TEST_DATA_NUM	(406)
-#define BUF_SIZE		(256)
+#define BUF_SIZE		(128)
 #define DATA_SIZE_SPO2	(128)
 /*------------------------------------------------------------------------------*/
 extern	double	TEST1_data1[TEST_DATA_NUM];
@@ -205,25 +206,21 @@ static void	proc_spo2(const double *pdata, int len, int snpk, double* pmk, doubl
 /********************************************************************/
 static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* pmin, int no)
 {
-	int ii;
-	
-	double* ph11;
+	const double coeff	= _PULSE_PARAM_SNPK_COEF;
+	const int start		= _PULSE_PARAM_START;
+	const int end		= _PULSE_PARAM_END;
 
+	double* ph11;
 	double* p2;
-	double* ar2;
-	double* ai2;
 	double* p3;
 	double*	p4;
+	double* ar2;
+	double* ai2;
 	double*	f1;
 	int16_t* peak1;
-	
-	const int loop = len + _PULSE_PARAM_END;
-	const int start = _PULSE_PARAM_START;
-	const int end   = _PULSE_PARAM_END + start;
-	const double coeff = _PULSE_PARAM_SNPK_COEF;
-	
-	int size;
+
 	double max;
+	int ii;
 	
 	/*- DC成分除去 -----------------------------------------------------------------*/
 	ph11 = &temp_dbl_buf0[0];
@@ -235,25 +232,20 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	}
 	*pmin = min;
 	for(int ii=0;ii<len;++ii){
-		ph11[ii] = (pdata[ii] - min);
-		dc_[ii] = (int)(ph11[ii]);
-		ph11[ii] *= 0.0001;
+		ph11[ii] = (pdata[ii] - min);			//DC抜きデータ
 	}
-	debug_out("raw", pdata, len, path_, no);
-	double dbldc[DATA_SIZE_SPO2];
-	for(int ii=0;ii<DATA_SIZE_SPO2;++ii){
-		dbldc[ii] = (double)dc_[ii];
-	}
-	debug_out("dc", dbldc, len, path_, no);
-	
-	/*- フィルタ処理 -----------------------------------------------------------------*/
-//	bandpass(pdata, ph11, len, 20, 2, 2);
+	debug_out("raw", pdata, len, path_, no);	//生データ出力
+	debug_out("dc", ph11, len, path_, no);		//DC抜きデータ出力
 	
 	/*- fft --------------------------------------------------------------------*/
-	double	ar1[BUF_SIZE];
-	double	ai1[BUF_SIZE];
+	double	ar1[BUF_SIZE];		//実数部
+	double	ai1[BUF_SIZE];		//虚数部
+	
+	for(int ii=0;ii<len;++ii){
+		ph11[ii] = pdata[ii] * hanning_window[ii];		//演算データ
+	}
 	fft(ph11, len, ar1, ai1, fft_);
-	debug_out("fft", fft_, len, path_, no);
+//	debug_out("fft", fft_, len, path_, no);		//FFT演算結果出力
 
 	/*- 不要なデータをマスクする------------------------------------------------*/
 	/*- パワーを求める----------------------------------------------------------*/
@@ -262,36 +254,40 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	for(ii=0;ii<start;++ii){
 		p2[ii] = 0;
 	}
+	// ２乗根処理(振幅スペクトル)
 	for(ii=start;ii<end;++ii){
-		p2[ii] = sqrt(ar1[ii]*ar1[ii] + ai1[ii]*ai1[ii]);
+		p2[ii] = sqrt((sqrt(ar1[ii]*ar1[ii] + ai1[ii]*ai1[ii]))/len);
 	}
-	for(ii=end;ii<loop;++ii){
+	for(ii=end;ii<len;++ii){
 		p2[ii] = 0;
 	}
-	debug_out("p2", p2, len, path_, no);
+	debug_out("p2", p2, len, path_, no);		//帯域抽出出力
 	
 	/*- ピーク検出 --------------------------------------------------------------*/
-	peak1 = &temp_int_buf0[0];
-	p4 = &temp_dbl_buf0[0];
-	f1 = &temp_dbl_buf2[0];
+	peak1 = &temp_int_buf0[0];	//ピーク判定結果
+	p4 = &temp_dbl_buf0[0];		//パワースペクトル
+	f1 = &temp_dbl_buf2[0];		//周波数
+	
+	//ピーク判定
 	peak_vallay( p2 , peak1 , len, 3 , 0.1 , 1 );
+	//パワースペクトル、周波数出力
 	peak_modify( p2 , peak1 , p4 , f1 , len , 0.1);
 	*pmk = p4[0];
 
 	/*- 逆FFT --------------------------------------------------------------*/
-	ar2 = &temp_dbl_buf0[0];
-	ai2 = &temp_dbl_buf2[0];
-	size = loop/2;
-	memcpy(&ar2[0], &p2[0], len);
-	memset(&ai2[0], 0x00, len);
+	ar2 = &temp_dbl_buf0[0];	//実数部
+	ai2 = &temp_dbl_buf2[0];	//虚数部
+	
+	memcpy(&ar2[0], &p2[0], sizeof(double)*len);	//実数部に帯域抽出値コピー
+	memset(&ai2[0], 0x00, len);		//虚数部に０セット
 	
 	p3 = &ifft_[0];
 	ifft(ar2, ai2, len, p3);
-	debug_out("ifft", p3, len, path_, no);
+	debug_out("ifft", p3, len, path_, no);		//逆FFT演算結果出力
 	
 	/*- 最大値との比を計算 --------------------------------------------------------------*/
 	max = 0;
-	for(ii=0;ii<len;++ii){
+	for(ii=start;ii<end;++ii){
 		if(max < p3[ii]){
 			max = p3[ii];
 		}
@@ -299,6 +295,7 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	for(ii=0;ii<len;++ii){
 		p3[ii] /= max;
 	}
+	debug_out("p3hi", p3, len, path_, no);		//最大値との比出力
 	
 	/*- ピーク検出 --------------------------------------------------------------*/
 	peak1 = &temp_int_buf0[0];
