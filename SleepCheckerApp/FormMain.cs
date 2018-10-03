@@ -56,7 +56,15 @@ namespace SleepCheckerApp
         static extern int get_spo2();
         [DllImport("PulseOximeter.dll")]
         static extern double get_acdc();
-
+        [DllImport("PulseOximeter.dll")]
+        static extern double get_acavg_clr();
+        [DllImport("PulseOximeter.dll")]
+        static extern double get_acavg_inf();
+        [DllImport("PulseOximeter.dll")]
+        static extern double get_dcavg_clr();
+        [DllImport("PulseOximeter.dll")]
+        static extern double get_dcavg_inf();
+        
         private ComPort com = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数

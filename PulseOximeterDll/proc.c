@@ -23,8 +23,14 @@ DLLEXPORT int __stdcall get_sinpak_clr(void);
 DLLEXPORT int __stdcall get_sinpak_inf(void);
 DLLEXPORT int __stdcall get_spo2(void);
 DLLEXPORT double __stdcall get_acdc(void);
+DLLEXPORT double __stdcall get_acavg_clr(void);
+DLLEXPORT double __stdcall get_acavg_inf(void);
+DLLEXPORT double __stdcall get_dcavg_clr(void);
+DLLEXPORT double __stdcall get_dcavg_inf(void);
 static void	proc_spo2(const double *pdata, int len, int psnpk, double* pmk, double* pmin, int no);
 static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* pmin, int no);
+static void acdc_average(const double* pdata, double* ar1, double* ai1, double* p3, double pulse, int len, int no);
+static double CalcCoeff(double dc);
 /*==============================================================================*/
 #define TEST_DATA_NUM	(406)
 #define BUF_SIZE		(128)
@@ -42,30 +48,34 @@ extern	int		peak_modify	( double in_data[] , int in_res[] , double ot_data[] , d
 extern	void 	peak_vallay	( double in[] , int    ot[] , int size, int width , double th , int peak );
 extern	void	cal_sp1		( double mx1 , double mx2, int *sp );
 extern	void	ifft(double	ar[],double	ai[],int N, double	ot[]);
-static double CalcCoeff(double dc);
 /*------------------------------------------------------------------------------*/
-double	temp_dbl_buf0[BUF_SIZE];
-double	temp_dbl_buf1[BUF_SIZE];
-double	temp_dbl_buf2[BUF_SIZE];
-
 typedef int int16_t;
-int16_t		temp_int_buf0[BUF_SIZE];
 
-double	mx1_;
-double	mx2_;
-double	min1_;
-double	min2_;
-int dc_[BUF_SIZE];
 double fft_[BUF_SIZE];
 double ifft_[BUF_SIZE];
 double new_ifft_[BUF_SIZE];
+double ratio_ifft_[BUF_SIZE];
+double	temp_dbl_buf0[BUF_SIZE];
+double	temp_dbl_buf1[BUF_SIZE];
+double	temp_dbl_buf2[BUF_SIZE];
+int16_t	temp_int_buf0[BUF_SIZE];
+int dc_[BUF_SIZE];
+char path_[256];
+
+double mx1_;
+double mx2_;
+double min1_;
+double min2_;
+double acdc_;
+double ac_avg_clr;
+double ac_avg_inf;
+double dc_avg_clr;
+double dc_avg_inf;
+double ac_avg_ratio;
 int	snpk1_;
 int	snpk2_;
-int		sp1_;
-int		sp2_;
-double acdc_;
-
-char path_[256];
+int	sp1_;
+int	sp2_;
 
 DLLEXPORT void __stdcall calculator_clr(int *pdata, int len, char* ppath)
 {
@@ -233,6 +243,7 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	*pmin = min;
 	for(int ii=0;ii<len;++ii){
 		ph11[ii] = (pdata[ii] - min);			//DC抜きデータ
+		dc_[ii] = (int)(ph11[ii]);
 	}
 	debug_out("raw", pdata, len, path_, no);	//生データ出力
 	debug_out("dc", ph11, len, path_, no);		//DC抜きデータ出力
@@ -286,6 +297,8 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	debug_out("ifft", p3, len, path_, no);		//逆FFT演算結果出力
 	
 	/*- 最大値との比を計算 --------------------------------------------------------------*/
+	p3 = &ratio_ifft_[0];
+	memcpy(&ratio_ifft_[0], &ifft_[0], sizeof(double)*len);
 	max = 0;
 	for(ii=start;ii<end;++ii){
 		if(max < p3[ii]){
@@ -307,9 +320,70 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	
 	/*- HR --------------------------------------------------------------*/
 	*psnpk = (int)(60 / (f1[0] * coeff));
-	double test = *psnpk;
-	debug_out("snpk", &test, 1, path_, no);
+	double pulse = *psnpk;
+	debug_out("snpk", &pulse, 1, path_, no);
+	
+	/*- AC、DCの平均値算出 ----------------------------------------------*/
+	acdc_average(pdata, ar1, ai1, p3, pulse, len, no);
 }
+
+static void acdc_average(const double* pdata, double* ar1, double* ai1, double* p3, double pulse, int len, int no)
+{
+	double ac_avg = 0;
+	double dc_avg = 0;
+	double pos_center = ((pulse / 60) / _SAMPLING_FREQUENCY);	//センター位置
+	int pos_center_down = (int)pos_center;
+	int ii;
+
+	// pos_center_downまでは 0
+	for (int ii = 0; ii<pos_center_down; ++ii) {
+		ar1[ii] = 0;
+		ai1[ii] = 0;
+	}
+
+	if (pos_center_down == pos_center)
+	{
+		pos_center_down++;
+	}
+	else {
+		pos_center_down = pos_center_down + 2;
+	}
+	// pos_center_down以降も 0
+	for (ii = pos_center_down; ii<len; ++ii) {
+		ar1[ii] = 0;
+		ai1[ii] = 0;
+	}
+	// 逆FFT
+	ifft(ar1, ai1, len, p3);
+
+	// 演算結果を絶対値にする
+	for (ii = 0; ii < len; ++ii) {
+		p3[ii] = fabs(p3[ii]);
+	}
+	
+	// 平均算出
+	for (ii = 0; ii < len; ii++) {
+		ac_avg += p3[ii];
+		dc_avg += pdata[ii];
+	}
+	ac_avg /= len;
+	dc_avg /= len;
+
+	if (no == 1) {
+		ac_avg_clr = ac_avg;	//赤色のAC平均値
+		dc_avg_clr = dc_avg;	//赤色のDC平均値
+		debug_out("ac_avg_clr", &ac_avg_clr, 1, path_, 0);
+		debug_out("dc_avg_clr", &dc_avg_clr, 1, path_, 0);
+	}
+	else {
+		ac_avg_inf = ac_avg;	//赤外のAC平均値
+		dc_avg_inf = dc_avg;	//赤外のDC平均値
+		debug_out("ac_avg_inf", &ac_avg_inf, 1, path_, 0);
+		debug_out("dc_avg_inf", &dc_avg_inf, 1, path_, 0);
+	}
+}
+
+
 
 // DC成分除去データ
 DLLEXPORT void __stdcall get_dc(int* pdata)
@@ -366,6 +440,39 @@ DLLEXPORT double __stdcall get_acdc(void)
 {
 	return acdc_;
 }
+
+// AC平均値(赤色)
+DLLEXPORT double __stdcall get_acavg_clr(void)
+{
+	return ac_avg_clr;
+}
+
+// AC平均値(赤外)
+DLLEXPORT double __stdcall get_acavg_inf(void)
+{
+	return ac_avg_inf;
+}
+
+// DC平均値(赤色)
+DLLEXPORT double __stdcall get_dcavg_clr(void)
+{
+	return dc_avg_clr;
+}
+
+// DC平均値(赤外)
+DLLEXPORT double __stdcall get_dcavg_inf(void)
+{
+	return dc_avg_inf;
+}
+
+// AC平均値の比（赤色/赤外）
+DLLEXPORT double __stdcall get_acavg_ratio(void)
+{
+	ac_avg_ratio = ac_avg_clr / ac_avg_inf;
+	debug_out("ac_avg_ratio", &ac_avg_ratio, 1, path_, 0);
+	return ac_avg_ratio;
+}
+
 
 static double CalcCoeff(double dc)
 {
