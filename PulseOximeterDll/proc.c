@@ -27,6 +27,7 @@ DLLEXPORT double __stdcall get_acavg_clr(void);
 DLLEXPORT double __stdcall get_acavg_inf(void);
 DLLEXPORT double __stdcall get_dcavg_clr(void);
 DLLEXPORT double __stdcall get_dcavg_inf(void);
+DLLEXPORT double __stdcall get_acavg_ratio(void);
 static void	proc_spo2(const double *pdata, int len, int psnpk, double* pmk, double* pmin, int no);
 static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* pmin, int no);
 static void acdc_average(const double* pdata, double* ar1, double* ai1, double* p3, double pulse, int len, int no);

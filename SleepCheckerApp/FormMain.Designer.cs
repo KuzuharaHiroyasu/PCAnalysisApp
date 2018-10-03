@@ -224,8 +224,8 @@
             // 
             // chartSinpaku
             // 
-            chartArea3.AxisX.Interval = 1D;
-            chartArea3.AxisX.Maximum = 10D;
+            chartArea3.AxisX.Interval = 2D;
+            chartArea3.AxisX.Maximum = 30D;
             chartArea3.AxisX.Minimum = 0D;
             chartArea3.AxisY.Maximum = 200D;
             chartArea3.AxisY.Minimum = 0D;
@@ -255,13 +255,13 @@
             // 
             // chartSpO2
             // 
-            chartArea4.AxisX.Interval = 1D;
-            chartArea4.AxisX.Maximum = 10D;
+            chartArea4.AxisX.Interval = 2D;
+            chartArea4.AxisX.Maximum = 30D;
             chartArea4.AxisX.Minimum = 0D;
             chartArea4.AxisX.Title = "秒";
-            chartArea4.AxisY.Maximum = 200D;
-            chartArea4.AxisY.Minimum = 0D;
-            chartArea4.AxisY.Title = "%";
+//            chartArea4.AxisY.Maximum = 100D;
+//            chartArea4.AxisY.Minimum = 0D;
+            chartArea4.AxisY.Title = "";
             chartArea4.Name = "ChartAreaTime";
             this.chartSpO2.ChartAreas.Add(chartArea4);
             legend4.Name = "Legend1";
@@ -271,11 +271,11 @@
             series7.ChartArea = "ChartAreaTime";
             series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series7.Legend = "Legend1";
-            series7.Name = "通常";
+            series7.Name = "SpO2";
             series8.ChartArea = "ChartAreaTime";
             series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series8.Legend = "Legend1";
-            series8.Name = "AC/DC比";
+            series8.Name = "AC比";
             series8.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
             this.chartSpO2.Series.Add(series7);
             this.chartSpO2.Series.Add(series8);

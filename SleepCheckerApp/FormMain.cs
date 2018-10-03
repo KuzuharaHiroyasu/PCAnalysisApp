@@ -64,7 +64,9 @@ namespace SleepCheckerApp
         static extern double get_dcavg_clr();
         [DllImport("PulseOximeter.dll")]
         static extern double get_dcavg_inf();
-        
+        [DllImport("PulseOximeter.dll")]
+        static extern double get_acavg_ratio();
+
         private ComPort com = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
@@ -118,7 +120,7 @@ namespace SleepCheckerApp
         Queue<double> NewIfftSekigaiDataQueue = new Queue<double>();
         
         // 演算結果データ
-        private const int BufNumSpO2Graph = 11;             // 1分(15データ)分だけ表示する // 0点も打つので+1
+        private const int BufNumSpO2Graph = 31;             // 1分(15データ)分だけ表示する // 0点も打つので+1
         private const int ShipakuDataRirekiNum = BufNumSpO2Graph;    // 心拍数データ履歴数
         private const int SpDataRirekiNum = BufNumSpO2Graph;         // SpO2データ履歴数
         Queue<double> ShinpakuSekisyokuDataQueue = new Queue<double>();
@@ -361,8 +363,8 @@ namespace SleepCheckerApp
                 //結果表示
                 double shinpaku_sekisyoku = get_sinpak_clr();
                 double shinpaku_sekigai   = get_sinpak_inf();
-                double sp_normal = get_spo2();
-                double sp_acdc = get_acdc();
+                double sp_normal = 0; // get_spo2();
+                double sp_acdc = get_acavg_ratio();
 
                 //グラフ用データ追加
                 lock (lockData_SpO2)
@@ -784,7 +786,7 @@ namespace SleepCheckerApp
                 }
 
                 // SpO2グラフを更新
-                Series srs_normal = chartSpO2.Series["通常"];
+                Series srs_normal = chartSpO2.Series["SpO2"];
                 srs_normal.Points.Clear();
                 cnt = 0;
                 foreach (double data in SpNormalDataQueue)
@@ -794,7 +796,7 @@ namespace SleepCheckerApp
                 }
 
                 // Acdcグラフを更新
-                Series srs_acdc = chartSpO2.Series["AC/DC比"];
+                Series srs_acdc = chartSpO2.Series["AC比"];
                 srs_acdc.Points.Clear();
                 cnt = 0;
                 foreach (double data in SpAcdcDataQueue)
