@@ -363,7 +363,7 @@ namespace SleepCheckerApp
                 //結果表示
                 double shinpaku_sekisyoku = get_sinpak_clr();
                 double shinpaku_sekigai   = get_sinpak_inf();
-                double sp_normal = 0; // get_spo2();
+                double sp_normal = get_spo2();
                 double sp_acdc = get_acavg_ratio();
 
                 //グラフ用データ追加

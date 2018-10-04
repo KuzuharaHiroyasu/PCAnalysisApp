@@ -105,13 +105,13 @@ DLLEXPORT void __stdcall calculator_clr(int *pdata, int len, char* ppath)
 		snpk1_ = 0;
 	}
 	
-	for (i=0; i<DATA_SIZE_SPO2; i++)
-	{
-		tmp = (double)pdata[i];
-		// -3`3V‚Ì24bit•ª‰ð”\AD’l
-		temp_dbl_buf2[i] = tmp;
-	}
-	proc_spo2(temp_dbl_buf2, DATA_SIZE_SPO2, snpk1_, &mx1_, &min1_, 1);
+//	for (i=0; i<DATA_SIZE_SPO2; i++)
+//	{
+//		tmp = (double)pdata[i];
+//		// -3`3V‚Ì24bit•ª‰ð”\AD’l
+//		temp_dbl_buf2[i] = tmp;
+//	}
+//	proc_spo2(temp_dbl_buf2, DATA_SIZE_SPO2, snpk1_, &mx1_, &min1_, 1);
 }
 
 DLLEXPORT void __stdcall calculator_inf(int *pdata, int len, char* ppath)
@@ -128,24 +128,25 @@ DLLEXPORT void __stdcall calculator_inf(int *pdata, int len, char* ppath)
 	if((0 > snpk2_) || (snpk2_ > 200)){
 		snpk2_ = 0;
 	}
-	for (i = 0; i<DATA_SIZE_SPO2; i++)
-	{
-		tmp = (double)pdata[i];
-		temp_dbl_buf2[i] = tmp;
-	}
-	proc_spo2(temp_dbl_buf2, DATA_SIZE_SPO2, snpk2_, &mx2_, &min2_, 2);
+//	for (i = 0; i<DATA_SIZE_SPO2; i++)
+//	{
+//		tmp = (double)pdata[i];
+//		temp_dbl_buf2[i] = tmp;
+//	}
+//	proc_spo2(temp_dbl_buf2, DATA_SIZE_SPO2, snpk2_, &mx2_, &min2_, 2);
 	
 	/*- SPO2 --------------------------------------------------------------*/
-	double	coeff = CalcCoeff(min2_) / CalcCoeff(min1_);
-	if(mx2_ != 0){
-		acdc_ = (mx1_ / mx2_) * coeff;
-	}else{
-		acdc_ = 0;
-	}
-	debug_out("acdc", &acdc_, 1, path_, 0);
-	cal_sp1( mx1_, mx2_, &sp1_ );
-	double test = (double)sp1_;
-	debug_out("spo2", &test, 1, path_, 0);
+//	double	coeff = CalcCoeff(min2_) / CalcCoeff(min1_);
+//	if(mx2_ != 0){
+//		acdc_ = (mx1_ / mx2_) * coeff;
+//	}else{
+//		acdc_ = 0;
+//	}
+//	debug_out("acdc", &acdc_, 1, path_, 0);
+//	cal_sp1( mx1_, mx2_, &sp1_ );
+	double sp1_temp = (110 - (25 * ac_avg_ratio));
+	debug_out("spo2", &sp1_temp, 1, path_, 0);
+	sp1_ = (int)sp1_temp;
 	if((0 > sp1_) || (sp1_ > 200)){
 		sp1_ = 0;
 	}
