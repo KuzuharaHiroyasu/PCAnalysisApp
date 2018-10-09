@@ -374,15 +374,13 @@ static void acdc_average(const double* pdata, double* ar1, double* ai1, double* 
 	if (no == 1) {
 		ac_avg_clr = ac_avg;	//赤色のAC平均値
 		dc_avg_clr = dc_avg;	//赤色のDC平均値
-		debug_out("ac_avg_clr", &ac_avg_clr, 1, path_, 0);
-		debug_out("dc_avg_clr", &dc_avg_clr, 1, path_, 0);
 	}
 	else {
 		ac_avg_inf = ac_avg;	//赤外のAC平均値
 		dc_avg_inf = dc_avg;	//赤外のDC平均値
-		debug_out("ac_avg_inf", &ac_avg_inf, 1, path_, 0);
-		debug_out("dc_avg_inf", &dc_avg_inf, 1, path_, 0);
 	}
+	debug_out("ac_avg", &ac_avg, 1, path_, no);
+	debug_out("dc_avg", &dc_avg, 1, path_, no);
 }
 
 
