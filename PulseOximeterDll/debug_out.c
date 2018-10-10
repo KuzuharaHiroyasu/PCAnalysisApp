@@ -10,11 +10,12 @@ void	debug_out( char *f , const double d[] , int size , const char* ppath, int n
 {
 	FILE		*fp;
 	char		b[1024];
+	errno_t error;
 
-	sprintf( b , "%s\\%s(%d).txt" , ppath , f , no );
+	sprintf_s( b , 1024, "%s\\%s(%d).txt" , ppath , f , no );
 
-	fp = fopen(b ,  "w" );
-	if (fp == NULL)
+	error = fopen_s(&fp, b, "w");
+	if (error != 0)
 	{
 		printf("file open error [debug_out]\n");
 		exit(0);
