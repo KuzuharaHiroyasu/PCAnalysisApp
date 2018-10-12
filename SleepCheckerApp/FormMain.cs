@@ -510,18 +510,41 @@ namespace SleepCheckerApp
         private void CreateRootDir()
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
+            string temp;
+            int i;
+
             // rootパス
-            ApneaRootPath_ = "C:\\ax\\apnea\\" + datestr + "\\";
-            if(Directory.Exists(ApneaRootPath_)){
-            }else{
-                Directory.CreateDirectory(ApneaRootPath_);
+            ApneaRootPath_ = "C:\\ax\\apnea\\" + datestr;
+            temp = ApneaRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = ApneaRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
             }
-            
+
             // rootパス
             PulseRootPath_ = "C:\\ax\\pulse\\" + datestr + "\\";
-            if(Directory.Exists(PulseRootPath_)){
-            }else{
-                Directory.CreateDirectory(PulseRootPath_);
+            temp = PulseRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = PulseRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
             }
         }
         
