@@ -103,7 +103,7 @@ namespace SleepCheckerApp
         private List<int> SpO2_CalcDataList2 = new List<int>();
         
         // グラフ用
-        private const int SpO2_RawDataRirekiNum = 1280;              // 生データ履歴数
+        private const int SpO2_RawDataRirekiNum = 128;              // 生データ履歴数
         
         // 生データ
         Queue<int> RawDataSekisyokuQueue = new Queue<int>();

@@ -156,7 +156,7 @@
             chartArea1.AxisX.Interval = 6D;
             chartArea1.AxisX.Maximum = 60D;
             chartArea1.AxisX.Minimum = 0D;
-            chartArea1.AxisX.Title = "秒";
+            chartArea1.AxisX.Title = "";
             chartArea1.AxisY.Interval = 10D;
             chartArea1.AxisY.Maximum = 100D;
             chartArea1.AxisY.Minimum = 0D;
@@ -194,7 +194,7 @@
             chartArea2.AxisX.Interval = 1D;
             chartArea2.AxisX.Maximum = 10D;
             chartArea2.AxisX.Minimum = 0D;
-            chartArea2.AxisX.Title = "秒";
+            chartArea2.AxisX.Title = "";
             chartArea2.AxisY.Interval = 1D;
             chartArea2.AxisY.Maximum = 4D;
             chartArea2.AxisY.Minimum = 0D;
@@ -227,9 +227,9 @@
             chartArea3.AxisX.Interval = 2D;
             chartArea3.AxisX.Maximum = 30D;
             chartArea3.AxisX.Minimum = 0D;
-            chartArea3.AxisY.Maximum = 200D;
-            chartArea3.AxisY.Minimum = 0D;
-            chartArea3.AxisY.Title = "回数";
+            chartArea3.AxisY.Maximum = 110D;
+            chartArea3.AxisY.Minimum = 60D;
+            chartArea3.AxisY.Title = "";
             chartArea3.Name = "ChartAreaTime";
             this.chartSinpaku.ChartAreas.Add(chartArea3);
             legend3.Name = "Legend1";
@@ -248,9 +248,9 @@
             this.chartSinpaku.Series.Add(series6);
             this.chartSinpaku.Size = new System.Drawing.Size(705, 193);
             this.chartSinpaku.TabIndex = 13;
-            this.chartSinpaku.Text = "心拍数";
+            this.chartSinpaku.Text = "脈拍数";
             title3.Name = "Title";
-            title3.Text = "心拍数";
+            title3.Text = "脈拍数";
             this.chartSinpaku.Titles.Add(title3);
             // 
             // chartSpO2
@@ -258,9 +258,9 @@
             chartArea4.AxisX.Interval = 2D;
             chartArea4.AxisX.Maximum = 30D;
             chartArea4.AxisX.Minimum = 0D;
-            chartArea4.AxisX.Title = "秒";
-//            chartArea4.AxisY.Maximum = 100D;
-//            chartArea4.AxisY.Minimum = 0D;
+            chartArea4.AxisX.Title = "";
+            chartArea4.AxisY.Maximum = 110D;
+            chartArea4.AxisY.Minimum = 60D;
             chartArea4.AxisY.Title = "";
             chartArea4.Name = "ChartAreaTime";
             this.chartSpO2.ChartAreas.Add(chartArea4);
@@ -326,8 +326,8 @@
             // 
             // chartRawData_SpO2
             // 
-            chartArea6.AxisX.Interval = 128D;
-            chartArea6.AxisX.Maximum = 1280D;
+            chartArea6.AxisX.Interval = 0D;
+            chartArea6.AxisX.Maximum = 128D;
             chartArea6.AxisX.Minimum = 0D;
             chartArea6.AxisX.Title = "個数";
             chartArea6.AxisY.Maximum = 8388607D;
@@ -379,12 +379,12 @@
             // 
             // chartRawData_Acc
             // 
-            chartArea7.AxisX.Interval = 128D;
-            chartArea7.AxisX.Maximum = 1280D;
+            chartArea7.AxisX.Interval = 0D;
+            chartArea7.AxisX.Maximum = 128D;
             chartArea7.AxisX.Minimum = 0D;
             chartArea7.AxisX.Title = "個数";
             chartArea7.AxisX2.Interval = 128D;
-            chartArea7.AxisX2.Maximum = 1280D;
+            chartArea7.AxisX2.Maximum = 128D;
             chartArea7.AxisX2.Minimum = 0D;
             chartArea7.Name = "ChartAreaTime";
             this.chartRawData_Acc.ChartAreas.Add(chartArea7);
