@@ -39,12 +39,20 @@ DLLEXPORT int	__stdcall get_result_peak(double* data);
 DLLEXPORT int	__stdcall get_result_apnea(double* data);
 DLLEXPORT int   __stdcall get_result_snore_count();
 
+void calc_snore_init(void);
+static int proc_on(int Pos);
+static int proc_off(int Pos);
+static void Save(void);
+static void Reset(void);
+static void Judge(void);
+
 /************************************************************/
 /* マクロ													*/
 /************************************************************/
 #define DATA_SIZE		(200)	// 10秒間、50msに1回データ取得した数
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
+#define RIREKI			3
 
 /************************************************************/
 /* 型定義													*/
@@ -72,6 +80,12 @@ double	xy2_[DATA_SIZE];
 double	interval_[DATA_SIZE];
 
 char path_[256];
+
+static B	SnoreTime_[RIREKI];
+static UB	SnoreFlg_; // ONカウント中 or OFFカウント中
+static UB	SnoreCnt_; // ON連続回数, OFF連続回数 兼用
+
+int temp_int_buf0[BUF_SIZE];
 
 /************************************************************/
 /* ＲＯＭ定義												*/
@@ -127,7 +141,8 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	for(int ii=0;ii<len;++ii){
 		ptest1[ii] = movave_[ii] / APNEA_PARAM_RAW;
 	}
-	
+
+	calc_snore_init();
 	// (21) - (34)
 	getwav_pp(ptest1, len, APNEA_PARAM_PEAK_THRE);
 //	getwav_pp(testdata, 200, 0.003f);
@@ -138,9 +153,35 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	
 	// (48) - (56)
 	getwav_snore(ptest1, len, APNEA_PARAM_SNORE);
+	double tmpsnore = (double)snore_;
+	debug_out("snore_", &tmpsnore, 1, path_);
 //	getwav_snore(testdata, 200, 0.0125f);
 	
 	// (57)
+}
+
+/************************************************************************/
+/* 関数     : calc_snore_init											*/
+/* 関数名   : 初期化処理												*/
+/* 引数     : なし														*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2017.07.12 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+void calc_snore_init(void)
+{
+	int ii;
+
+	SnoreFlg_ = OFF;
+	SnoreCnt_ = 0;
+	snore_ = SNORE_OFF;
+	for (ii = 0; ii<RIREKI; ++ii) {
+		SnoreTime_[ii] = -1;
+	}
 }
 
 /************************************************************************/
@@ -397,74 +438,185 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 /************************************************************************/
 void getwav_snore(const double* pData, int DSize, double Param)
 {
-	// (48) = Param
-	
-	// 結果[いびき]を入れる箱
-	double* pbase_x_y2 = (double*)calloc(DSize, sizeof(double));
-	
-	// (49)
-	for(int ii=0;ii<DSize;++ii){
-		if(pData[ii] < Param){
-			pbase_x_y2[ii] = 1;
-		}else{
-			pbase_x_y2[ii] = 0;
-		}
-	}
-	
-	// (51)
-	int cnt=0;
-	BOOL active = FALSE;
-	for(int ii=0;ii<DSize;++ii){
-		if((pbase_x_y2[ii] >= 1) && (active == FALSE)){
-			active = TRUE;
-			cnt += 1;
-		}else if(pbase_x_y2[ii] < 1){
-			active = FALSE;
-		}else{
-			// なにもしない
-		}
-	}
+	int ii;
+	int jj;
+	int loop;
+	int size;
 	int pos = 0;
-	active = FALSE;
-	memset(xy2_, 0x00, DSize);
-	for(int ii=0;ii<DSize;++ii){
-		if((pbase_x_y2[ii] >= 1) && (active == FALSE)){
-			active = TRUE;
-			xy2_[pos] = ii * 0.05;
-			pos += 1;
-		}else if(pbase_x_y2[ii] < 1){
-			active = FALSE;
-		}else{
-			// なにもしない
+
+	// 閾値を超えた回数の移動累計をとる
+	loop = DATA_SIZE_APNEA - SNORE_PARAM_SIZE;
+	for (ii = 0; ii<loop; ++ii) {
+		temp_int_buf0[ii] = 0;
+		size = ii + SNORE_PARAM_SIZE;
+		for (jj = ii; jj<size; ++jj) {
+			if (pData[jj] >= SNORE_PARAM_THRE) {
+				temp_int_buf0[ii] += 1;
+			}
 		}
 	}
-	debug_out("x_y2", xy2_, cnt, path_);
-	
-	// (54) pinterval[1] - pinterval[intervalsize] までが 呼吸間隔
-	int intervalsize = cnt;
-	memset(interval_, 0x00, DSize);
-	for(int ii=1;ii<intervalsize;++ii){
-		interval_[ii] = xy2_[ii+1] - xy2_[ii];
+
+	while (pos < loop) {
+		switch (SnoreFlg_) {
+		case ON:
+			pos = proc_on(pos);
+			break;
+		case OFF:
+			pos = proc_off(pos);
+			break;
+		default:
+			calc_snore_init();
+			return;
+		}
 	}
-	debug_out("interval", interval_, intervalsize, path_);
-	
-	// (55)
+}
+
+
+/************************************************************************/
+/* 関数     : proc_on													*/
+/* 関数名   : いびきON時処理											*/
+/* 引数     : int Data : 波形データ										*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2018.07.25 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+static int proc_on(int Pos)
+{
+	int ii;
+	int loop = DATA_SIZE_APNEA - SNORE_PARAM_SIZE;
+	int pos = loop;
+
+	// OFF確定している場所を特定する
+	for (ii = Pos; ii<loop; ++ii) {
+		if (temp_int_buf0[ii] <= SNORE_PARAM_OFF_CNT) {
+			SnoreFlg_ = OFF;
+			pos = ii;
+			Save();
+			Judge();
+			break;
+		}
+		else {
+			SnoreCnt_ += 1;
+		}
+	}
+
+	return pos;
+}
+
+/************************************************************************/
+/* 関数     : proc_off													*/
+/* 関数名   : いびきOFF時処理											*/
+/* 引数     : int Data : 波形データ										*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2018.07.25 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+static int proc_off(int Pos)
+{
+	int ii;
+	int loop = DATA_SIZE_APNEA - SNORE_PARAM_SIZE;
+	int pos = loop;
+
+	// ON確定している場所を特定する
+	for (ii = Pos; ii<loop; ++ii) {
+		if (temp_int_buf0[ii] >= SNORE_PARAM_ON_CNT) {
+			SnoreFlg_ = ON;
+			SnoreCnt_ = 0;
+			pos = ii;
+			break;
+		}
+		else {
+			SnoreCnt_ += 1;
+			if (SnoreCnt_ >= SNORE_PARAM_NORMAL_CNT) {
+				Reset();
+			}
+		}
+	}
+
+	return pos;
+}
+
+/************************************************************************/
+/* 関数     : Save														*/
+/* 関数名   : いびき時間を保存											*/
+/* 引数     : なし														*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2018.07.25 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+static void Save(void)
+{
+	int ii;
+
+	for (ii = 1; ii<RIREKI; ++ii) {
+		SnoreTime_[RIREKI - ii] = SnoreTime_[RIREKI - ii - 1];
+	}
+	SnoreTime_[0] = SnoreCnt_;
+	SnoreCnt_ = 0;
+}
+
+/************************************************************************/
+/* 関数     : Judge														*/
+/* 関数名   : いびき判定												*/
+/* 引数     : なし														*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2018.07.25 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+static void Judge(void)
+{
+	int ii;
+
+	for (ii = 0; ii<RIREKI; ++ii) {
+		if (SnoreTime_[ii] == -1) {
+			return;
+		}
+	}
+
+	for (ii = 0; ii<RIREKI - 1; ++ii) {
+		if (abs(SnoreTime_[0] - SnoreTime_[ii + 1]) > SNORE_PARAM_GOSA) {
+			return;
+		}
+	}
+	snore_ = SNORE_ON;
+}
+
+/************************************************************************/
+/* 関数     : Reset														*/
+/* 関数名   : 通常呼吸への復帰処理										*/
+/* 引数     : なし														*/
+/* 戻り値   : なし														*/
+/* 変更履歴 : 2018.07.25 Axia Soft Design mmura	初版作成				*/
+/************************************************************************/
+/* 機能 :																*/
+/************************************************************************/
+/* 注意事項 :															*/
+/* なし																	*/
+/************************************************************************/
+static void Reset(void)
+{
+	int ii;
+
+	for (ii = 0; ii<RIREKI; ++ii) {
+		SnoreTime_[ii] = -1;
+	}
 	snore_ = SNORE_OFF;
-	int intervalsize2 = 0;
-	for(int ii=0;ii<intervalsize;++ii){
-		// 3 <= x <= 5 以外の値を0にする
-		if((3.0f <= interval_[ii]) && (interval_[ii] <= 5.0f)){
-			// そのまま
-			snore_ = SNORE_ON;
-			intervalsize2 += 1;
-		}else{
-			interval_[ii] = 0.0f;
-		}
-	}
-	double tmpsnore = (double)snore_;
-	debug_out("snore", &tmpsnore, 1, path_);
-	
-	free(pbase_x_y2);
 }
 
 // DC成分除去データを取得する
