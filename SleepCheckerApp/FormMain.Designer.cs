@@ -733,6 +733,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1437, 934);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.groupBox2);
