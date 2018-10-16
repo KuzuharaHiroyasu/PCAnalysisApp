@@ -82,7 +82,13 @@ namespace SleepCheckerApp
         Queue<double> RawDataRespQueue = new Queue<double>();
         Queue<double> RawDataSnoreQueue = new Queue<double>();
         Queue<double> RawDataDcQueue = new Queue<double>();
-        
+
+        // 加速度センサー
+        private const int Acc_RawDataRirekiNum = 60 * 20;       // 生データ履歴数 20Hz * 60s分
+        Queue<double> AccelerometerXQueue = new Queue<double>();
+        Queue<double> AccelerometerYQueue = new Queue<double>();
+        Queue<double> AccelerometerZQueue = new Queue<double>();
+
         // 演算途中データ
         Queue<double> ApneaAveQueue = new Queue<double>();
         Queue<int> ApneaEvalQueue = new Queue<int>();
@@ -97,6 +103,7 @@ namespace SleepCheckerApp
         Queue<double> ResultIbikiQueue = new Queue<double>();
         
         object lockData = new object();
+        object lockData_Acc = new object();
 
         // For PulseOximeter
         private List<int> SpO2_CalcDataList1 = new List<int>();
@@ -170,6 +177,10 @@ namespace SleepCheckerApp
             ApneaPointQueue.Clear();
             SnoreXy2Queue.Clear();
             SnoreIntervalQueue.Clear();
+            AccelerometerXQueue.Clear();
+            AccelerometerYQueue.Clear();
+            AccelerometerZQueue.Clear();
+
             for (int i = 0; i < ApneaGraphDataNum; i++)
             {
                 RawDataRespQueue.Enqueue(0);
@@ -203,6 +214,12 @@ namespace SleepCheckerApp
                 NewIfftSekigaiDataQueue.Enqueue(0);
                 RawDataSekisyokuQueue.Enqueue(0);
                 RawDataSekigaiQueue.Enqueue(0);
+            }
+            for (int i = 0; i < Acc_RawDataRirekiNum; i++)
+            {
+                AccelerometerXQueue.Enqueue(0);
+                AccelerometerYQueue.Enqueue(0);
+                AccelerometerZQueue.Enqueue(0);
             }
             for (int i = 0; i < ShipakuDataRirekiNum; i++)
             {
@@ -280,6 +297,12 @@ namespace SleepCheckerApp
                         SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
                         // For 加速度
                         SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
+
+                        DateTime dt = DateTime.Now;
+                        Encoding sjisEnc = Encoding.GetEncoding("Shift_JIS");
+                        StreamWriter writer = new StreamWriter("Accelerometer.txt", true, sjisEnc);
+                        writer.WriteLine(dt + " X: " + datas[4] + ", Y: " + datas[5] + ", Z: " + datas[6]);
+                        writer.Close();
                     }
                     else
                     {
@@ -332,6 +355,40 @@ namespace SleepCheckerApp
                 CalcDataList1.Clear();
                 CalcDataList2.Clear();
             }
+        }
+
+        private void GraphUpdate_Acc()
+        {
+            int cnt = 0;
+
+            lock (lockData_Acc)
+            {
+                // いびき回数グラフを更新
+                Series accelerometer_x = chartAccelerometer.Series["X軸"]; //■
+                Series accelerometer_y = chartAccelerometer.Series["Y軸"]; //■
+                Series accelerometer_z = chartAccelerometer.Series["Z軸"]; //■
+                accelerometer_x.Points.Clear();
+                accelerometer_y.Points.Clear();
+                accelerometer_z.Points.Clear();
+                foreach (int data in AccelerometerXQueue)
+                {
+                    accelerometer_x.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in AccelerometerYQueue)
+                {
+                    accelerometer_y.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in AccelerometerZQueue)
+                {
+                    accelerometer_z.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+            }
+            chartAccelerometer.Invalidate();
         }
 
         // For PulseOximeter
@@ -399,8 +456,29 @@ namespace SleepCheckerApp
         // For 加速度
         private void SetCalcData_Acc(int data1, int data2, int data3)
         {
+            lock (lockData_Acc)
+            {
+                //グラフ用データ追加
+                // X軸
+                if (AccelerometerXQueue.Count >= Acc_RawDataRirekiNum)
+                {
+                    AccelerometerXQueue.Dequeue();
+                }
+                AccelerometerXQueue.Enqueue(data1);
+                // Y軸
+                if (AccelerometerYQueue.Count >= Acc_RawDataRirekiNum)
+                {
+                    AccelerometerYQueue.Dequeue();
+                }
+                AccelerometerYQueue.Enqueue(data2);
+                // Z軸
+                if (AccelerometerZQueue.Count >= Acc_RawDataRirekiNum)
+                {
+                    AccelerometerZQueue.Dequeue();
+                }
+                AccelerometerZQueue.Enqueue(data3);
+            }
         }
-
 
         // For Apnea
         private void Calc_Apnea()
@@ -925,6 +1003,7 @@ namespace SleepCheckerApp
         {
             GraphUpdate();
             GraphUpdate_SpO2();
+            GraphUpdate_Acc();
         }
         
         private void CalculateAll(String FolderPath)
