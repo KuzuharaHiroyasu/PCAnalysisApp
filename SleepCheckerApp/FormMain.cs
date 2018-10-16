@@ -592,7 +592,7 @@ namespace SleepCheckerApp
             int i;
 
             // rootパス
-            ApneaRootPath_ = "C:\\ax\\apnea\\" + datestr;
+            ApneaRootPath_ = "C:\\ax\\apnea\\" + datestr + "\\";
             temp = ApneaRootPath_;
             for (i = 1; i < 20; i++)
             {
