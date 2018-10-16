@@ -334,9 +334,15 @@ static void acdc_average(const double* pdata, double* ar1, double* ai1, double* 
 	double ac_avg = 0;
 	double dc_avg = 0;
 	double pos_center = ((pulse / 60) / _SAMPLING_FREQUENCY);	//センター位置
-	int pos_center_down = (int)pos_center;
+	int pos_center_down;
 	int ii;
 
+	// センターが0～127の範囲にない場合は0に丸める(不正アクセス対策)
+	if (pos_center < 0 || pos_center > len - 1) {
+		pos_center = 0;
+	}
+	pos_center_down = (int)pos_center;
+	
 	// pos_center_downまでは 0
 	for (int ii = 0; ii<pos_center_down; ++ii) {
 		ar1[ii] = 0;
