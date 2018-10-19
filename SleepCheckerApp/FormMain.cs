@@ -35,6 +35,9 @@ namespace SleepCheckerApp
         static extern void get_snore_interval(IntPtr data);
         [DllImport("Apnea.dll")]
         static extern int get_state();
+        [DllImport("Apnea.dll")]
+        static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
+
         // For PulseOximeter
         [DllImport("PulseOximeter.dll")]
         static extern void calculator_clr(IntPtr data, int len, IntPtr path);
@@ -140,8 +143,11 @@ namespace SleepCheckerApp
         // 保存rootパス
         private string ApneaRootPath_;
         private string PulseRootPath_;
+        private string AcceRootPath_;
+
         private int ApneaCalcCount_;
         private int PulseCalcCount_;
+        private int AcceCalcCount_;
 
         public FormMain()
         {
@@ -165,7 +171,8 @@ namespace SleepCheckerApp
             CreateRootDir();
             ApneaCalcCount_ = 0;
             PulseCalcCount_ = 0;
-            
+            AcceCalcCount_  = 0;
+
             // グラフ表示初期化
             // For Apnea
             RawDataRespQueue.Clear();
@@ -297,12 +304,6 @@ namespace SleepCheckerApp
                         SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
                         // For 加速度
                         SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
-
-                        DateTime dt = DateTime.Now;
-                        Encoding sjisEnc = Encoding.GetEncoding("Shift_JIS");
-                        StreamWriter writer = new StreamWriter("Accelerometer.txt", true, sjisEnc);
-                        writer.WriteLine(dt + " X: " + datas[4] + ", Y: " + datas[5] + ", Z: " + datas[6]);
-                        writer.Close();
                     }
                     else
                     {
@@ -456,6 +457,10 @@ namespace SleepCheckerApp
         // For 加速度
         private void SetCalcData_Acc(int data1, int data2, int data3)
         {
+            string path = CreateAcceDir(AcceCalcCount_);
+            AcceCalcCount_ += 1;
+            IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+
             lock (lockData_Acc)
             {
                 //グラフ用データ追加
@@ -477,6 +482,8 @@ namespace SleepCheckerApp
                     AccelerometerZQueue.Dequeue();
                 }
                 AccelerometerZQueue.Enqueue(data3);
+
+                get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
             }
         }
 
@@ -624,6 +631,23 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+
+            // rootパス
+            AcceRootPath_ = "C:\\ax\\acce\\" + datestr + "\\";
+            temp = AcceRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = AcceRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
+            }
         }
         
         // 演算結果保存用パスの作成[無呼吸]
@@ -647,6 +671,21 @@ namespace SleepCheckerApp
                 Directory.CreateDirectory(path);
             }
             
+            return path;
+        }
+
+        // 加速度センサー保存用パスの作成[加速度]
+        private string CreateAcceDir(int Count)
+        {
+            string path = AcceRootPath_ + Count.ToString("D");
+            if (Directory.Exists(path))
+            {
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+
             return path;
         }
 

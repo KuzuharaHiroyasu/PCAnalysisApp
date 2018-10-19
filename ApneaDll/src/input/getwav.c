@@ -38,6 +38,7 @@ DLLEXPORT int	__stdcall get_result_snore(double* data);
 DLLEXPORT int	__stdcall get_result_peak(double* data);
 DLLEXPORT int	__stdcall get_result_apnea(double* data);
 DLLEXPORT int   __stdcall get_result_snore_count();
+DLLEXPORT void   __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath);
 
 void calc_snore_init(void);
 static int proc_on(int Pos);
@@ -683,6 +684,24 @@ DLLEXPORT int __stdcall get_state(void)
 	ret |= (snore_ & 0x01);
 	
 	return ret;
+}
+
+// 加速度センサーの値を取得
+DLLEXPORT void __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath)
+{
+	// ファイル出力パスを保存
+	int pos = 0;
+	if (ppath) {
+		while (ppath[pos] != '\0') {
+			path_[pos] = ppath[pos];
+			pos += 1;
+		}
+		path_[pos] = '\0';
+	}
+
+	debug_out("acce_x", &data_x, 1, path_);
+	debug_out("acce_y", &data_y, 1, path_);
+	debug_out("acce_z", &data_z, 1, path_);
 }
 
 /************************************************************/
