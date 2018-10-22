@@ -149,6 +149,8 @@ namespace SleepCheckerApp
         private int PulseCalcCount_;
         private int AcceCalcCount_;
 
+        private int cnt = 0;
+
         public FormMain()
         {
             InitializeComponent();
@@ -432,16 +434,19 @@ namespace SleepCheckerApp
                         ShinpakuSekisyokuDataQueue.Dequeue();
                     }
                     ShinpakuSekisyokuDataQueue.Enqueue(shinpaku_sekisyoku);
+
                     if (ShinpakuSekigaiDataQueue.Count >= ShipakuDataRirekiNum)
                     {
                         ShinpakuSekigaiDataQueue.Dequeue();
                     }
                     ShinpakuSekigaiDataQueue.Enqueue(shinpaku_sekigai);
+
                     if (SpNormalDataQueue.Count >= SpDataRirekiNum)
                     {
                         SpNormalDataQueue.Dequeue();
                     }
                     SpNormalDataQueue.Enqueue(sp_normal);
+
                     if (SpAcdcDataQueue.Count >= SpDataRirekiNum)
                     {
                         SpAcdcDataQueue.Dequeue();
@@ -457,10 +462,6 @@ namespace SleepCheckerApp
         // For 加速度
         private void SetCalcData_Acc(int data1, int data2, int data3)
         {
-            string path = CreateAcceDir(AcceCalcCount_);
-            AcceCalcCount_ += 1;
-            IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-
             lock (lockData_Acc)
             {
                 //グラフ用データ追加
@@ -483,7 +484,24 @@ namespace SleepCheckerApp
                 }
                 AccelerometerZQueue.Enqueue(data3);
 
-                get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
+                //10回に1回テキスト出力する(500ms毎)（暫定）
+                //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
+                //理想は1テキスト内に出力し続ける
+                if (cnt == 0) {
+                    string path = CreateAcceDir(AcceCalcCount_);
+                    IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+                    get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
+                    AcceCalcCount_++;
+                    cnt++;
+                }
+                else
+                {
+                    cnt++;
+                    if(cnt == 9)
+                    {
+                        cnt = 0;
+                    }
+                }
             }
         }
 
@@ -677,15 +695,15 @@ namespace SleepCheckerApp
         // 加速度センサー保存用パスの作成[加速度]
         private string CreateAcceDir(int Count)
         {
+
             string path = AcceRootPath_ + Count.ToString("D");
             if (Directory.Exists(path))
             {
             }
             else
             {
-                Directory.CreateDirectory(path);
+                 Directory.CreateDirectory(path);
             }
-
             return path;
         }
 
