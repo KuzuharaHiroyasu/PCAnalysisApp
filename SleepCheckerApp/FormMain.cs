@@ -936,7 +936,7 @@ namespace SleepCheckerApp
                 }
 
                 // Acdcグラフを更新
-                Series srs_acdc = chartSpO2.Series["AC比"];
+/*                Series srs_acdc = chartSpO2.Series["AC比"];
                 srs_acdc.Points.Clear();
                 cnt = 0;
                 foreach (double data in SpAcdcDataQueue)
@@ -944,7 +944,7 @@ namespace SleepCheckerApp
                     srs_acdc.Points.AddXY(cnt, data);
                     cnt++;
                 }
-
+*/
                 // 生データグラフを更新
                 Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色"];
                 Series srs_rawsekigai = chartRawData_SpO2.Series["赤外"];
