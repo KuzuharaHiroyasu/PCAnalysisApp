@@ -39,8 +39,8 @@ DLLEXPORT int	__stdcall get_result_peak(double* data);
 DLLEXPORT int	__stdcall get_result_apnea(double* data);
 DLLEXPORT int   __stdcall get_result_snore_count();
 DLLEXPORT void   __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath);
+DLLEXPORT void __stdcall calc_snore_init(void);
 
-void calc_snore_init(void);
 static int proc_on(int Pos);
 static int proc_off(int Pos);
 static void Save(void);
@@ -84,7 +84,7 @@ char path_[256];
 
 static B	SnoreTime_[RIREKI];
 static UB	SnoreFlg_; // ONカウント中 or OFFカウント中
-static UB	SnoreCnt_; // ON連続回数, OFF連続回数 兼用
+static int	SnoreCnt_; // ON連続回数, OFF連続回数 兼用
 
 int temp_int_buf0[BUF_SIZE];
 
@@ -143,7 +143,6 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 		ptest1[ii] = movave_[ii] / APNEA_PARAM_RAW;
 	}
 
-	calc_snore_init();
 	// (21) - (34)
 	getwav_pp(ptest1, len, APNEA_PARAM_PEAK_THRE);
 //	getwav_pp(testdata, 200, 0.003f);
@@ -153,7 +152,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 //	getwav_apnea(testdata, 200, 450, 0.0015f, 0.002f);
 	
 	// (48) - (56)
-	getwav_snore(ptest1, len, APNEA_PARAM_SNORE);
+	getwav_snore(raw_, len, APNEA_PARAM_SNORE);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
 //	getwav_snore(testdata, 200, 0.0125f);
@@ -173,7 +172,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 /* 注意事項 :															*/
 /* なし																	*/
 /************************************************************************/
-void calc_snore_init(void)
+DLLEXPORT void    __stdcall calc_snore_init(void)
 {
 	int ii;
 

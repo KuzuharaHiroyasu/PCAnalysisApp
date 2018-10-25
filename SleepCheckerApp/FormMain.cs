@@ -37,6 +37,8 @@ namespace SleepCheckerApp
         static extern int get_state();
         [DllImport("Apnea.dll")]
         static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
+        [DllImport("Apnea.dll")]
+        static extern void calc_snore_init();
 
         // For PulseOximeter
         [DllImport("PulseOximeter.dll")]
@@ -248,6 +250,8 @@ namespace SleepCheckerApp
             timer.Tick += new EventHandler(Interval);
             timer.Interval = 500;           // ms単位
             timer.Start();
+
+            calc_snore_init();
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
