@@ -497,7 +497,7 @@ namespace SleepCheckerApp
                 else
                 {
                     cnt++;
-                    if(cnt == 9)
+                    if(cnt == 10)
                     {
                         cnt = 0;
                     }
