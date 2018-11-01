@@ -152,6 +152,8 @@ namespace SleepCheckerApp
         private int AcceCalcCount_;
 
         private int cnt = 0;
+        private int snore = 0;
+        private int apnea = 0;
 
         System.Media.SoundPlayer player = null;
         string SoundFile = "alarm.wav";
@@ -594,8 +596,8 @@ namespace SleepCheckerApp
                     
                     // 演算結果データ
                     int state = get_state();
-                    int snore = state & 0x01;
-                    int apnea = (state & 0xC0) >> 6;
+                    snore = state & 0x01;
+                    apnea = (state & 0xC0) >> 6;
                     if (ResultIbikiQueue.Count >= BufNumApneaGraph)
                     {
                         ResultIbikiQueue.Dequeue();
@@ -607,7 +609,7 @@ namespace SleepCheckerApp
                     }
                     ApneaQueue.Enqueue(apnea);
 
-                    playAlarm(snore, apnea);
+                    playAlarm();
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
@@ -1356,7 +1358,7 @@ namespace SleepCheckerApp
             }
         }
 
-        private void playAlarm(int snore, int apnea)
+        private void playAlarm()
         {
             if (player != null)
             {
@@ -1371,7 +1373,7 @@ namespace SleepCheckerApp
                             playflg = true;
                         }
                     }
-                    else if (checkBox_Apnea.Checked && apnea == 2)
+                    else if (checkBox_apnea.Checked && apnea == 2)
                     {// 無呼吸判定ON
                         if (!playflg)
                         {// 再生中ではない
@@ -1393,10 +1395,108 @@ namespace SleepCheckerApp
 
         private void radio_alarmOff_CheckedChanged(object sender, EventArgs e)
         {
-            if (radio_alarmOff.Checked && playflg)
-            {// 再生中
-                player.Stop();
-                playflg = false;
+            if (player != null)
+            {//アラームON
+                if (radio_alarmOn.Checked)
+                {
+                    if (checkBox_snore.Checked && snore == 1)
+                    {// いびき判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else if (checkBox_apnea.Checked && apnea == 2)
+                    {// 無呼吸判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else
+                    {// どちらもOFF
+                        if (playflg)
+                        {// 再生中
+                            player.Stop();
+                            playflg = false;
+                        }
+                    }
+                }
+                else if (radio_alarmOff.Checked && playflg)
+                {// 再生中
+                    player.Stop();
+                    playflg = false;
+                }
+            }
+        }
+
+        private void checkBox_snore_CheckedChanged(object sender, EventArgs e)
+        {
+            if (player != null)
+            {//アラームON
+                if (radio_alarmOn.Checked)
+                {
+                    if (checkBox_snore.Checked && snore == 1)
+                    {// いびき判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else
+                    {// どちらもOFF
+                        if (!checkBox_apnea.Checked || apnea != 2)
+                        {
+                            if (playflg)
+                            {// 再生中
+                                player.Stop();
+                                playflg = false;
+                            }
+                        }
+                    }
+                }
+                else if (radio_alarmOff.Checked && playflg)
+                {// 再生中
+                    player.Stop();
+                    playflg = false;
+                }
+            }
+        }
+
+        private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
+        {
+            if (player != null)
+            {//アラームON
+                if (radio_alarmOn.Checked)
+                {
+                    if (checkBox_apnea.Checked && apnea == 2)
+                    {// 無呼吸判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else
+                    {// どちらもOFF
+                        if (!checkBox_snore.Checked || snore != 1)
+                        {
+                            if (playflg)
+                            {// 再生中
+                                player.Stop();
+                                playflg = false;
+                            }
+                        }
+                    }
+                }
+                else if (radio_alarmOff.Checked && playflg)
+                {// 再生中
+                    player.Stop();
+                    playflg = false;
+                }
             }
         }
     }
