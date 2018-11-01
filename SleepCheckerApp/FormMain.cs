@@ -153,6 +153,10 @@ namespace SleepCheckerApp
 
         private int cnt = 0;
 
+        System.Media.SoundPlayer player = null;
+        string SoundFile = "alarm.wav";
+        Boolean playflg = false;
+
         public FormMain()
         {
             InitializeComponent();
@@ -252,6 +256,8 @@ namespace SleepCheckerApp
             timer.Start();
 
             calc_snore_init();
+
+            player = new System.Media.SoundPlayer(SoundFile);
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -273,6 +279,7 @@ namespace SleepCheckerApp
         private void ComPort_DataReceived(byte[] buffer)
         {
             string text = "";
+
             try
             {
                 text = amari + Encoding.ASCII.GetString(buffer);
@@ -599,6 +606,8 @@ namespace SleepCheckerApp
                         ApneaQueue.Dequeue();
                     }
                     ApneaQueue.Enqueue(apnea);
+
+                    playAlarm(snore, apnea);
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
@@ -1344,6 +1353,50 @@ namespace SleepCheckerApp
             else
             {
                 srs.Enabled = false;
+            }
+        }
+
+        private void playAlarm(int snore, int apnea)
+        {
+            if (player != null)
+            {
+                //アラームON
+                if (radio_alarmOn.Checked)
+                {
+                    if (checkBox_snore.Checked && snore == 1)
+                    {// いびき判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else if (checkBox_Apnea.Checked && apnea == 2)
+                    {// 無呼吸判定ON
+                        if (!playflg)
+                        {// 再生中ではない
+                            player.PlayLooping();
+                            playflg = true;
+                        }
+                    }
+                    else
+                    {// どちらもOFF
+                        if (playflg)
+                        {// 再生中
+                            player.Stop();
+                            playflg = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void radio_alarmOff_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radio_alarmOff.Checked && playflg)
+            {// 再生中
+                player.Stop();
+                playflg = false;
             }
         }
     }
