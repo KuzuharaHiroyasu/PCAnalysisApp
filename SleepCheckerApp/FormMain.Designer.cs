@@ -29,102 +29,98 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-
-            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
-
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series14 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series16 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series17 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series18 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series25 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series26 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series27 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series28 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series29 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series30 = new System.Windows.Forms.DataVisualization.Charting.Series();
-
+            System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.buttonStart = new System.Windows.Forms.Button();
-
-            this.chartResultIbiki   = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartApnea         = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartSinpaku       = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartSpO2          = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartRawData       = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartRawData_SpO2  = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartRawData_Acc   = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart1             = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartResultIbiki = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartApnea = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartSinpaku = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartSpO2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartRawData = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartRawData_SpO2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartRawData_Acc = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartAccelerometer = new System.Windows.Forms.DataVisualization.Charting.Chart();
-
-            this.groupBox1   = new System.Windows.Forms.GroupBox();
-            this.groupBox2   = new System.Windows.Forms.GroupBox();
-            this.groupBoxCom = new System.Windows.Forms.GroupBox();
-
-            this.comboBoxComport = new System.Windows.Forms.ComboBox();
-
-            this.checkBox_ifftinf        = new System.Windows.Forms.CheckBox();
-            this.checkBox_ifftclr        = new System.Windows.Forms.CheckBox();
-            this.checkBox_fftinf         = new System.Windows.Forms.CheckBox();
-            this.checkBox_fftclr         = new System.Windows.Forms.CheckBox();
-            this.checkBox_dcinf          = new System.Windows.Forms.CheckBox();
-            this.checkBox_dcclr          = new System.Windows.Forms.CheckBox();
-            this.checkBox_rawinf         = new System.Windows.Forms.CheckBox();
-            this.checkBox_rawclr         = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox_ifftinf = new System.Windows.Forms.CheckBox();
+            this.checkBox_ifftclr = new System.Windows.Forms.CheckBox();
+            this.checkBox_fftinf = new System.Windows.Forms.CheckBox();
+            this.checkBox_fftclr = new System.Windows.Forms.CheckBox();
+            this.checkBox_dcinf = new System.Windows.Forms.CheckBox();
+            this.checkBox_dcclr = new System.Windows.Forms.CheckBox();
+            this.checkBox_rawinf = new System.Windows.Forms.CheckBox();
+            this.checkBox_rawclr = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.checkBox_snore_interval = new System.Windows.Forms.CheckBox();
-            this.checkBox_snorexy2       = new System.Windows.Forms.CheckBox();
-            this.checkBox_apneapoint     = new System.Windows.Forms.CheckBox();
-            this.checkBox_apnearms       = new System.Windows.Forms.CheckBox();
-            this.checkBox_apneaeval      = new System.Windows.Forms.CheckBox();
-            this.checkBox_apneaave       = new System.Windows.Forms.CheckBox();
-            this.checkBox_dcresp         = new System.Windows.Forms.CheckBox();
-            this.checkBox_rawsnore       = new System.Windows.Forms.CheckBox();
-            this.checkBox_rawresp        = new System.Windows.Forms.CheckBox();
-
+            this.checkBox_snorexy2 = new System.Windows.Forms.CheckBox();
+            this.checkBox_apneapoint = new System.Windows.Forms.CheckBox();
+            this.checkBox_apnearms = new System.Windows.Forms.CheckBox();
+            this.checkBox_apneaeval = new System.Windows.Forms.CheckBox();
+            this.checkBox_apneaave = new System.Windows.Forms.CheckBox();
+            this.checkBox_dcresp = new System.Windows.Forms.CheckBox();
+            this.checkBox_rawsnore = new System.Windows.Forms.CheckBox();
+            this.checkBox_rawresp = new System.Windows.Forms.CheckBox();
+            this.groupBoxCom = new System.Windows.Forms.GroupBox();
+            this.comboBoxComport = new System.Windows.Forms.ComboBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.checkBox_apnea = new System.Windows.Forms.CheckBox();
+            this.checkBox_snore = new System.Windows.Forms.CheckBox();
+            this.radio_alarmOff = new System.Windows.Forms.RadioButton();
+            this.radio_alarmOn = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.chartResultIbiki)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSinpaku)).BeginInit();
@@ -134,13 +130,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData_Acc)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartAccelerometer)).BeginInit();
-
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBoxCom.SuspendLayout();
-
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // buttonStart
             // 
@@ -151,25 +145,6 @@
             this.buttonStart.Text = "開始";
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
-            // 
-            // groupBoxCom
-            // 
-            this.groupBoxCom.Controls.Add(this.comboBoxComport);
-            this.groupBoxCom.Controls.Add(this.buttonStart);
-            this.groupBoxCom.Location = new System.Drawing.Point(12, 12);
-            this.groupBoxCom.Name = "groupBoxCom";
-            this.groupBoxCom.Size = new System.Drawing.Size(321, 66);
-            this.groupBoxCom.TabIndex = 8;
-            this.groupBoxCom.TabStop = false;
-            this.groupBoxCom.Text = "データ読み込み";
-            // 
-            // comboBoxComport
-            // 
-            this.comboBoxComport.FormattingEnabled = true;
-            this.comboBoxComport.Location = new System.Drawing.Point(26, 28);
-            this.comboBoxComport.Name = "comboBoxComport";
-            this.comboBoxComport.Size = new System.Drawing.Size(124, 20);
-            this.comboBoxComport.TabIndex = 15;
             // 
             // chartResultIbiki
             // 
@@ -433,6 +408,102 @@
             title7.Text = "演算途中データ";
             this.chartRawData_Acc.Titles.Add(title7);
             // 
+            // chart1
+            // 
+            chartArea8.AxisX.Interval = 200D;
+            chartArea8.AxisX.Maximum = 2000D;
+            chartArea8.AxisX.Minimum = 0D;
+            chartArea8.AxisX.Title = "個数";
+            chartArea8.AxisX2.Interval = 128D;
+            chartArea8.AxisX2.Maximum = 1280D;
+            chartArea8.AxisX2.Minimum = 0D;
+            chartArea8.Name = "ChartAreaTime";
+            this.chart1.ChartAreas.Add(chartArea8);
+            legend8.Name = "Legend1";
+            this.chart1.Legends.Add(legend8);
+            this.chart1.Location = new System.Drawing.Point(12, 324);
+            this.chart1.Name = "chart1";
+            series22.ChartArea = "ChartAreaTime";
+            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series22.Legend = "Legend1";
+            series22.Name = "無呼吸(ave)";
+            series23.ChartArea = "ChartAreaTime";
+            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series23.Legend = "Legend1";
+            series23.Name = "無呼吸(eval)";
+            series24.ChartArea = "ChartAreaTime";
+            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series24.Legend = "Legend1";
+            series24.Name = "無呼吸(rms)";
+            series25.ChartArea = "ChartAreaTime";
+            series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series25.Legend = "Legend1";
+            series25.Name = "無呼吸(point)";
+            series26.ChartArea = "ChartAreaTime";
+            series26.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series26.Legend = "Legend1";
+            series26.Name = "いびき(xy2)";
+            series26.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            series27.ChartArea = "ChartAreaTime";
+            series27.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series27.Legend = "Legend1";
+            series27.Name = "いびき(interval)";
+            series27.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            this.chart1.Series.Add(series22);
+            this.chart1.Series.Add(series23);
+            this.chart1.Series.Add(series24);
+            this.chart1.Series.Add(series25);
+            this.chart1.Series.Add(series26);
+            this.chart1.Series.Add(series27);
+            this.chart1.Size = new System.Drawing.Size(705, 193);
+            this.chart1.TabIndex = 20;
+            title8.Name = "Title";
+            title8.Text = "演算途中データ";
+            this.chart1.Titles.Add(title8);
+            // 
+            // chartAccelerometer
+            // 
+            chartArea9.AxisX.Interval = 100D;
+            chartArea9.AxisX.Maximum = 1200D;
+            chartArea9.AxisX.Minimum = 0D;
+            chartArea9.AxisX.Title = "個数";
+            chartArea9.AxisY.Maximum = 127D;
+            chartArea9.AxisY.Minimum = -128D;
+            chartArea9.AxisY.Title = "値";
+            chartArea9.Name = "ChartAreaTime";
+            this.chartAccelerometer.ChartAreas.Add(chartArea9);
+            legend9.Name = "Legend1";
+            this.chartAccelerometer.Legends.Add(legend9);
+            this.chartAccelerometer.Location = new System.Drawing.Point(12, 722);
+            this.chartAccelerometer.Name = "chartAccelerometer";
+            series28.BorderWidth = 2;
+            series28.ChartArea = "ChartAreaTime";
+            series28.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series28.Legend = "Legend1";
+            series28.MarkerBorderWidth = 5;
+            series28.Name = "X軸";
+            series29.BorderWidth = 2;
+            series29.ChartArea = "ChartAreaTime";
+            series29.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series29.Legend = "Legend1";
+            series29.MarkerBorderWidth = 5;
+            series29.Name = "Y軸";
+            series30.BorderWidth = 2;
+            series30.ChartArea = "ChartAreaTime";
+            series30.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series30.Legend = "Legend1";
+            series30.MarkerBorderWidth = 5;
+            series30.Name = "Z軸";
+            this.chartAccelerometer.Series.Add(series28);
+            this.chartAccelerometer.Series.Add(series29);
+            this.chartAccelerometer.Series.Add(series30);
+            this.chartAccelerometer.Size = new System.Drawing.Size(705, 193);
+            this.chartAccelerometer.TabIndex = 21;
+            this.chartAccelerometer.Text = "加速度センサー";
+            title9.Name = "Title";
+            title9.Text = "加速度センサー";
+            this.chartAccelerometer.Titles.Add(title9);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.checkBox_ifftinf);
@@ -565,9 +636,9 @@
             this.groupBox2.Controls.Add(this.checkBox_dcresp);
             this.groupBox2.Controls.Add(this.checkBox_rawsnore);
             this.groupBox2.Controls.Add(this.checkBox_rawresp);
-            this.groupBox2.Location = new System.Drawing.Point(390, 17);
+            this.groupBox2.Location = new System.Drawing.Point(544, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(443, 92);
+            this.groupBox2.Size = new System.Drawing.Size(444, 98);
             this.groupBox2.TabIndex = 19;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "呼吸切替";
@@ -689,101 +760,86 @@
             this.checkBox_rawresp.UseVisualStyleBackColor = true;
             this.checkBox_rawresp.CheckedChanged += new System.EventHandler(this.checkBox_rawresp_CheckedChanged);
             // 
-            // chart1
+            // groupBoxCom
             // 
-            chartArea8.AxisX.Interval = 200D;
-            chartArea8.AxisX.Maximum = 2000D;
-            chartArea8.AxisX.Minimum = 0D;
-            chartArea8.AxisX.Title = "個数";
-            chartArea8.AxisX2.Interval = 128D;
-            chartArea8.AxisX2.Maximum = 1280D;
-            chartArea8.AxisX2.Minimum = 0D;
-            chartArea8.Name = "ChartAreaTime";
-            this.chart1.ChartAreas.Add(chartArea8);
-            legend8.Name = "Legend1";
-            this.chart1.Legends.Add(legend8);
-            this.chart1.Location = new System.Drawing.Point(12, 324);
-            this.chart1.Name = "chart1";
-            series22.ChartArea = "ChartAreaTime";
-            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series22.Legend = "Legend1";
-            series22.Name = "無呼吸(ave)";
-            series23.ChartArea = "ChartAreaTime";
-            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series23.Legend = "Legend1";
-            series23.Name = "無呼吸(eval)";
-            series24.ChartArea = "ChartAreaTime";
-            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series24.Legend = "Legend1";
-            series24.Name = "無呼吸(rms)";
-            series25.ChartArea = "ChartAreaTime";
-            series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series25.Legend = "Legend1";
-            series25.Name = "無呼吸(point)";
-            series26.ChartArea = "ChartAreaTime";
-            series26.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series26.Legend = "Legend1";
-            series26.Name = "いびき(xy2)";
-            series26.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            series27.ChartArea = "ChartAreaTime";
-            series27.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series27.Legend = "Legend1";
-            series27.Name = "いびき(interval)";
-            series27.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            this.chart1.Series.Add(series22);
-            this.chart1.Series.Add(series23);
-            this.chart1.Series.Add(series24);
-            this.chart1.Series.Add(series25);
-            this.chart1.Series.Add(series26);
-            this.chart1.Series.Add(series27);
-            this.chart1.Size = new System.Drawing.Size(705, 193);
-            this.chart1.TabIndex = 20;
-            title8.Name = "Title";
-            title8.Text = "演算途中データ";
-            this.chart1.Titles.Add(title8);
+            this.groupBoxCom.Controls.Add(this.comboBoxComport);
+            this.groupBoxCom.Controls.Add(this.buttonStart);
+            this.groupBoxCom.Location = new System.Drawing.Point(12, 12);
+            this.groupBoxCom.Name = "groupBoxCom";
+            this.groupBoxCom.Size = new System.Drawing.Size(321, 66);
+            this.groupBoxCom.TabIndex = 8;
+            this.groupBoxCom.TabStop = false;
+            this.groupBoxCom.Text = "データ読み込み";
             // 
-            // chartAccelerometer
+            // comboBoxComport
             // 
-            chartArea9.AxisX.Interval = 100D;
-            chartArea9.AxisX.Maximum = 1200D;
-            chartArea9.AxisX.Minimum = 0D;
-            chartArea9.AxisX.Title = "個数";
-            chartArea9.AxisY.Maximum = 127D;
-            chartArea9.AxisY.Minimum = -128D;
-            chartArea9.AxisY.Title = "値";
-            chartArea9.Name = "ChartAreaTime";
-            this.chartAccelerometer.ChartAreas.Add(chartArea9);
-            legend9.Name = "Legend1";
-            this.chartAccelerometer.Legends.Add(legend9);
-            this.chartAccelerometer.Location = new System.Drawing.Point(12, 722);
-            this.chartAccelerometer.Name = "chartAccelerometer";
-            series28.BorderWidth = 2;
-            series28.ChartArea = "ChartAreaTime";
-            series28.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series28.Legend = "Legend1";
-            series28.MarkerBorderWidth = 5;
-            series28.Name = "X軸";
-            series29.BorderWidth = 2;
-            series29.ChartArea = "ChartAreaTime";
-            series29.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series29.Legend = "Legend1";
-            series29.MarkerBorderWidth = 5;
-            series29.Name = "Y軸";
-            series30.BorderWidth = 2;
-            series30.ChartArea = "ChartAreaTime";
-            series30.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series30.Legend = "Legend1";
-            series30.MarkerBorderWidth = 5;
-            series30.Name = "Z軸";
-            this.chartAccelerometer.Series.Add(series28);
-            this.chartAccelerometer.Series.Add(series29);
-            this.chartAccelerometer.Series.Add(series30);
-            this.chartAccelerometer.Size = new System.Drawing.Size(705, 193);
-            this.chartAccelerometer.TabIndex = 21;
-            this.chartAccelerometer.Text = "加速度センサー";
-            title9.Name = "Title";
-            title9.Text = "加速度センサー";
-            this.chartAccelerometer.Titles.Add(title9);
+            this.comboBoxComport.FormattingEnabled = true;
+            this.comboBoxComport.Location = new System.Drawing.Point(26, 28);
+            this.comboBoxComport.Name = "comboBoxComport";
+            this.comboBoxComport.Size = new System.Drawing.Size(124, 20);
+            this.comboBoxComport.TabIndex = 15;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.checkBox_apnea);
+            this.groupBox3.Controls.Add(this.checkBox_snore);
+            this.groupBox3.Controls.Add(this.radio_alarmOff);
+            this.groupBox3.Controls.Add(this.radio_alarmOn);
+            this.groupBox3.Location = new System.Drawing.Point(340, 13);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(200, 100);
+            this.groupBox3.TabIndex = 22;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "アラーム";
+            // 
+            // checkBox_apnea
+            // 
+            this.checkBox_apnea.AutoSize = true;
+            this.checkBox_apnea.Checked = true;
+            this.checkBox_apnea.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_apnea.Location = new System.Drawing.Point(46, 71);
+            this.checkBox_apnea.Name = "checkBox_apnea";
+            this.checkBox_apnea.Size = new System.Drawing.Size(60, 16);
+            this.checkBox_apnea.TabIndex = 3;
+            this.checkBox_apnea.Text = "無呼吸";
+            this.checkBox_apnea.UseVisualStyleBackColor = true;
+            this.checkBox_apnea.CheckedChanged += new System.EventHandler(this.checkBox_Apnea_CheckedChanged);
+            // 
+            // checkBox_snore
+            // 
+            this.checkBox_snore.AutoSize = true;
+            this.checkBox_snore.Checked = true;
+            this.checkBox_snore.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_snore.Location = new System.Drawing.Point(46, 48);
+            this.checkBox_snore.Name = "checkBox_snore";
+            this.checkBox_snore.Size = new System.Drawing.Size(53, 16);
+            this.checkBox_snore.TabIndex = 2;
+            this.checkBox_snore.Text = "いびき";
+            this.checkBox_snore.UseVisualStyleBackColor = true;
+            this.checkBox_snore.CheckedChanged += new System.EventHandler(this.checkBox_snore_CheckedChanged);
+            // 
+            // radio_alarmOff
+            // 
+            this.radio_alarmOff.AutoSize = true;
+            this.radio_alarmOff.Location = new System.Drawing.Point(115, 21);
+            this.radio_alarmOff.Name = "radio_alarmOff";
+            this.radio_alarmOff.Size = new System.Drawing.Size(45, 16);
+            this.radio_alarmOff.TabIndex = 1;
+            this.radio_alarmOff.Text = "OFF";
+            this.radio_alarmOff.UseVisualStyleBackColor = true;
+            this.radio_alarmOff.CheckedChanged += new System.EventHandler(this.radio_alarmOff_CheckedChanged);
+            // 
+            // radio_alarmOn
+            // 
+            this.radio_alarmOn.AutoSize = true;
+            this.radio_alarmOn.Checked = true;
+            this.radio_alarmOn.Location = new System.Drawing.Point(46, 21);
+            this.radio_alarmOn.Name = "radio_alarmOn";
+            this.radio_alarmOn.Size = new System.Drawing.Size(39, 16);
+            this.radio_alarmOn.TabIndex = 0;
+            this.radio_alarmOn.TabStop = true;
+            this.radio_alarmOn.Text = "ON";
+            this.radio_alarmOn.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -791,6 +847,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1437, 934);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.chartAccelerometer);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.groupBox2);
@@ -807,7 +864,6 @@
             this.Text = "快眠チェッカー";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.groupBoxCom.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chartResultIbiki)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSinpaku)).EndInit();
@@ -815,12 +871,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData_SpO2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData_Acc)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartAccelerometer)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartAccelerometer)).EndInit();
+            this.groupBoxCom.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -861,6 +920,11 @@
         private System.Windows.Forms.CheckBox checkBox_rawresp;
         private System.Windows.Forms.CheckBox checkBox_snore_interval;
         private System.Windows.Forms.CheckBox checkBox_snorexy2;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox checkBox_apnea;
+        private System.Windows.Forms.CheckBox checkBox_snore;
+        private System.Windows.Forms.RadioButton radio_alarmOff;
+        private System.Windows.Forms.RadioButton radio_alarmOn;
     }
 }
 
