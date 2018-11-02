@@ -277,13 +277,18 @@ namespace SleepCheckerApp
 
         private void buttonStart_Click(object sender, EventArgs e)
         {
-            com.PortName = comboBoxComport.Text;
-            com.BaudRate = 76800;
-            com.Parity = Parity.Even;
-            com.DataBits = 8;
-            com.StopBits = StopBits.One;
-            com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-            com.Start();
+            if (buttonStart.Text == "開始")
+            {
+                com.PortName = comboBoxComport.Text;
+                com.BaudRate = 76800;
+                com.Parity = Parity.Even;
+                com.DataBits = 8;
+                com.StopBits = StopBits.One;
+                com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                com.Start();
+                buttonStart.Text = "データ取得中";
+                buttonStart.Enabled = false;
+            }
         }
 
         private void buttonStop_Click(object sender, EventArgs e)
