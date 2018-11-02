@@ -284,12 +284,18 @@ namespace SleepCheckerApp
                 com.Parity = Parity.Even;
                 com.DataBits = 8;
                 com.StopBits = StopBits.One;
-                com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                com.Start();
-                buttonStart.Text = "データ取得中";
-                buttonStart.Enabled = false;
+                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                {
+                    Boolean ret = com.Start();
+                    if (ret)
+                    {
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Text = "データ取得中";
+                        buttonStart.Enabled = false;
+                    }
+                }
             }
-        }
+    }
 
         private void ComPort_DataReceived(byte[] buffer)
         {

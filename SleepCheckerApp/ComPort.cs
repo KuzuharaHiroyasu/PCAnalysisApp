@@ -24,13 +24,23 @@ namespace SleepCheckerApp
         {
         }
 
-        public void Start()
+        public Boolean Start()
         {
             myPort = new SerialPort(
                  PortName, BaudRate, Parity, DataBits, StopBits);
-            myPort.Open();
+            try
+            {
+                myPort.Open();
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show(PortName + "は使用できません。");
+
+                return false;
+            }
             receiveThread = new Thread(ComPort.ReceiveWork);
             receiveThread.Start(this);
+            return true;
         }
 
         public static void ReceiveWork(object target)
