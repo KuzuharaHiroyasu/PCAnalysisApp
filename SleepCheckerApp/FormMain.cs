@@ -291,11 +291,6 @@ namespace SleepCheckerApp
             }
         }
 
-        private void buttonStop_Click(object sender, EventArgs e)
-        {
-            com.Close();
-        }
-
         private void ComPort_DataReceived(byte[] buffer)
         {
             string text = "";
