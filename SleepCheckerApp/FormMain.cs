@@ -1545,6 +1545,7 @@ namespace SleepCheckerApp
                     SoundFile = SOUND_10000HZ;
                     break;
                 default:
+                    SoundFile = SOUND_1000HZ;
                     break;
             }
             player = new System.Media.SoundPlayer(SoundFile);
