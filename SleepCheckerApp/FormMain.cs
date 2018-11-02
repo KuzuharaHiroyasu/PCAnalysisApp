@@ -14,22 +14,8 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace SleepCheckerApp
 {
-    public static class define
-    {
-        public const string SOUND_1000HZ  = "1000Hz.wav";
-        public const string SOUND_5000HZ  = "5000Hz.wav";
-        public const string SOUND_10000HZ = "10000Hz.wav";
-    }
-
     public partial class FormMain : Form
     {
-        enum alarmIndex
-        {
-            SOUND_1000HZ = 0,
-            SOUND_5000HZ,
-            SOUND_10000HZ,
-        }
-
         // For Apnea
         [DllImport("Apnea.dll")]
         static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
@@ -89,6 +75,16 @@ namespace SleepCheckerApp
         private ComPort com = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
+        private const string SOUND_1000HZ = "1000Hz.wav";
+        private const string SOUND_5000HZ = "5000Hz.wav";
+        private const string SOUND_10000HZ = "10000Hz.wav";
+
+        enum alarmIndex
+        {
+            SOUND_1000HZ = 0,
+            SOUND_5000HZ,
+            SOUND_10000HZ,
+        }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
         private List<int> CalcDataList1 = new List<int>();
@@ -169,9 +165,10 @@ namespace SleepCheckerApp
         private int snore = 0;
         private int apnea = 0;
 
-        System.Media.SoundPlayer player = null;
-        string SoundFile = define.SOUND_1000HZ; //デフォルト
-        Boolean playflg = false;
+        // アラーム
+        private System.Media.SoundPlayer player = null;
+        private string SoundFile = SOUND_1000HZ; //デフォルト
+        private Boolean playflg = false;
 
         public FormMain()
         {
@@ -1533,13 +1530,13 @@ namespace SleepCheckerApp
             switch(index)
             {
                 case (int)alarmIndex.SOUND_1000HZ:
-                    SoundFile = define.SOUND_1000HZ;
+                    SoundFile = SOUND_1000HZ;
                     break;
                 case (int)alarmIndex.SOUND_5000HZ:
-                    SoundFile = define.SOUND_5000HZ;
+                    SoundFile = SOUND_5000HZ;
                     break;
                 case (int)alarmIndex.SOUND_10000HZ:
-                    SoundFile = define.SOUND_10000HZ;
+                    SoundFile = SOUND_10000HZ;
                     break;
                 default:
                     break;
