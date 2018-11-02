@@ -14,8 +14,22 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace SleepCheckerApp
 {
+    public static class define
+    {
+        public const string SOUND_1000HZ  = "1000Hz.wav";
+        public const string SOUND_5000HZ  = "5000Hz.wav";
+        public const string SOUND_10000HZ = "10000Hz.wav";
+    }
+
     public partial class FormMain : Form
     {
+        enum alarmIndex
+        {
+            SOUND_1000HZ = 0,
+            SOUND_5000HZ,
+            SOUND_10000HZ,
+        }
+
         // For Apnea
         [DllImport("Apnea.dll")]
         static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
@@ -156,7 +170,7 @@ namespace SleepCheckerApp
         private int apnea = 0;
 
         System.Media.SoundPlayer player = null;
-        string SoundFile = "alarm.wav";
+        string SoundFile = define.SOUND_1000HZ; //デフォルト
         Boolean playflg = false;
 
         public FormMain()
@@ -258,6 +272,8 @@ namespace SleepCheckerApp
             timer.Start();
 
             calc_snore_init();
+
+            comboBox_alarm.SelectedIndex = 0;
 
             player = new System.Media.SoundPlayer(SoundFile);
         }
@@ -1496,6 +1512,45 @@ namespace SleepCheckerApp
                 {// 再生中
                     player.Stop();
                     playflg = false;
+                }
+            }
+        }
+
+        private void comboBox_alarm_TextChanged(object sender, EventArgs e)
+        {
+            int index = comboBox_alarm.SelectedIndex;
+
+            if (player != null)
+            {
+                if(playflg)
+                {//再生中なら停止
+                    player.Stop();
+                }
+                player.Dispose();
+                player = null;
+            }
+
+            switch(index)
+            {
+                case (int)alarmIndex.SOUND_1000HZ:
+                    SoundFile = define.SOUND_1000HZ;
+                    break;
+                case (int)alarmIndex.SOUND_5000HZ:
+                    SoundFile = define.SOUND_5000HZ;
+                    break;
+                case (int)alarmIndex.SOUND_10000HZ:
+                    SoundFile = define.SOUND_10000HZ;
+                    break;
+                default:
+                    break;
+            }
+            player = new System.Media.SoundPlayer(SoundFile);
+
+            if(player != null)
+            {
+                if(playflg)
+                {
+                    player.PlayLooping();
                 }
             }
         }
