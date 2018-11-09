@@ -810,8 +810,6 @@
             // checkBox_apnea
             // 
             this.checkBox_apnea.AutoSize = true;
-            this.checkBox_apnea.Checked = true;
-            this.checkBox_apnea.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_apnea.Location = new System.Drawing.Point(108, 43);
             this.checkBox_apnea.Name = "checkBox_apnea";
             this.checkBox_apnea.Size = new System.Drawing.Size(60, 16);
