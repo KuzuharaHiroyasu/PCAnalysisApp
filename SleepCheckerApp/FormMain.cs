@@ -1572,9 +1572,12 @@ namespace SleepCheckerApp
             do
             {
                 com.PortName = comboBoxComport.Items[i].ToString();
-                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                if (com.PortName != "COM1")
                 {
-                    ret = com.Start();
+                    if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                    {
+                        ret = com.Start();
+                    }
                 }
                 i++;
             } while (ret == false);
