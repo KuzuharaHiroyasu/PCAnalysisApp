@@ -295,7 +295,7 @@ namespace SleepCheckerApp
                     }
                 }
             }
-    }
+        }
 
         private void ComPort_DataReceived(byte[] buffer)
         {
@@ -1557,6 +1557,36 @@ namespace SleepCheckerApp
                     player.PlayLooping();
                 }
             }
+        }
+
+        private void startAnalysis()
+        {
+            Boolean ret = false;
+            int i = 0;
+
+            com.BaudRate = 76800;
+            com.Parity = Parity.Even;
+            com.DataBits = 8;
+            com.StopBits = StopBits.One;
+
+            do
+            {
+                com.PortName = comboBoxComport.Items[i].ToString();
+                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                {
+                    ret = com.Start();
+                }
+                i++;
+            } while (ret == false);
+
+            com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+            buttonStart.Text = "データ取得中";
+            buttonStart.Enabled = false;
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            startAnalysis();
         }
     }
 }
