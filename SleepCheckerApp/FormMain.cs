@@ -11,6 +11,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Management;
 
 namespace SleepCheckerApp
 {
@@ -169,6 +170,10 @@ namespace SleepCheckerApp
         private System.Media.SoundPlayer player = null;
         private string SoundFile = SOUND_1000HZ; //デフォルト
         private Boolean playflg = false;
+
+        // 情報取得コマンド
+
+        static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
 
         public FormMain()
         {
@@ -1589,6 +1594,24 @@ namespace SleepCheckerApp
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+            string[] Array_DeviceID;//取得ID分解用配列
+            ManagementObjectCollection MyCollection;
+            Boolean ret = false;
+
+            //ループ動作（←ループ条件は、後程要検証）
+            do
+            {
+                MyCollection = MyOCS.Get();
+                foreach (ManagementObject MyObject in MyCollection)
+                {
+                    Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
+                    if (Array_DeviceID[0].Contains("USB") && Array_DeviceID[1].Contains("FLASH"))
+                    {
+                        ret = true;
+                    }
+                }
+             } while (ret == false);
+
             startAnalysis();
         }
     }
