@@ -192,7 +192,7 @@ namespace SleepCheckerApp
                 comboBoxComport.Items.Add(port);
                 //Console.WriteLine(port);
             }
-            
+
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
@@ -649,29 +649,34 @@ namespace SleepCheckerApp
         }
         
         // 演算結果保存用パスの作成[共通]
-        private void CreateRootDir()
+        private Boolean CreateRootDir()
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
             string drivePath = "A:\\Experiment"; //初期値
             int path = 0x41; //A
             int i;
-            char path_char;
+            char path_char = (char)path;
 
             // AドライブからZまで検索
-            path_char = (char)path;
-            while (path_char <= 'Z')
+            do
             {
-                if(!System.IO.Directory.Exists(path_char + ":\\Experiment"))
+                if (!System.IO.Directory.Exists(path_char + ":\\Experiment"))
                 {
                     path = path + 1;
                     path_char = (char)path;
-                } else
+                    if (path_char > 'Z')
+                    {
+                        Application.Exit();
+                        return false;
+                    }
+                }
+                else
                 {
                     drivePath = path_char + ":\\Experiment";
                     break;
                 }
-            }
+            } while (path_char <= 'Z');
 
             // rootパス
             ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
@@ -723,6 +728,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+            return true;
         }
         
         // 演算結果保存用パスの作成[無呼吸]
@@ -1615,6 +1621,7 @@ namespace SleepCheckerApp
             string[] Array_DeviceID;//取得ID分解用配列
             ManagementObjectCollection MyCollection;
             Boolean ret = false;
+            int cnt = 0;
 
             // USBメモリーが挿さっているか確認
             do
@@ -1626,15 +1633,24 @@ namespace SleepCheckerApp
                     if (Array_DeviceID[0].Contains("USB") && Array_DeviceID[1].Contains("FLASH"))
                     {
                         ret = true;
+                        break;
                     }
                 }
+                cnt++;
+                if (cnt > 360)
+                { //3分間見つからなかったらアプリ終了
+                    Application.Exit();
+                    return;
+                }
+                //見つからなかったら500msスリープ(CPU負荷軽減)
+                System.Threading.Thread.Sleep(500);
             } while (ret == false);
 
-            // USBが挿さっていれば出力先ドライブ検索
-            CreateRootDir();
-
-            // 解析
-            startAnalysis();
+            if(CreateRootDir())
+            {
+                // 解析
+                startAnalysis();
+            }
         }
     }
 }
