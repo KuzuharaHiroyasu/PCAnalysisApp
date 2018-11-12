@@ -1637,8 +1637,8 @@ namespace SleepCheckerApp
                     }
                 }
                 cnt++;
-                if (cnt > 360)
-                { //3分間見つからなかったらアプリ終了
+                if (cnt > 600)
+                { //5分間見つからなかったらアプリ終了
                     Application.Exit();
                     return;
                 }
