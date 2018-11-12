@@ -194,7 +194,7 @@ namespace SleepCheckerApp
             }
             
             // 演算データ保存向け初期化処理
-            CreateRootDir();
+            //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
             PulseCalcCount_ = 0;
             AcceCalcCount_  = 0;
@@ -1616,7 +1616,7 @@ namespace SleepCheckerApp
             ManagementObjectCollection MyCollection;
             Boolean ret = false;
 
-            //ループ動作（←ループ条件は、後程要検証）
+            // USBメモリーが挿さっているか確認
             do
             {
                 MyCollection = MyOCS.Get();
@@ -1630,6 +1630,10 @@ namespace SleepCheckerApp
                 }
             } while (ret == false);
 
+            // USBが挿さっていれば出力先ドライブ検索
+            CreateRootDir();
+
+            // 解析
             startAnalysis();
         }
     }
