@@ -653,10 +653,28 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
+            string drivePath = "A:\\Experiment"; //初期値
+            int path = 0x41; //A
             int i;
+            char path_char;
+
+            // AドライブからZまで検索
+            path_char = (char)path;
+            while (path_char <= 'Z')
+            {
+                if(!System.IO.Directory.Exists(path_char + ":\\Experiment"))
+                {
+                    path = path + 1;
+                    path_char = (char)path;
+                } else
+                {
+                    drivePath = path_char + ":\\Experiment";
+                    break;
+                }
+            }
 
             // rootパス
-            ApneaRootPath_ = ".\\ax\\apnea\\" + datestr + "\\";
+            ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
             temp = ApneaRootPath_;
             for (i = 1; i < 20; i++)
             {
@@ -673,7 +691,7 @@ namespace SleepCheckerApp
             }
 
             // rootパス
-            PulseRootPath_ = ".\\ax\\pulse\\" + datestr + "\\";
+            PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
             temp = PulseRootPath_;
             for (i = 1; i < 20; i++)
             {
@@ -690,7 +708,7 @@ namespace SleepCheckerApp
             }
 
             // rootパス
-            AcceRootPath_ = ".\\ax\\acce\\" + datestr + "\\";
+            AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
             temp = AcceRootPath_;
             for (i = 1; i < 20; i++)
             {
@@ -1610,7 +1628,7 @@ namespace SleepCheckerApp
                         ret = true;
                     }
                 }
-             } while (ret == false);
+            } while (ret == false);
 
             startAnalysis();
         }
