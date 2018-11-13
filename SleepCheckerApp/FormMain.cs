@@ -1601,7 +1601,7 @@ namespace SleepCheckerApp
             do
             {
                 com.PortName = comboBoxComport.Items[i].ToString();
-                if (com.PortName != "COM1")
+                if (com.PortName != "COM1" && com.PortName != "COM5")
                 {
                     if (String.IsNullOrWhiteSpace(com.PortName) == false)
                     {
@@ -1648,9 +1648,27 @@ namespace SleepCheckerApp
 
             if(CreateRootDir())
             {
+                readyLEDLighting();
                 // 解析
                 startAnalysis();
             }
+        }
+
+        private void readyLEDLighting()
+        {
+            com.PortName = "COM5"; //固定
+            com.BaudRate = 9600;
+            com.Parity = Parity.Even;
+            com.DataBits = 8;
+            com.StopBits = StopBits.One;
+            com.Start();
+
+            byte[] param = new byte[1];
+            param[0] = 1;
+            //データは何でもいい。Arduino側で制御する。
+
+            com.WriteData(param);
+            com.Close();
         }
     }
 }
