@@ -87,6 +87,13 @@ namespace SleepCheckerApp
             SOUND_10000HZ,
         }
 
+        enum ledPattern
+        {
+            LED_OFF = 0,
+            LED_READY,
+            LED_ERROR,
+        }
+
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
         private List<int> CalcDataList1 = new List<int>();
         private List<int> CalcDataList2 = new List<int>();
@@ -667,6 +674,7 @@ namespace SleepCheckerApp
                     path_char = (char)path;
                     if (path_char > 'Z')
                     {
+                        readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
                         Application.Exit();
                         return false;
                     }
@@ -1609,6 +1617,12 @@ namespace SleepCheckerApp
                     }
                 }
                 i++;
+                if(!ret && (i > 255))
+                {
+                    readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
+                    Application.Exit();
+                    return;
+                }
             } while (ret == false);
 
             com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
@@ -1637,8 +1651,9 @@ namespace SleepCheckerApp
                     }
                 }
                 cnt++;
-                if (cnt > 600)
+                if (cnt > 200)
                 { //5分間見つからなかったらアプリ終了
+                    readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
                     Application.Exit();
                     return;
                 }
@@ -1648,13 +1663,13 @@ namespace SleepCheckerApp
 
             if(CreateRootDir())
             {
-                readyLEDLighting();
+                readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
                 // 解析
                 startAnalysis();
             }
         }
 
-        private void readyLEDLighting()
+        private void readyLEDLighting(byte pattern)
         {
             com.PortName = "COM5"; //固定
             com.BaudRate = 9600;
@@ -1664,7 +1679,7 @@ namespace SleepCheckerApp
             com.Start();
 
             byte[] param = new byte[1];
-            param[0] = 1;
+            param[0] = pattern;
             //データは何でもいい。Arduino側で制御する。
 
             com.WriteData(param);
