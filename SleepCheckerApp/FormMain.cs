@@ -665,7 +665,7 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
-            string drivePath = "A:\\Experiment"; //初期値
+            string drivePath = "C:\\Experiment"; //初期値
             int path = 0x41; //A
             int i;
             char path_char = (char)path;
