@@ -1710,7 +1710,7 @@ namespace SleepCheckerApp
             for (deviceNumber = 0; deviceNumber < WaveIn.DeviceCount; deviceNumber++)
             {
                 capabilities = WaveIn.GetCapabilities(deviceNumber);
-                if(capabilities.ProductName == "マイク")
+                if(capabilities.ProductName.Contains("マイク"))
                 {
                     ret = true;
                     break;
