@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
+#define LATTEPANDA // LATTEPANDAのLED出力
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -670,6 +673,7 @@ namespace SleepCheckerApp
             int i;
             char path_char = (char)path;
 
+#if USB_OUTPUT
             // AドライブからZまで検索
             do
             {
@@ -689,7 +693,7 @@ namespace SleepCheckerApp
                     break;
                 }
             } while (path_char <= 'Z');
-
+#endif
             // rootパス
             ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
             temp = ApneaRootPath_;
@@ -1641,6 +1645,7 @@ namespace SleepCheckerApp
             Boolean ret = false;
             int cnt = 0;
 
+#if USB_OUTPUT
             // USBメモリーが挿さっているか確認
             do
             {
@@ -1664,20 +1669,22 @@ namespace SleepCheckerApp
                 //見つからなかったら500msスリープ(CPU負荷軽減)
                 System.Threading.Thread.Sleep(500);
             } while (ret == false);
+#endif
 
             if(CreateRootDir())
             {
-                //readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
+                readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
                 // 解析
                 startAnalysis();
 
                 // 録音開始
-//                startRecordApnea();
+                startRecordApnea();
             }
         }
 
         private void readyLEDLighting(byte pattern)
         {
+#if LATTEPANDA
             com.PortName = "COM5"; //固定
             com.BaudRate = 9600;
             com.Parity = Parity.Even;
@@ -1691,6 +1698,7 @@ namespace SleepCheckerApp
 
             com.WriteData(param);
             com.Close();
+#endif        
         }
 
         private void startRecordApnea()
