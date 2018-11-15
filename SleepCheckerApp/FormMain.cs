@@ -166,11 +166,11 @@ namespace SleepCheckerApp
         
         // 演算結果保存向けデータ-------
         // 保存rootパス
-        private string drivePath = "C:\\Experiment"; //初期値
-
         private string ApneaRootPath_;
         private string PulseRootPath_;
         private string AcceRootPath_;
+        private string RecordRootPath_;
+        private string recordFilePath;
 
         private int ApneaCalcCount_;
         private int PulseCalcCount_;
@@ -670,6 +670,7 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
+            string drivePath = "C:\\Experiment"; //初期値
             int path = 0x41; //A
             int i;
             char path_char = (char)path;
@@ -745,6 +746,25 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+
+            // rootパス
+            RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
+            temp = RecordRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = RecordRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    recordFilePath = temp;
+                    break;
+                }
+            }
+
             return true;
         }
         
@@ -1732,7 +1752,7 @@ namespace SleepCheckerApp
             sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
             
             // wave出力
-            waveWriter = new WaveFileWriter(drivePath + "\\record_snore.wav", sourceStream.WaveFormat);
+            waveWriter = new WaveFileWriter(recordFilePath + "record_snore.wav", sourceStream.WaveFormat);
 
             // 録音開始
             sourceStream.StartRecording();
