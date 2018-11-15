@@ -678,10 +678,9 @@ namespace SleepCheckerApp
                     path = path + 1;
                     path_char = (char)path;
                     if (path_char > 'Z')
-                    {
-                        readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                        Application.Exit();
-                        return false;
+                    { //USBは挿しているがZドライブまで検索したが見つからなかった場合（そんなことあるのか？）の救済措置として、強制的にCドライブに出力する。
+                        drivePath = "C:\\Experiment";
+                        break;
                     }
                 }
                 else
@@ -1623,7 +1622,7 @@ namespace SleepCheckerApp
                 }
                 i++;
                 if(!ret && (i > 255))
-                {
+                { //COMポートの最大数ループしても見つからなかった時
                     readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
                     Application.Exit();
                     return;
