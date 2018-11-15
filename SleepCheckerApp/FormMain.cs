@@ -12,6 +12,8 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Management;
+using NAudio;
+using NAudio.Wave;
 
 namespace SleepCheckerApp
 {
@@ -179,8 +181,11 @@ namespace SleepCheckerApp
         private Boolean playflg = false;
 
         // 情報取得コマンド
-
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
+
+        // 音声録音
+        private WaveIn sourceStream = null;
+        private WaveFileWriter waveWriter = null;
 
         public FormMain()
         {
@@ -1663,9 +1668,12 @@ namespace SleepCheckerApp
 
             if(CreateRootDir())
             {
-                readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
+                //readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
                 // 解析
                 startAnalysis();
+
+                // 録音開始
+//                startRecordApnea();
             }
         }
 
@@ -1684,6 +1692,76 @@ namespace SleepCheckerApp
 
             com.WriteData(param);
             com.Close();
+        }
+
+        private void startRecordApnea()
+        {
+            WaveInCapabilities capabilities;
+            int deviceNumber;
+            Boolean ret = false;
+
+            for (deviceNumber = 0; deviceNumber < WaveIn.DeviceCount; deviceNumber++)
+            {
+                capabilities = WaveIn.GetCapabilities(deviceNumber);
+                if(capabilities.ProductName == "マイク")
+                {
+                    ret = true;
+                    break;
+                }
+            }
+
+            if(!ret)
+            { //マイクが見つからない
+                return;
+            }
+
+            // waveIn Select Recording Device
+            sourceStream = new WaveIn();
+            sourceStream.DeviceNumber = deviceNumber;
+            sourceStream.WaveFormat = new WaveFormat(44100, WaveIn.GetCapabilities(deviceNumber).Channels);
+
+            // 録音のコールバックkな数
+            sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
+
+            // wave出力
+            waveWriter = new WaveFileWriter("test.wav", sourceStream.WaveFormat);
+
+            // 録音開始
+            sourceStream.StartRecording();
+        }
+
+        private void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
+        {
+            if (waveWriter == null) return;
+
+            waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
+            waveWriter.Flush();
+        }
+
+        private void stopRecordApnea()
+        {
+            if (sourceStream != null)
+            {
+                sourceStream.StopRecording();
+                sourceStream.Dispose();
+                sourceStream = null;
+            }
+
+            if (waveWriter != null)
+            {
+                waveWriter.Dispose();
+                waveWriter = null;
+            }
+        }
+
+        private void button_recordstop_Click(object sender, EventArgs e)
+        {
+            stopRecordApnea();
+        }
+
+        private void button_recordstart_Click(object sender, EventArgs e)
+        {
+            startRecordApnea();
         }
     }
 }
