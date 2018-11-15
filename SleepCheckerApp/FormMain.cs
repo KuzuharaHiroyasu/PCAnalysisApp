@@ -1729,9 +1729,9 @@ namespace SleepCheckerApp
 
             // 録音のコールバックkな数
             sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
-
+            
             // wave出力
-            waveWriter = new WaveFileWriter("test.wav", sourceStream.WaveFormat);
+            waveWriter = new WaveFileWriter(@"C:\\Experiment\\record_snore.wav", sourceStream.WaveFormat);
 
             // 録音開始
             sourceStream.StartRecording();
