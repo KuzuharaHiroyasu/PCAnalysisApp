@@ -670,29 +670,29 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
-            string drivePath = "C:\\Experiment"; //初期値
-            int path = 0x41; //A
+            string drivePath = "C:\\"; //初期値
             int i;
-            char path_char = (char)path;
+            char path_char = 'A';
+            System.IO.DriveInfo drive;
 
 #if USB_OUTPUT
             // AドライブからZまで検索
             do
             {
-                if (!System.IO.Directory.Exists(path_char + ":\\Experiment"))
+                temp = path_char.ToString();
+                drive = new System.IO.DriveInfo(temp);
+                if(drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
                 {
-                    path = path + 1;
-                    path_char = (char)path;
-                    if (path_char > 'Z')
-                    { //USBは挿しているがZドライブまで検索したが見つからなかった場合（そんなことあるのか？）の救済措置として、強制的にCドライブに出力する。
-                        drivePath = "C:\\Experiment";
-                        break;
-                    }
+                    drivePath = temp + ":\\";
+                    break;
                 }
                 else
                 {
-                    drivePath = path_char + ":\\Experiment";
-                    break;
+                    path_char++;
+                    if (path_char > 'Z')
+                    { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                        break;
+                    }
                 }
             } while (path_char <= 'Z');
 #endif
