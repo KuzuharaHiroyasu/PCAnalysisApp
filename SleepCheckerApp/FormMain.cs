@@ -672,10 +672,9 @@ namespace SleepCheckerApp
             string temp;
             string drivePath = "C:\\"; //初期値
             int i;
+#if USB_OUTPUT
             char path_char = 'A';
             System.IO.DriveInfo drive;
-
-#if USB_OUTPUT
             // AドライブからZまで検索
             do
             {
@@ -1661,12 +1660,13 @@ namespace SleepCheckerApp
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+#if USB_OUTPUT
             string[] Array_DeviceID;//取得ID分解用配列
             ManagementObjectCollection MyCollection;
             Boolean ret = false;
             int cnt = 0;
 
-#if USB_OUTPUT
+
             // USBメモリーが挿さっているか確認
             do
             {
