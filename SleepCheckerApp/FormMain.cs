@@ -903,6 +903,7 @@ namespace SleepCheckerApp
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            stopRecordApnea();
             com.Close();
         }
 
