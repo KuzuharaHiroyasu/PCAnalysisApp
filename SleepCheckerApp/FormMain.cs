@@ -1727,6 +1727,8 @@ namespace SleepCheckerApp
             WaveInCapabilities capabilities;
             int deviceNumber;
             Boolean ret = false;
+            string fileName = "record_snore";
+            string temp;
 
             for (deviceNumber = 0; deviceNumber < WaveIn.DeviceCount; deviceNumber++)
             {
@@ -1750,9 +1752,22 @@ namespace SleepCheckerApp
 
             // 録音のコールバックkな数
             sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
-            
+
+            temp = fileName + ".wav";
+            for (int i = 1; i < 20; i++)
+            {
+                if (File.Exists(recordFilePath + temp))
+                {
+                    temp = fileName + "(" + i + ")" + ".wav";
+                }
+                else
+                {
+                    fileName = temp;
+                    break;
+                }
+            }
             // wave出力
-            waveWriter = new WaveFileWriter(recordFilePath + "record_snore.wav", sourceStream.WaveFormat);
+            waveWriter = new WaveFileWriter(recordFilePath + fileName, sourceStream.WaveFormat);
 
             // 録音開始
             sourceStream.StartRecording();
