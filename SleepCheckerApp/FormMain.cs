@@ -679,7 +679,7 @@ namespace SleepCheckerApp
             do
             {
                 temp = path_char.ToString();
-                if (temp == "C" || temp == "D")
+                if (temp != "C" && temp != "D")
                 {
                     drive = new System.IO.DriveInfo(temp);
                     if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
