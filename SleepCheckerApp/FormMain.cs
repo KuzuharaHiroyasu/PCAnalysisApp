@@ -675,23 +675,29 @@ namespace SleepCheckerApp
 #if USB_OUTPUT
             char path_char = 'A';
             System.IO.DriveInfo drive;
-            // AドライブからZまで検索
+            // AドライブからZドライブかまで検索(ただし、CとDは除く)
             do
             {
                 temp = path_char.ToString();
-                drive = new System.IO.DriveInfo(temp);
-                if(drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                if (temp == "C" || temp == "D")
                 {
-                    drivePath = temp + ":\\";
-                    break;
-                }
-                else
-                {
-                    path_char++;
-                    if (path_char > 'Z')
-                    { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                    drive = new System.IO.DriveInfo(temp);
+                    if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                    {
+                        drivePath = temp + ":\\";
                         break;
                     }
+                    else
+                    {
+                        path_char++;
+                        if (path_char > 'Z')
+                        { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                            break;
+                        }
+                    }
+                }else
+                {
+                    path_char++;
                 }
             } while (path_char <= 'Z');
 #endif
