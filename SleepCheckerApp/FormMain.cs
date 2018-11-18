@@ -17,6 +17,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Management;
 using NAudio;
 using NAudio.Wave;
+using Microsoft.Win32;
 
 namespace SleepCheckerApp
 {
@@ -1828,6 +1829,19 @@ namespace SleepCheckerApp
         private void button_recordstart_Click(object sender, EventArgs e)
         {
             startRecordApnea();
+        }
+
+        //ログオフ、シャットダウンしようとしているとき
+        private void SystemEvents_SessionEnding(object sender, SessionEndingEventArgs e)
+        {
+            if (e.Reason == SessionEndReasons.Logoff)
+            {
+            }
+            else if (e.Reason == SessionEndReasons.SystemShutdown)
+            {
+                stopRecordApnea();
+                com.Close();
+            }
         }
     }
 }
