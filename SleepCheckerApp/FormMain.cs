@@ -1718,15 +1718,31 @@ namespace SleepCheckerApp
             com.Parity = Parity.Even;
             com.DataBits = 8;
             com.StopBits = StopBits.One;
+
+            comSerch();
             com.Start();
 
             byte[] param = new byte[1];
             param[0] = pattern;
             //データは何でもいい。Arduino側で制御する。
-
             com.WriteData(param);
             com.Close();
-#endif        
+#endif
+        }
+
+        private void comSerch()
+        {
+            do
+            {
+                string[] ports = com.GetPortNames();
+                foreach (string port in ports)
+                {
+                    if (port == "COM5")
+                    {
+                        return;
+                    }
+                }
+            } while (true);
         }
 
         private void startRecordApnea()
