@@ -1667,32 +1667,24 @@ namespace SleepCheckerApp
             string[] Array_DeviceID;//取得ID分解用配列
             ManagementObjectCollection MyCollection;
             Boolean ret = false;
-            int cnt = 0;
-
 
             // USBメモリーが挿さっているか確認
-            do
+            MyCollection = MyOCS.Get();
+            foreach (ManagementObject MyObject in MyCollection)
             {
-                MyCollection = MyOCS.Get();
-                foreach (ManagementObject MyObject in MyCollection)
+                Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
+                if (Array_DeviceID[0].Contains("USB") && Array_DeviceID[1].Contains("FLASH"))
                 {
-                    Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
-                    if (Array_DeviceID[0].Contains("USB") && Array_DeviceID[1].Contains("FLASH"))
-                    {
-                        ret = true;
-                        break;
-                    }
+                    ret = true;
+                    break;
                 }
-                cnt++;
-                if (cnt > 200)
-                { //5分間見つからなかったらアプリ終了
-                    readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                    Application.Exit();
-                    return;
-                }
-                //見つからなかったら500msスリープ(CPU負荷軽減)
-                System.Threading.Thread.Sleep(500);
-            } while (ret == false);
+            }
+            if (!ret)
+            { //5分間見つからなかったらアプリ終了
+                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
+                Application.Exit();
+                return;
+            }
 #endif
             CreateRootDir();
             readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
