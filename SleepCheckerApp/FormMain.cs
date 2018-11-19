@@ -667,7 +667,7 @@ namespace SleepCheckerApp
         }
         
         // 演算結果保存用パスの作成[共通]
-        private Boolean CreateRootDir()
+        private void CreateRootDir()
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
@@ -770,8 +770,6 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
-            return true;
         }
         
         // 演算結果保存用パスの作成[無呼吸]
@@ -1632,17 +1630,15 @@ namespace SleepCheckerApp
             }
         }
 
-        private void startAnalysis()
+        private Boolean startAnalysis()
         {
             Boolean ret = false;
-            int i = 0;
-
             com.BaudRate = 76800;
             com.Parity = Parity.Even;
             com.DataBits = 8;
             com.StopBits = StopBits.One;
 
-            do
+            for(int i =0; i < comboBoxComport.Items.Count; i++)
             {
                 com.PortName = comboBoxComport.Items[i].ToString();
                 if (com.PortName != "COM1" && com.PortName != "COM5")
@@ -1650,20 +1646,18 @@ namespace SleepCheckerApp
                     if (String.IsNullOrWhiteSpace(com.PortName) == false)
                     {
                         ret = com.Start();
+                        break;
                     }
                 }
-                i++;
-                if(!ret && (i > 255))
-                { //COMポートの最大数ループしても見つからなかった時
-                    readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                    Application.Exit();
-                    return;
-                }
-            } while (ret == false);
+            }
 
-            com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-            buttonStart.Text = "データ取得中";
-            buttonStart.Enabled = false;
+            if(!ret)
+            {
+                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
+                Application.Exit();
+            }
+
+            return ret;
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -1699,15 +1693,16 @@ namespace SleepCheckerApp
                 System.Threading.Thread.Sleep(500);
             } while (ret == false);
 #endif
-
-            if(CreateRootDir())
+            CreateRootDir();
+            readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
+            // 解析
+            if(startAnalysis())
             {
-                readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
-                // 解析
-                startAnalysis();
-
                 // 録音開始
                 startRecordApnea();
+                com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                buttonStart.Text = "データ取得中";
+                buttonStart.Enabled = false;
             }
         }
 
