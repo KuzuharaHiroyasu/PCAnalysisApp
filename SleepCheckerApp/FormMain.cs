@@ -95,9 +95,10 @@ namespace SleepCheckerApp
 
         enum ledPattern
         {
-            LED_OFF = 0,
-            LED_READY,
-            LED_ERROR,
+            LED_OFF = 0,    //解析スタート
+            LED_READY,      //使用していない
+            LED_ERROR,      //エラー
+            LED_SHUTDOWN,   //シャットダウン
         }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
