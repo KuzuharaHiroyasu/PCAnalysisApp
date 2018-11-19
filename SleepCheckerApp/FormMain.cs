@@ -1752,7 +1752,7 @@ namespace SleepCheckerApp
             for (deviceNumber = 0; deviceNumber < WaveIn.DeviceCount; deviceNumber++)
             {
                 capabilities = WaveIn.GetCapabilities(deviceNumber);
-                if(capabilities.ProductName.Contains("マイク"))
+                if (capabilities.ProductName.Contains("マイク") || capabilities.ProductName.Contains("Microphone"))
                 {
                     ret = true;
                     break;
@@ -1761,6 +1761,8 @@ namespace SleepCheckerApp
 
             if(!ret)
             { //マイクが見つからない
+                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
+                Application.Exit();
                 return;
             }
 
