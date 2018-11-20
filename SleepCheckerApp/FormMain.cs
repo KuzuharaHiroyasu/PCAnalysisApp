@@ -1673,7 +1673,7 @@ namespace SleepCheckerApp
             foreach (ManagementObject MyObject in MyCollection)
             {
                 Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
-                if (Array_DeviceID[0].Contains("USB") && Array_DeviceID[1].Contains("FLASH"))
+                if (Array_DeviceID[0].Contains("USBSTOR"))
                 {
                     ret = true;
                     break;
