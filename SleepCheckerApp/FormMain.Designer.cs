@@ -864,6 +864,7 @@
             this.button_recordstop.TabIndex = 23;
             this.button_recordstop.Text = "録音停止";
             this.button_recordstop.UseVisualStyleBackColor = true;
+            this.button_recordstop.Visible = false;
             this.button_recordstop.Click += new System.EventHandler(this.button_recordstop_Click);
             // 
             // button_recordstart
@@ -874,6 +875,7 @@
             this.button_recordstart.TabIndex = 24;
             this.button_recordstart.Text = "録音開始";
             this.button_recordstart.UseVisualStyleBackColor = true;
+            this.button_recordstart.Visible = false;
             this.button_recordstart.Click += new System.EventHandler(this.button_recordstart_Click);
             // 
             // FormMain
