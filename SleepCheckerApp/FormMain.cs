@@ -314,8 +314,10 @@ namespace SleepCheckerApp
                     Boolean ret = com.Start();
                     if (ret)
                     {
+                        // 録音開始
+                        startRecordApnea();
                         com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中";
+                        buttonStart.Text = "データ取得中/録音中";
                         buttonStart.Enabled = false;
                     }
                 }
