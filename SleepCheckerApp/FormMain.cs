@@ -1,5 +1,5 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
-#define LATTEPANDA // LATTEPANDAのLED出力
+//#define LATTEPANDA // LATTEPANDAのLED出力
 
 using System;
 using System.Collections.Generic;
