@@ -1,4 +1,4 @@
-﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
+﻿//#define USB_OUTPUT // 無効化するexeと同ディレクトリ内に出力する
 //#define LATTEPANDA // LATTEPANDAのLED出力
 
 using System;
@@ -672,8 +672,14 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
-            string drivePath = "C:\\"; //初期値
+            string drivePath;
             int i;
+#if USB_OUTPUT
+            drivePath = "C:\\"; //初期値
+#else
+            drivePath = "."; //exeと同ディレクトリ
+#endif
+
 #if USB_OUTPUT
             char path_char = 'A';
             System.IO.DriveInfo drive;
