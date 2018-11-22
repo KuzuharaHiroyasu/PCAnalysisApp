@@ -673,8 +673,14 @@ namespace SleepCheckerApp
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
             string temp;
-            string drivePath = "C:\\"; //初期値
+            string drivePath;
             int i;
+#if USB_OUTPUT
+            drivePath = "C:\\"; //初期値
+#else
+            drivePath = "."; //exeと同ディレクトリ
+#endif
+
 #if USB_OUTPUT
             char path_char = 'A';
             System.IO.DriveInfo drive;
