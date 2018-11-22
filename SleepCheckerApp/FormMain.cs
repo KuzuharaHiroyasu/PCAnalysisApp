@@ -1,6 +1,6 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
 #define LATTEPANDA // LATTEPANDAのLED出力
-//#define AUTO_ANALYSIS // 解析自動スタート
+#define AUTO_ANALYSIS // 解析自動スタート
 
 using System;
 using System.Collections.Generic;
