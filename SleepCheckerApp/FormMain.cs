@@ -173,8 +173,10 @@ namespace SleepCheckerApp
         private string ApneaRootPath_;
         private string PulseRootPath_;
         private string AcceRootPath_;
+#if RECORDING
         private string RecordRootPath_;
         private string recordFilePath;
+#endif
 
         private int ApneaCalcCount_;
         private int PulseCalcCount_;
@@ -769,7 +771,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+#if RECORDING
             // rootパス
             RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
             temp = RecordRootPath_;
@@ -787,6 +789,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+#endif
         }
         
         // 演算結果保存用パスの作成[無呼吸]
