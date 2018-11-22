@@ -311,14 +311,18 @@ namespace SleepCheckerApp
                 com.StopBits = StopBits.One;
                 if (String.IsNullOrWhiteSpace(com.PortName) == false)
                 {
-                    Boolean ret = com.Start();
-                    if (ret)
+                    // 録音開始
+                    if (startRecordApnea())
                     {
-                        // 録音開始
-                        startRecordApnea();
-                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中/録音中";
-                        buttonStart.Enabled = false;
+                        if (com.Start())
+                        {
+                            com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                            buttonStart.Text = "データ取得中/録音中";
+                            buttonStart.Enabled = false;
+                        } else
+                        {
+                            stopRecordApnea();
+                        }
                     }
                 }
             }
@@ -1746,7 +1750,7 @@ namespace SleepCheckerApp
             } while (true);
         }
 
-        private void startRecordApnea()
+        private Boolean startRecordApnea()
         {
             WaveInCapabilities capabilities;
             int deviceNumber;
@@ -1767,8 +1771,8 @@ namespace SleepCheckerApp
             if(!ret)
             { //マイクが見つからない
                 readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                Application.Exit();
-                return;
+                System.Windows.Forms.MessageBox.Show("マイクが見つかりません");
+                return false;
             }
 
             // waveIn Select Recording Device
@@ -1797,6 +1801,8 @@ namespace SleepCheckerApp
 
             // 録音開始
             sourceStream.StartRecording();
+
+            return true;
         }
 
         private void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
