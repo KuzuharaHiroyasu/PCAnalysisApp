@@ -1,6 +1,7 @@
 ﻿//#define USB_OUTPUT // 無効化するexeと同ディレクトリ内に出力する
 //#define LATTEPANDA // LATTEPANDAのLED出力
 //#define AUTO_ANALYSIS // 解析自動スタート
+//#define RECORDING //録音
 
 using System;
 using System.Collections.Generic;
@@ -191,9 +192,11 @@ namespace SleepCheckerApp
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
 
+#if RECORDING
         // 音声録音
         private WaveIn sourceStream = null;
         private WaveFileWriter waveWriter = null;
+#endif
 
         public FormMain()
         {
@@ -1752,6 +1755,7 @@ namespace SleepCheckerApp
 
         private Boolean startRecordApnea()
         {
+#if RECORDING
             WaveInCapabilities capabilities;
             int deviceNumber;
             Boolean ret = false;
@@ -1801,10 +1805,11 @@ namespace SleepCheckerApp
 
             // 録音開始
             sourceStream.StartRecording();
-
+#endif
             return true;
         }
 
+#if RECORDING
         private void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
         {
             if (waveWriter == null) return;
@@ -1812,9 +1817,11 @@ namespace SleepCheckerApp
             waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
             waveWriter.Flush();
         }
+#endif
 
         private void stopRecordApnea()
         {
+#if RECORDING
             if (sourceStream != null)
             {
                 sourceStream.StopRecording();
@@ -1827,6 +1834,7 @@ namespace SleepCheckerApp
                 waveWriter.Dispose();
                 waveWriter = null;
             }
+#endif
         }
 
         private void button_recordstop_Click(object sender, EventArgs e)
