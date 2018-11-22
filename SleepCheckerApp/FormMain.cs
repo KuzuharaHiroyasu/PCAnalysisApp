@@ -1698,10 +1698,10 @@ namespace SleepCheckerApp
             readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
 
 #if AUTO_ANALYSIS
-            // 解析
-            if(startRecordApnea())
+            // 録音開始
+            if (startRecordApnea())
             {
-                // 録音開始
+                // 解析
                 if (startAnalysis())
                 {
                     com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
