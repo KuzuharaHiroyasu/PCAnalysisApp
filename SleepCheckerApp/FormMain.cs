@@ -1,5 +1,6 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
 #define LATTEPANDA // LATTEPANDAのLED出力
+//#define AUTO_ANALYSIS // 解析自動スタート
 
 using System;
 using System.Collections.Generic;
@@ -1695,6 +1696,8 @@ namespace SleepCheckerApp
 #endif
             CreateRootDir();
             readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
+
+#if AUTO_ANALYSIS
             // 解析
             if(startAnalysis())
             {
@@ -1704,6 +1707,7 @@ namespace SleepCheckerApp
                 buttonStart.Text = "データ取得中";
                 buttonStart.Enabled = false;
             }
+#endif
         }
 
         private void readyLEDLighting(byte pattern)
