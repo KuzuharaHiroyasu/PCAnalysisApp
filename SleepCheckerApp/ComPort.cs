@@ -34,8 +34,7 @@ namespace SleepCheckerApp
             }
             catch
             {
-//                System.Windows.Forms.MessageBox.Show(PortName + "は使用できません。");
-
+                System.Windows.Forms.MessageBox.Show(PortName + "は使用できません。");
                 return false;
             }
             receiveThread = new Thread(ComPort.ReceiveWork);
