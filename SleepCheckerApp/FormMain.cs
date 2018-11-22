@@ -1688,7 +1688,7 @@ namespace SleepCheckerApp
                 }
             }
             if (!ret)
-            { //5分間見つからなかったらアプリ終了
+            {
                 readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
                 Application.Exit();
                 return;
@@ -1699,13 +1699,18 @@ namespace SleepCheckerApp
 
 #if AUTO_ANALYSIS
             // 解析
-            if(startAnalysis())
+            if(startRecordApnea())
             {
                 // 録音開始
-                startRecordApnea();
-                com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                buttonStart.Text = "データ取得中";
-                buttonStart.Enabled = false;
+                if (startAnalysis())
+                {
+                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    buttonStart.Text = "データ取得中";
+                    buttonStart.Enabled = false;
+                } else
+                {
+                    stopRecordApnea();
+                }
             }
 #endif
         }
@@ -1745,7 +1750,7 @@ namespace SleepCheckerApp
             } while (true);
         }
 
-        private void startRecordApnea()
+        private Boolean startRecordApnea()
         {
             WaveInCapabilities capabilities;
             int deviceNumber;
@@ -1767,7 +1772,7 @@ namespace SleepCheckerApp
             { //マイクが見つからない
                 readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
                 Application.Exit();
-                return;
+                return ret;
             }
 
             // waveIn Select Recording Device
@@ -1796,6 +1801,8 @@ namespace SleepCheckerApp
 
             // 録音開始
             sourceStream.StartRecording();
+
+            return ret;
         }
 
         private void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
