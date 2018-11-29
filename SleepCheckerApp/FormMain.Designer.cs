@@ -466,8 +466,8 @@
             // 
             // chartAccelerometer
             // 
-            chartArea9.AxisX.Interval = 100D;
-            chartArea9.AxisX.Maximum = 1200D;
+            chartArea9.AxisX.Interval = 10D;
+            chartArea9.AxisX.Maximum = 120D;
             chartArea9.AxisX.Minimum = 0D;
             chartArea9.AxisX.Title = "個数";
             chartArea9.AxisY.Maximum = 127D;

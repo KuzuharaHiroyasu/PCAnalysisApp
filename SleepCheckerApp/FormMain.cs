@@ -116,7 +116,7 @@ namespace SleepCheckerApp
         Queue<double> RawDataDcQueue = new Queue<double>();
 
         // 加速度センサー
-        private const int Acc_RawDataRirekiNum = 60 * 20;       // 生データ履歴数 20Hz * 60s分
+        private const int Acc_RawDataRirekiNum = 120;       // 生データ履歴数 500ms * 120個 = 60秒
         Queue<double> AccelerometerXQueue = new Queue<double>();
         Queue<double> AccelerometerYQueue = new Queue<double>();
         Queue<double> AccelerometerZQueue = new Queue<double>();
@@ -180,7 +180,6 @@ namespace SleepCheckerApp
         private int PulseCalcCount_;
         private int AcceCalcCount_;
 
-        private int cnt = 0;
         private int snore = 0;
         private int apnea = 0;
 
@@ -362,8 +361,11 @@ namespace SleepCheckerApp
                         SetCalcData_Apnea(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
                         // For PulseOximeter
                         SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-                        // For 加速度
-                        SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
+                        if (Convert.ToInt32(datas[4]) != 999)
+                        {
+                            // For 加速度
+                            SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
+                        }
                     }
                     else
                     {
@@ -545,21 +547,10 @@ namespace SleepCheckerApp
                 //10回に1回テキスト出力する(500ms毎)（暫定）
                 //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
                 //理想は1テキスト内に出力し続ける
-                if (cnt == 0) {
-                    string path = CreateAcceDir(AcceCalcCount_);
-                    IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                    get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
-                    AcceCalcCount_++;
-                    cnt++;
-                }
-                else
-                {
-                    cnt++;
-                    if(cnt == 10)
-                    {
-                        cnt = 0;
-                    }
-                }
+                string path = CreateAcceDir(AcceCalcCount_);
+                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+                get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
+                AcceCalcCount_++;
             }
         }
 
