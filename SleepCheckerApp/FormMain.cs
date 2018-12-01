@@ -1,5 +1,6 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
 #define LATTEPANDA // LATTEPANDAのLED出力
+#define C_DRIVE // Cドライブ直下にログ出力
 #define AUTO_ANALYSIS // 解析自動スタート
 
 using System;
@@ -670,7 +671,11 @@ namespace SleepCheckerApp
 #if USB_OUTPUT
             drivePath = "C:\\"; //初期値
 #else
+#if C_DRIVE
+            drivePath = "C:\\";
+#else
             drivePath = "."; //exeと同ディレクトリ
+#endif
 #endif
 
 #if USB_OUTPUT
