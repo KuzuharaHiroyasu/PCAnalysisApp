@@ -96,12 +96,11 @@ namespace SleepCheckerApp
             SOUND_10000HZ,
         }
 
-        enum ledPattern
+        enum request
         {
             LED_OFF = 0,    //解析スタート
-            LED_READY,      //使用していない
             LED_ERROR,      //エラー
-            LED_SHUTDOWN,   //シャットダウン
+            SET_CLOCK,      //時刻設定
         }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
@@ -1655,22 +1654,66 @@ namespace SleepCheckerApp
                     }
                 }
             }
-
-            if(!ret)
-            {
-                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                Application.Exit();
-            }
-
             return ret;
         }
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+            Boolean ret = false;
+
+            ret = USBConnectConf();
+
+            if (ret)
+            {
+                setComPort_Lattepanda();
+                // 時刻送信リクエスト
+                requestLattepanda((byte)request.SET_CLOCK); 
+                
+                // 時刻受信処理
+
+                // ログ出力フォルダ作成
+                CreateRootDir();
+
+                // 解析スタートでLATTEPANDAのLEDを消灯。
+                requestLattepanda((byte)request.LED_OFF); 
+                closeComPort_Lattepanda();
+#if AUTO_ANALYSIS
+                // 録音開始
+                ret = startRecordApnea();
+
+                if (ret)
+                {
+                    // 解析
+                    ret = startAnalysis();
+                    if (ret)
+                    {
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Text = "データ取得中";
+                        buttonStart.Enabled = false;
+                    }
+                    else
+                    {
+                        stopRecordApnea();
+                    }
+                }
+#endif
+            }
+
+            if (!ret)
+            { //エラー処理
+                setComPort_Lattepanda();
+                requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
+                closeComPort_Lattepanda();
+                Application.Exit();
+            }
+        }
+
+        private Boolean USBConnectConf()
+        {
+            Boolean ret = false;
 #if USB_OUTPUT
             string[] Array_DeviceID;//取得ID分解用配列
             ManagementObjectCollection MyCollection;
-            Boolean ret = false;
 
             // USBメモリーが挿さっているか確認
             MyCollection = MyOCS.Get();
@@ -1683,32 +1726,10 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-            if (!ret)
-            {
-                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                Application.Exit();
-                return;
-            }
+# else
+            ret = true; // 無条件でtrue
 #endif
-            CreateRootDir();
-            readyLEDLighting((byte)ledPattern.LED_OFF); // 解析スタートでLATTEPANDAのLEDを消灯。
-
-#if AUTO_ANALYSIS
-            // 録音開始
-            if (startRecordApnea())
-            {
-                // 解析
-                if (startAnalysis())
-                {
-                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                    buttonStart.Text = "データ取得中";
-                    buttonStart.Enabled = false;
-                } else
-                {
-                    stopRecordApnea();
-                }
-            }
-#endif
+            return ret;
         }
 
         private void setComPort_Lattepanda()
@@ -1732,7 +1753,7 @@ namespace SleepCheckerApp
 #endif
         }
 
-        private void readyLEDLighting(byte pattern)
+        private void requestLattepanda(byte pattern)
         {
 #if LATTEPANDA
             byte[] param = new byte[1];
@@ -1778,8 +1799,6 @@ namespace SleepCheckerApp
 
             if(!ret)
             { //マイクが見つからない
-                readyLEDLighting((byte)ledPattern.LED_ERROR); // LATTEPANDAのLEDを光らせる。
-                Application.Exit();
                 return ret;
             }
 
