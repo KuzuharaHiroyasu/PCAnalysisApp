@@ -1711,7 +1711,7 @@ namespace SleepCheckerApp
 #endif
         }
 
-        private void readyLEDLighting(byte pattern)
+        private void setComPort_Lattepanda()
         {
 #if LATTEPANDA
             com.PortName = "COM5"; //固定
@@ -1722,7 +1722,19 @@ namespace SleepCheckerApp
 
             comSerch();
             com.Start();
+#endif
+        }
 
+        private void closeComPort_Lattepanda()
+        {
+#if LATTEPANDA
+            com.Close();
+#endif
+        }
+
+        private void readyLEDLighting(byte pattern)
+        {
+#if LATTEPANDA
             byte[] param = new byte[1];
             param[0] = pattern;
             //データは何でもいい。Arduino側で制御する。
