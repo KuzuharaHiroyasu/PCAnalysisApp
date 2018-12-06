@@ -11,7 +11,7 @@ namespace SleepCheckerApp
 {
     class ComPort
     {
-        private SerialPort myPort = null;
+        public SerialPort myPort = null;
         private Thread receiveThread = null;
 
         public String PortName { get; set; }

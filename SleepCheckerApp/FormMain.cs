@@ -1651,18 +1651,31 @@ namespace SleepCheckerApp
 
         private void Form1_Shown(object sender, EventArgs e)
         {
+//            string clock = "";
+//            string revData;
             Boolean ret = false;
 
             ret = USBConnectConf();
-
             if (ret)
             {
                 setComPort_Lattepanda();
+/*
                 // 時刻送信リクエスト
-                requestLattepanda((byte)request.SET_CLOCK); 
+                requestLattepanda((byte)request.SET_CLOCK);
                 
                 // 時刻受信処理
+#if LATTEPANDA
+                MessageBox.Show("受信待ち");
+                com.DataReceived += ComPort_DataReceived;
 
+                revData = com.myPort.ReadLine();
+                if(revData == "")
+                {
+                    break;
+                }
+                clock += revData;
+#endif
+*/
                 // ログ出力フォルダ作成
                 CreateRootDir();
 

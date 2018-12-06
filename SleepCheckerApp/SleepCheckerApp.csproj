@@ -69,6 +69,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NAudio">
       <HintPath>..\..\..\Users\h-kuzuhara\Downloads\NAudio-Release\NAudio.dll</HintPath>
     </Reference>
