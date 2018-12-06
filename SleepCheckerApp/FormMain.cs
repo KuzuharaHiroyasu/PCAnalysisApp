@@ -5,21 +5,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Management;
-using NAudio;
-using NAudio.Wave;
-using Microsoft.Win32;
 
 namespace SleepCheckerApp
 {
@@ -82,6 +74,7 @@ namespace SleepCheckerApp
         static extern double get_acavg_ratio();
 
         private ComPort com = null;
+        private SoundRecord sound = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
         private const string SOUND_1000HZ = "1000Hz.wav";
@@ -191,10 +184,6 @@ namespace SleepCheckerApp
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
 
-        // 音声録音
-        private WaveIn sourceStream = null;
-        private WaveFileWriter waveWriter = null;
-
         public FormMain()
         {
             InitializeComponent();
@@ -206,13 +195,16 @@ namespace SleepCheckerApp
         private void Form1_Load(object sender, EventArgs e)
         {
             com = new ComPort();
+            sound = new SoundRecord();
+            sound.form = this;
+
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
             {
                 comboBoxComport.Items.Add(port);
                 //Console.WriteLine(port);
             }
-
+            
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
@@ -912,7 +904,7 @@ namespace SleepCheckerApp
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            stopRecordApnea();
+            sound.stopRecordApnea();
             com.Close();
         }
 
@@ -1679,7 +1671,7 @@ namespace SleepCheckerApp
                 closeComPort_Lattepanda();
 #if AUTO_ANALYSIS
                 // 録音開始
-                ret = startRecordApnea();
+                ret = sound.startRecordApnea();
 
                 if (ret)
                 {
@@ -1693,7 +1685,7 @@ namespace SleepCheckerApp
                     }
                     else
                     {
-                        stopRecordApnea();
+                        sound.stopRecordApnea();
                     }
                 }
 #endif
@@ -1779,104 +1771,19 @@ namespace SleepCheckerApp
             } while (true);
         }
 
-        private Boolean startRecordApnea()
-        {
-            WaveInCapabilities capabilities;
-            int deviceNumber;
-            Boolean ret = false;
-            string fileName = "record_snore";
-            string temp;
-
-            for (deviceNumber = 0; deviceNumber < WaveIn.DeviceCount; deviceNumber++)
-            {
-                capabilities = WaveIn.GetCapabilities(deviceNumber);
-                if (capabilities.ProductName.Contains("マイク") || capabilities.ProductName.Contains("Microphone"))
-                {
-                    ret = true;
-                    break;
-                }
-            }
-
-            if(!ret)
-            { //マイクが見つからない
-                return ret;
-            }
-
-            // waveIn Select Recording Device
-            sourceStream = new WaveIn();
-            sourceStream.DeviceNumber = deviceNumber;
-            sourceStream.WaveFormat = new WaveFormat(4000, WaveIn.GetCapabilities(deviceNumber).Channels);
-
-            // 録音のコールバックkな数
-            sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
-
-            temp = fileName + ".wav";
-            for (int i = 1; i < 20; i++)
-            {
-                if (File.Exists(recordFilePath + temp))
-                {
-                    temp = fileName + "(" + i + ")" + ".wav";
-                }
-                else
-                {
-                    fileName = temp;
-                    break;
-                }
-            }
-            // wave出力
-            waveWriter = new WaveFileWriter(recordFilePath + fileName, sourceStream.WaveFormat);
-
-            // 録音開始
-            sourceStream.StartRecording();
-
-            return ret;
-        }
-
-        private void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            if (waveWriter == null) return;
-
-            waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
-            waveWriter.Flush();
-        }
-
-        private void stopRecordApnea()
-        {
-            if (sourceStream != null)
-            {
-                sourceStream.StopRecording();
-                sourceStream.Dispose();
-                sourceStream = null;
-            }
-
-            if (waveWriter != null)
-            {
-                waveWriter.Dispose();
-                waveWriter = null;
-            }
-        }
-
         private void button_recordstop_Click(object sender, EventArgs e)
         {
-            stopRecordApnea();
+            sound.stopRecordApnea();
         }
 
         private void button_recordstart_Click(object sender, EventArgs e)
         {
-            startRecordApnea();
+            sound.startRecordApnea();
         }
 
-        //ログオフ、シャットダウンしようとしているとき
-        private void SystemEvents_SessionEnding(object sender, SessionEndingEventArgs e)
+        public string getRecordFilePath()
         {
-            if (e.Reason == SessionEndReasons.Logoff)
-            {
-            }
-            else if (e.Reason == SessionEndReasons.SystemShutdown)
-            {
-                stopRecordApnea();
-                com.Close();
-            }
+            return recordFilePath;
         }
     }
 }
