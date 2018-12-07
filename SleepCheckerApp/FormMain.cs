@@ -80,7 +80,6 @@ namespace SleepCheckerApp
         private const string SOUND_1000HZ = "1000Hz.wav";
         private const string SOUND_5000HZ = "5000Hz.wav";
         private const string SOUND_10000HZ = "10000Hz.wav";
-        private const string AUDIO_PATH = "C:\\audio\\";
 
         enum alarmIndex
         {
@@ -289,7 +288,7 @@ namespace SleepCheckerApp
 
             comboBox_alarm.SelectedIndex = 0;
 
-            player = new System.Media.SoundPlayer(AUDIO_PATH + SoundFile);
+            player = new System.Media.SoundPlayer(SoundFile);
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -1615,7 +1614,7 @@ namespace SleepCheckerApp
                     SoundFile = SOUND_1000HZ;
                     break;
             }
-            player = new System.Media.SoundPlayer(AUDIO_PATH + SoundFile);
+            player = new System.Media.SoundPlayer(SoundFile);
 
             if(player != null)
             {
