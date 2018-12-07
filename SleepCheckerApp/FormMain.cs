@@ -1765,7 +1765,6 @@ namespace SleepCheckerApp
             param[0] = pattern;
             //データは何でもいい。Arduino側で制御する。
             com.WriteData(param);
-            com.Close();
 #endif
         }
 
