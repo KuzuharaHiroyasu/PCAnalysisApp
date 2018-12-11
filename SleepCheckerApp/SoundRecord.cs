@@ -32,6 +32,7 @@ namespace SleepCheckerApp
 
             if (!ret)
             { //マイクが見つからない
+                form.log_output("[ERROR]No mic.");
                 return ret;
             }
             
@@ -62,6 +63,8 @@ namespace SleepCheckerApp
             // 録音開始
             sourceStream.StartRecording();
 
+            form.log_output("[START]Record");
+
             return ret;
         }
 
@@ -80,6 +83,7 @@ namespace SleepCheckerApp
                 sourceStream.StopRecording();
                 sourceStream.Dispose();
                 sourceStream = null;
+                form.log_output("[STOP]Record");
             }
 
             if (waveWriter != null)

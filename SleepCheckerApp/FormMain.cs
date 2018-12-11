@@ -2,6 +2,7 @@
 #define LATTEPANDA // LATTEPANDAのLED出力
 #define C_DRIVE // Cドライブ直下にログ出力
 #define AUTO_ANALYSIS // 解析自動スタート
+#define LOG_OUT // ログ出力
 
 using System;
 using System.Collections.Generic;
@@ -183,6 +184,9 @@ namespace SleepCheckerApp
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
 
+        // ログ出力パス
+        string logPath = "C:\\log";
+
         public FormMain()
         {
             InitializeComponent();
@@ -196,6 +200,15 @@ namespace SleepCheckerApp
             com = new ComPort();
             sound = new SoundRecord();
             sound.form = this;
+            
+
+            if (!Directory.Exists(logPath))
+            {
+                Directory.CreateDirectory(logPath);
+            }
+            logPath = logPath + "\\log.txt";
+
+            log_output("[START-UP]App");
 
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
@@ -308,6 +321,7 @@ namespace SleepCheckerApp
                         com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
                         buttonStart.Text = "データ取得中";
                         buttonStart.Enabled = false;
+                        log_output("[START]Analysis(button)");
                     }
                 }
             }
@@ -356,7 +370,9 @@ namespace SleepCheckerApp
                         {
                             // For 加速度
                             SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
+                            log_output("DataReceived:Acc");
                         }
+                        log_output("DataReceived");
                     }
                     else
                     {
@@ -1645,6 +1661,8 @@ namespace SleepCheckerApp
                     }
                 }
             }
+            log_output("startAnalysis:" + ret);
+
             return ret;
         }
 
@@ -1676,6 +1694,7 @@ namespace SleepCheckerApp
                         com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
                         buttonStart.Text = "データ取得中";
                         buttonStart.Enabled = false;
+                        log_output("[START]Analysis_Auto");
                     }
                     else
                     {
@@ -1690,6 +1709,7 @@ namespace SleepCheckerApp
                 setComPort_Lattepanda();
                 requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
                 closeComPort_Lattepanda();
+                log_output("[ERROR]");
                 Application.Exit();
             }
         }
@@ -1712,9 +1732,10 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-# else
+#else
             ret = true; // 無条件でtrue
 #endif
+            log_output("USBConnectConf:" + ret);
             return ret;
         }
 
@@ -1764,19 +1785,28 @@ namespace SleepCheckerApp
             } while (true);
         }
 
-        private void button_recordstop_Click(object sender, EventArgs e)
-        {
-            sound.stopRecordApnea();
-        }
-
         private void button_recordstart_Click(object sender, EventArgs e)
         {
+            log_output("[BUTTON]Record Start");
             sound.startRecordApnea();
+        }
+
+        private void button_recordstop_Click(object sender, EventArgs e)
+        {
+            log_output("[BUTTON]Record Stop");
+            sound.stopRecordApnea();
         }
 
         public string getRecordFilePath()
         {
             return recordFilePath;
+        }
+
+        public void log_output(string msg)
+        {
+#if LOG_OUT
+            File.AppendAllText(logPath, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff") + "    " + msg + Environment.NewLine);
+#endif
         }
     }
 }
