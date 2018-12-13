@@ -9,7 +9,7 @@ namespace SleepCheckerApp
         private ComPort com = null;
 
         /************************************************************************/
-        /* 関数名   : SoundAlarm          		                                */
+        /* 関数名   : LattePanda          		                                */
         /* 機能     : コンストラクタ                                            */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/

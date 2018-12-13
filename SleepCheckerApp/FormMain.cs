@@ -360,6 +360,82 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
+        /* 関数名   : startAnalysis             		                		*/
+        /* 機能     : 解析スタート処理                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : Boolean : 成功 - true                                     */
+        /*                      失敗 - false                  					*/
+        /************************************************************************/
+        private Boolean startAnalysis()
+        {
+            Boolean ret = false;
+            com.BaudRate = 76800;
+            com.Parity = Parity.Even;
+            com.DataBits = 8;
+            com.StopBits = StopBits.One;
+
+            for (int i = 0; i < comboBoxComport.Items.Count; i++)
+            {
+                com.PortName = comboBoxComport.Items[i].ToString();
+                if (com.PortName != "COM1" && com.PortName != "COM5")
+                {
+                    if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                    {
+                        ret = com.Start();
+                        break;
+                    }
+                }
+            }
+            log_output("startAnalysis:" + ret);
+
+            return ret;
+        }
+
+        /************************************************************************/
+        /* 関数名   : USBConnectConf             		                		*/
+        /* 機能     : USBストレージ挿入確認                                     */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [Boolean] 成功 - true                                     */
+        /*          : [Boolean] 失敗 - false                  					*/
+        /************************************************************************/
+        private Boolean USBConnectConf()
+        {
+            Boolean ret = false;
+#if USB_OUTPUT
+            string[] Array_DeviceID;//取得ID分解用配列
+            ManagementObjectCollection MyCollection;
+
+            // USBストレージが挿さっているか確認
+            MyCollection = MyOCS.Get();
+            foreach (ManagementObject MyObject in MyCollection)
+            {
+                Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
+                if (Array_DeviceID[0].Contains("USBSTOR"))
+                {
+                    ret = true;
+                    break;
+                }
+            }
+#else
+            ret = true; // 無条件でtrue
+#endif
+            log_output("USBConnectConf:" + ret);
+
+            return ret;
+        }
+
+        /************************************************************************/
+        /* 関数名   : getRecordFilePath    		                          		*/
+        /* 機能     : 録音ファイルのファイルパスを返す                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [string] recordFilePath - ファイルパス         			*/
+        /************************************************************************/
+        public string getRecordFilePath()
+        {
+            return recordFilePath;
+        }
+
+        /************************************************************************/
         /* 関数名   : log_output                     			    			*/
         /* 機能     : ログ出力                                                  */
         /* 引数     : [string] msg - ログ文言                                   */
@@ -597,8 +673,6 @@ namespace SleepCheckerApp
                 AcceCalcCount_++;
             }
         }
-
-
 
         /************************************************************************/
         /* 関数名   : CreateRootDir                     			   			*/
@@ -1785,82 +1859,6 @@ namespace SleepCheckerApp
             int index = comboBox_alarm.SelectedIndex;
 
             alarm.alarmComboboxTextChanged(index);
-        }
-
-        /************************************************************************/
-        /* 関数名   : startAnalysis             		                		*/
-        /* 機能     : 解析スタート処理                                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : Boolean : 成功 - true                                     */
-        /*                      失敗 - false                  					*/
-        /************************************************************************/
-        private Boolean startAnalysis()
-        {
-            Boolean ret = false;
-            com.BaudRate = 76800;
-            com.Parity = Parity.Even;
-            com.DataBits = 8;
-            com.StopBits = StopBits.One;
-
-            for(int i =0; i < comboBoxComport.Items.Count; i++)
-            {
-                com.PortName = comboBoxComport.Items[i].ToString();
-                if (com.PortName != "COM1" && com.PortName != "COM5")
-                {
-                    if (String.IsNullOrWhiteSpace(com.PortName) == false)
-                    {
-                        ret = com.Start();
-                        break;
-                    }
-                }
-            }
-            log_output("startAnalysis:" + ret);
-
-            return ret;
-        }
-
-        /************************************************************************/
-        /* 関数名   : USBConnectConf             		                		*/
-        /* 機能     : USBストレージ挿入確認                                     */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : [Boolean] 成功 - true                                     */
-        /*          : [Boolean] 失敗 - false                  					*/
-        /************************************************************************/
-        private Boolean USBConnectConf()
-        {
-            Boolean ret = false;
-#if USB_OUTPUT
-            string[] Array_DeviceID;//取得ID分解用配列
-            ManagementObjectCollection MyCollection;
-
-            // USBストレージが挿さっているか確認
-            MyCollection = MyOCS.Get();
-            foreach (ManagementObject MyObject in MyCollection)
-            {
-                Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
-                if (Array_DeviceID[0].Contains("USBSTOR"))
-                {
-                    ret = true;
-                    break;
-                }
-            }
-#else
-            ret = true; // 無条件でtrue
-#endif
-            log_output("USBConnectConf:" + ret);
-
-            return ret;
-        }
-
-        /************************************************************************/
-        /* 関数名   : getRecordFilePath    		                          		*/
-        /* 機能     : 録音ファイルのファイルパスを返す                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : [string] recordFilePath - ファイルパス         			*/
-        /************************************************************************/
-        public string getRecordFilePath()
-        {
-            return recordFilePath;
         }
     }
 }
