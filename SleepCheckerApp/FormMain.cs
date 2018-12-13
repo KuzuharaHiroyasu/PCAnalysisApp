@@ -195,6 +195,12 @@ namespace SleepCheckerApp
             //CalcDataList2 = new List<int>(CalcData2);
         }
 
+        /************************************************************************/
+        /* 関数名   : Form1_Load          						    			*/
+        /* 機能     : フォーム読み込み時のイベント	                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void Form1_Load(object sender, EventArgs e)
         {
             com = new ComPort();
@@ -304,6 +310,12 @@ namespace SleepCheckerApp
             player = new System.Media.SoundPlayer(SoundFile);
         }
 
+        /************************************************************************/
+        /* 関数名   : Form1_Shown          						    			*/
+        /* 機能     : フォーム表示時のイベント		                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void Form1_Shown(object sender, EventArgs e)
         {
             Boolean ret = false;
@@ -348,12 +360,24 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : FormMain_FormClosing             			    			*/
+        /* 機能     : フォームを閉じる時のイベント	                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             sound.stopRecordApnea();
             com.Close();
         }
 
+        /************************************************************************/
+        /* 関数名   : log_output                     			    			*/
+        /* 機能     : ログ出力                                                  */
+        /* 引数     : string : msg - ログ文言                                   */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         public void log_output(string msg)
         {
 #if LOG_OUT
@@ -985,8 +1009,8 @@ namespace SleepCheckerApp
                 }
 
                 // 生データグラフを更新
-                Series srs_rawresp = chartRawData.Series["呼吸"]; //■
-                Series srs_rawsnore = chartRawData.Series["いびき"]; //■
+                Series srs_rawresp = chartRawData.Series["呼吸(生データ)"]; //■
+                Series srs_rawsnore = chartRawData.Series["いびき(生データ)"]; //■
                 Series srs_dcresp = chartRawData.Series["呼吸(移動平均)"]; //■
                 srs_rawresp.Points.Clear();
                 srs_rawsnore.Points.Clear();
@@ -1073,7 +1097,7 @@ namespace SleepCheckerApp
 
             lock (lockData_SpO2)
             {
-                // 心拍数グラフを更新
+                // 脈拍数グラフを更新
                 Series srs_sekisyoku = chartSinpaku.Series["赤色"];
                 Series srs_sekigai = chartSinpaku.Series["赤外"];
                 srs_sekisyoku.Points.Clear();
@@ -1111,9 +1135,9 @@ namespace SleepCheckerApp
                     cnt++;
                 }
 */
-                // 生データグラフを更新
-                Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色"];
-                Series srs_rawsekigai = chartRawData_SpO2.Series["赤外"];
+                // 生データSpO2グラフを更新
+                Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色(生データ)"];
+                Series srs_rawsekigai = chartRawData_SpO2.Series["赤外(生データ)"];
                 Series srs_dcsekisyoku = chartRawData_SpO2.Series["赤色(DC抜)"];
                 Series srs_dcsekigai = chartRawData_SpO2.Series["赤外(DC抜)"];
                 Series srs_cutsekisyoku = chartRawData_SpO2.Series["赤色(CUT)"];
