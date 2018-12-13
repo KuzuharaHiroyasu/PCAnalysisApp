@@ -282,7 +282,7 @@ namespace SleepCheckerApp
                 SpNormalDataQueue.Enqueue(0);
                 SpAcdcDataQueue.Enqueue(0);
             }
-            GraphUpdate();
+            GraphUpdate_Apnea();
             GraphUpdate_SpO2();
 
             // インターバル処理
@@ -361,7 +361,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         /* 関数名   : log_output                     			    			*/
         /* 機能     : ログ出力                                                  */
-        /* 引数     : string : msg - ログ文言                                   */
+        /* 引数     : [string] msg - ログ文言                                   */
         /* 戻り値   : なし														*/
         /************************************************************************/
         public void log_output(string msg)
@@ -371,6 +371,12 @@ namespace SleepCheckerApp
 #endif
         }
 
+        /************************************************************************/
+        /* 関数名   : ComPort_DataReceived            			    			*/
+        /* 機能     : データ受信イベント                                        */
+        /* 引数     : [byte[]] buffer - 受信データ                              */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void ComPort_DataReceived(byte[] buffer)
         {
             string text = "";
@@ -434,6 +440,13 @@ namespace SleepCheckerApp
         }
         public delegate void SetTextDelegate(string str);
 
+        /************************************************************************/
+        /* 関数名   : SetCalcData_Apnea               			    			*/
+        /* 機能     : 呼吸・いびきのデータをセット                              */
+        /* 引数     : [int] data1 - 呼吸の生データ                              */
+        /*          : [int] data2 - いびきの生データ                            */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         // For Apnea
         private void SetCalcData_Apnea(int data1, int data2)
         {
@@ -471,41 +484,13 @@ namespace SleepCheckerApp
             }
         }
 
-        private void GraphUpdate_Acc()
-        {
-            int cnt = 0;
-
-            lock (lockData_Acc)
-            {
-                // いびき回数グラフを更新
-                Series accelerometer_x = chartAccelerometer.Series["X軸"]; //■
-                Series accelerometer_y = chartAccelerometer.Series["Y軸"]; //■
-                Series accelerometer_z = chartAccelerometer.Series["Z軸"]; //■
-                accelerometer_x.Points.Clear();
-                accelerometer_y.Points.Clear();
-                accelerometer_z.Points.Clear();
-                foreach (int data in AccelerometerXQueue)
-                {
-                    accelerometer_x.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in AccelerometerYQueue)
-                {
-                    accelerometer_y.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in AccelerometerZQueue)
-                {
-                    accelerometer_z.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-            }
-            chartAccelerometer.Invalidate();
-        }
-
-        // For PulseOximeter
+        /************************************************************************/
+        /* 関数名   : SetCalcData_SpO2               			    			*/
+        /* 機能     : 赤色・赤外のデータをセット                                */
+        /* 引数     : [int] data1 - 赤色の生データ                              */
+        /*          : [int] data2 - 赤外の生データ                              */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void SetCalcData_SpO2(int data1, int data2)
         {
 
@@ -570,7 +555,14 @@ namespace SleepCheckerApp
             }
         }
 
-        // For 加速度
+        /************************************************************************/
+        /* 関数名   : SetCalcData_Acc               			    			*/
+        /* 機能     : 加速度センサーのデータをセット                            */
+        /* 引数     : [int] data1 - X軸                                         */
+        /*          : [int] data2 - Y軸                                         */
+        /*          : [int] data3 - Z軸                                         */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void SetCalcData_Acc(int data1, int data2, int data3)
         {
             lock (lockData_Acc)
@@ -605,113 +597,14 @@ namespace SleepCheckerApp
             }
         }
 
-        // For Apnea
-        private void Calc_Apnea()
-        {
-            try
-            {
-                string path = CreateApneaDir(ApneaCalcCount_);
-                ApneaCalcCount_ += 1;
-                
-                int num = CalcDataNumApnea;
-                IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
-                int[] arrayi = new int[num];
-                double[] arrayd = new double[num];
-                Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
-                Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                getwav_init(ptr, num, pathptr, ptr2);
-                lock (lockData)
-                {
-                    // DC成分除去データをQueueに置く
-                    getwav_dc(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        RawDataDcQueue.Dequeue();
-                        RawDataDcQueue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // 無呼吸(ave)データをQueueに置く
-                    get_apnea_ave(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        ApneaAveQueue.Dequeue();
-                        ApneaAveQueue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // 無呼吸(eval)データをQueueに置く
-                    get_apnea_eval(pi);
-                    Marshal.Copy(pi, arrayi, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        ApneaEvalQueue.Dequeue();
-                        ApneaEvalQueue.Enqueue(arrayi[ii]);
-                    }
-                    // 無呼吸(rms)データをQueueに置く
-                    get_apnea_rms(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        ApneaRmsQueue.Dequeue();
-                        ApneaRmsQueue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // 無呼吸(point)データをQueueに置く
-                    get_apnea_point(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        ApneaPointQueue.Dequeue();
-                        ApneaPointQueue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // いびき(xy2)データをQueueに置く
-                    get_snore_xy2(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        SnoreXy2Queue.Dequeue();
-                        SnoreXy2Queue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // いびき(interval)データをQueueに置く
-                    get_snore_interval(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        SnoreIntervalQueue.Dequeue();
-                        SnoreIntervalQueue.Enqueue(arrayd[ii]);
-                    }
-                    
-                    // 演算結果データ
-                    int state = get_state();
-                    snore = state & 0x01;
-                    apnea = (state & 0xC0) >> 6;
-                    if (ResultIbikiQueue.Count >= BufNumApneaGraph)
-                    {
-                        ResultIbikiQueue.Dequeue();
-                    }
-                    ResultIbikiQueue.Enqueue(snore);
-                    if (ApneaQueue.Count >= BufNumApneaGraph)
-                    {
-                        ApneaQueue.Dequeue();
-                    }
-                    ApneaQueue.Enqueue(apnea);
 
-                    alarm.confirmAlarm();
-                }
-                Marshal.FreeCoTaskMem(ptr);
-                Marshal.FreeCoTaskMem(ptr2);
-                Marshal.FreeCoTaskMem(pi);
-                Marshal.FreeCoTaskMem(pd);
-                Marshal.FreeHGlobal(pathptr);
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show(ex.Message, "内部エラー(Calc)");
-                Console.WriteLine(ex.Message);
-            }
-        }
-        
-        // 演算結果保存用パスの作成[共通]
+
+        /************************************************************************/
+        /* 関数名   : CreateRootDir                     			   			*/
+        /* 機能     : 演算結果保存用パスの作成                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void CreateRootDir()
         {
             string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
@@ -830,8 +723,13 @@ namespace SleepCheckerApp
                 }
             }
         }
-        
-        // 演算結果保存用パスの作成[無呼吸]
+
+        /************************************************************************/
+        /* 関数名   : CreateApneaDir                     		    			*/
+        /* 機能     : 無呼吸演算結果保存用パスの作成                            */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private string CreateApneaDir(int Count)
         {
            string path = ApneaRootPath_ + Count.ToString("D");
@@ -843,7 +741,12 @@ namespace SleepCheckerApp
             return path;
         }
 
-        // 演算結果保存用パスの作成[SPO2]
+        /************************************************************************/
+        /* 関数名   : CreatePulseDir                     		    			*/
+        /* 機能     : SpO2演算結果保存用パスの作成                              */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private string CreatePulseDir(int Count)
         {
            string path = PulseRootPath_ + Count.ToString("D");
@@ -855,7 +758,12 @@ namespace SleepCheckerApp
             return path;
         }
 
-        // 加速度センサー保存用パスの作成[加速度]
+        /************************************************************************/
+        /* 関数名   : CreateAcceDir                     		    			*/
+        /* 機能     : 加速度センサー結果保存用パスの作成                        */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private string CreateAcceDir(int Count)
         {
 
@@ -870,7 +778,130 @@ namespace SleepCheckerApp
             return path;
         }
 
-        // For PulseOximeter
+        /************************************************************************/
+        /* 関数名   : Calc_Apnea                    			    			*/
+        /* 機能     : 呼吸データの演算                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void Calc_Apnea()
+        {
+            try
+            {
+                string path = CreateApneaDir(ApneaCalcCount_);
+                ApneaCalcCount_ += 1;
+
+                int num = CalcDataNumApnea;
+                IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+                IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+                IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
+                int[] arrayi = new int[num];
+                double[] arrayd = new double[num];
+                Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
+                Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
+                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+                getwav_init(ptr, num, pathptr, ptr2);
+                lock (lockData)
+                {
+                    // DC成分除去データをQueueに置く
+                    getwav_dc(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        RawDataDcQueue.Dequeue();
+                        RawDataDcQueue.Enqueue(arrayd[ii]);
+                    }
+
+                    // 無呼吸(ave)データをQueueに置く
+                    get_apnea_ave(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        ApneaAveQueue.Dequeue();
+                        ApneaAveQueue.Enqueue(arrayd[ii]);
+                    }
+
+                    // 無呼吸(eval)データをQueueに置く
+                    get_apnea_eval(pi);
+                    Marshal.Copy(pi, arrayi, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        ApneaEvalQueue.Dequeue();
+                        ApneaEvalQueue.Enqueue(arrayi[ii]);
+                    }
+                    // 無呼吸(rms)データをQueueに置く
+                    get_apnea_rms(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        ApneaRmsQueue.Dequeue();
+                        ApneaRmsQueue.Enqueue(arrayd[ii]);
+                    }
+
+                    // 無呼吸(point)データをQueueに置く
+                    get_apnea_point(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        ApneaPointQueue.Dequeue();
+                        ApneaPointQueue.Enqueue(arrayd[ii]);
+                    }
+
+                    // いびき(xy2)データをQueueに置く
+                    get_snore_xy2(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        SnoreXy2Queue.Dequeue();
+                        SnoreXy2Queue.Enqueue(arrayd[ii]);
+                    }
+
+                    // いびき(interval)データをQueueに置く
+                    get_snore_interval(pd);
+                    Marshal.Copy(pd, arrayd, 0, num);
+                    for (int ii = 0; ii < num; ++ii)
+                    {
+                        SnoreIntervalQueue.Dequeue();
+                        SnoreIntervalQueue.Enqueue(arrayd[ii]);
+                    }
+
+                    // 演算結果データ
+                    int state = get_state();
+                    snore = state & 0x01;
+                    apnea = (state & 0xC0) >> 6;
+                    if (ResultIbikiQueue.Count >= BufNumApneaGraph)
+                    {
+                        ResultIbikiQueue.Dequeue();
+                    }
+                    ResultIbikiQueue.Enqueue(snore);
+                    if (ApneaQueue.Count >= BufNumApneaGraph)
+                    {
+                        ApneaQueue.Dequeue();
+                    }
+                    ApneaQueue.Enqueue(apnea);
+
+                    alarm.confirmAlarm();
+                }
+                Marshal.FreeCoTaskMem(ptr);
+                Marshal.FreeCoTaskMem(ptr2);
+                Marshal.FreeCoTaskMem(pi);
+                Marshal.FreeCoTaskMem(pd);
+                Marshal.FreeHGlobal(pathptr);
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.Message, "内部エラー(Calc)");
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : Calc_SpO2                     			    			*/
+        /* 機能     : SpO2データの演算                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void Calc_SpO2()
         {
             try
@@ -965,7 +996,13 @@ namespace SleepCheckerApp
             }
         }
 
-        private void GraphUpdate()
+        /************************************************************************/
+        /* 関数名   : GraphUpdate_Apnea                			    			*/
+        /* 機能     : 呼吸グラフを更新                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void GraphUpdate_Apnea()
         {
             int cnt = 0;
 
@@ -1077,6 +1114,12 @@ namespace SleepCheckerApp
             chart1.Invalidate();
         }
 
+        /************************************************************************/
+        /* 関数名   : GraphUpdate_SpO2                			    			*/
+        /* 機能     : SpO2グラフを更新                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void GraphUpdate_SpO2()
         {
             int cnt = 0;
@@ -1213,14 +1256,66 @@ namespace SleepCheckerApp
             chartSpO2.Invalidate();
             chartRawData_SpO2.Invalidate();
         }
-        
+
+        /************************************************************************/
+        /* 関数名   : GraphUpdate_Acc                			    			*/
+        /* 機能     : 加速度センサーのグラフを更新                              */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void GraphUpdate_Acc()
+        {
+            int cnt = 0;
+
+            lock (lockData_Acc)
+            {
+                // 加速度センサーのグラフを更新
+                Series accelerometer_x = chartAccelerometer.Series["X軸"]; //■
+                Series accelerometer_y = chartAccelerometer.Series["Y軸"]; //■
+                Series accelerometer_z = chartAccelerometer.Series["Z軸"]; //■
+                accelerometer_x.Points.Clear();
+                accelerometer_y.Points.Clear();
+                accelerometer_z.Points.Clear();
+                foreach (int data in AccelerometerXQueue)
+                {
+                    accelerometer_x.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in AccelerometerYQueue)
+                {
+                    accelerometer_y.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in AccelerometerZQueue)
+                {
+                    accelerometer_z.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+            }
+            chartAccelerometer.Invalidate();
+        }
+
+        /************************************************************************/
+        /* 関数名   : Interval                      			    			*/
+        /* 機能     : グラフ更新イベント                                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         public void Interval(object sender, EventArgs e)
         {
-            GraphUpdate();
+            GraphUpdate_Apnea();
             GraphUpdate_SpO2();
             GraphUpdate_Acc();
         }
-        
+
+        /************************************************************************/
+        /* 関数名   : CalculateAll                   			    			*/
+        /* 機能     : CSVファイル読み込み                                       */
+        /* 引数     : [string] FolderPath - フォルダパス                        */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void CalculateAll(String FolderPath)
         {
         	string[] files = System.IO.Directory.GetFiles(FolderPath, "*.csv", System.IO.SearchOption.AllDirectories);
@@ -1228,7 +1323,13 @@ namespace SleepCheckerApp
         		Calculate(filename);
         	}
         }
-        
+
+        /************************************************************************/
+        /* 関数名   : Calculate                     			    			*/
+        /* 機能     : CSVファイルに書き出し                                     */
+        /* 引数     : [string] FolderPath - ファイルパス                        */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void Calculate(String FilePath)
         {
     		using(StreamReader r = new StreamReader(FilePath))
@@ -1721,8 +1822,8 @@ namespace SleepCheckerApp
         /* 関数名   : USBConnectConf             		                		*/
         /* 機能     : USBストレージ挿入確認                                     */
         /* 引数     : なし                                                      */
-        /* 戻り値   : Boolean : 成功 - true                                     */
-        /*                      失敗 - false                  					*/
+        /* 戻り値   : [Boolean] 成功 - true                                     */
+        /*          : [Boolean] 失敗 - false                  					*/
         /************************************************************************/
         private Boolean USBConnectConf()
         {
@@ -1786,7 +1887,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         /* 関数名   : requestLattepanda          		                		*/
         /* 機能     : ラテパンダにコマンドを送信する                            */
-        /* 引数     : byte : pattern - コマンド                                 */
+        /* 引数     : [byte] pattern - コマンド                                 */
         /* 戻り値   : なし														*/
         /************************************************************************/
         private void requestLattepanda(byte pattern)
@@ -1823,7 +1924,7 @@ namespace SleepCheckerApp
         /* 関数名   : getRecordFilePath    		                          		*/
         /* 機能     : 録音ファイルのファイルパスを返す                          */
         /* 引数     : なし                                                      */
-        /* 戻り値   : string : recordFilePath - ファイルパス         			*/
+        /* 戻り値   : [string] recordFilePath - ファイルパス         			*/
         /************************************************************************/
         public string getRecordFilePath()
         {
