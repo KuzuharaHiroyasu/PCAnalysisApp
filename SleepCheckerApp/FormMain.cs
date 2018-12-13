@@ -75,19 +75,10 @@ namespace SleepCheckerApp
         static extern double get_acavg_ratio();
 
         private ComPort com = null;
-        private SoundRecord sound = null;
+        private SoundRecord record = null;
+        private SoundAlarm alarm = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
-        private const string SOUND_1000HZ = "1000Hz.wav";
-        private const string SOUND_5000HZ = "5000Hz.wav";
-        private const string SOUND_10000HZ = "10000Hz.wav";
-
-        enum alarmIndex
-        {
-            SOUND_1000HZ = 0,
-            SOUND_5000HZ,
-            SOUND_10000HZ,
-        }
 
         enum request
         {
@@ -173,13 +164,8 @@ namespace SleepCheckerApp
         private int PulseCalcCount_;
         private int AcceCalcCount_;
 
-        private int snore = 0;
-        private int apnea = 0;
-
-        // アラーム
-        private System.Media.SoundPlayer player = null;
-        private string SoundFile = SOUND_1000HZ; //デフォルト
-        private Boolean playflg = false;
+        public int snore = 0;
+        public int apnea = 0;
 
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
@@ -204,9 +190,11 @@ namespace SleepCheckerApp
         private void Form1_Load(object sender, EventArgs e)
         {
             com = new ComPort();
-            sound = new SoundRecord();
-            sound.form = this;
-            
+            record = new SoundRecord();
+            alarm = new SoundAlarm();
+
+            record.form = this;
+            alarm.form = this;
 
             if (!Directory.Exists(logPath))
             {
@@ -306,8 +294,6 @@ namespace SleepCheckerApp
             calc_snore_init();
 
             comboBox_alarm.SelectedIndex = 0;
-
-            player = new System.Media.SoundPlayer(SoundFile);
         }
 
         /************************************************************************/
@@ -330,7 +316,7 @@ namespace SleepCheckerApp
             closeComPort_Lattepanda();
 #if AUTO_ANALYSIS
             // 録音開始
-            ret = sound.startRecordApnea();
+            ret = record.startRecordApnea();
 
             if (ret)
             {
@@ -345,7 +331,7 @@ namespace SleepCheckerApp
                 }
                 else
                 {
-                    sound.stopRecordApnea();
+                    record.stopRecordApnea();
                 }
             }
 #endif
@@ -368,7 +354,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            sound.stopRecordApnea();
+            record.stopRecordApnea();
             com.Close();
         }
 
@@ -710,7 +696,7 @@ namespace SleepCheckerApp
                     }
                     ApneaQueue.Enqueue(apnea);
 
-                    playAlarm();
+                    alarm.confirmAlarm();
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
@@ -1309,7 +1295,7 @@ namespace SleepCheckerApp
         private void button_recordstart_Click(object sender, EventArgs e)
         {
             log_output("[BUTTON]Record Start");
-            sound.startRecordApnea();
+            record.startRecordApnea();
         }
 
         /************************************************************************/
@@ -1321,7 +1307,7 @@ namespace SleepCheckerApp
         private void button_recordstop_Click(object sender, EventArgs e)
         {
             log_output("[BUTTON]Record Stop");
-            sound.stopRecordApnea();
+            record.stopRecordApnea();
         }
 
 /* チェックボックスイベント */
@@ -1650,85 +1636,18 @@ namespace SleepCheckerApp
             }
         }
 
-        private void playAlarm()
-        {
-            if (player != null)
-            {
-                //アラームON
-                if (radio_alarmOn.Checked)
-                {
-                    if (checkBox_snore.Checked && snore == 1)
-                    {// いびき判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else if (checkBox_apnea.Checked && apnea == 2)
-                    {// 無呼吸判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else
-                    {// どちらもOFF
-                        if (playflg)
-                        {// 再生中
-                            player.Stop();
-                            playflg = false;
-                        }
-                    }
-                }
-            }
-        }
+
 
 /* アラーム */
         /************************************************************************/
         /* 関数名   : radio_alarmOff_CheckedChanged          		    		*/
-        /* 機能     : アラームのON/OFFチェック時のイベント                      */
+        /* 機能     : アラームOFFのチェック状態が変更された時のイベント         */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
         private void radio_alarmOff_CheckedChanged(object sender, EventArgs e)
         {
-            if (player != null)
-            {//アラームON
-                if (radio_alarmOn.Checked)
-                {
-                    if (checkBox_snore.Checked && snore == 1)
-                    {// いびき判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else if (checkBox_apnea.Checked && apnea == 2)
-                    {// 無呼吸判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else
-                    {// どちらもOFF
-                        if (playflg)
-                        {// 再生中
-                            player.Stop();
-                            playflg = false;
-                        }
-                    }
-                }
-                else if (radio_alarmOff.Checked && playflg)
-                {// 再生中
-                    player.Stop();
-                    playflg = false;
-                }
-            }
+            alarm.alarmOffStatusChanged();
         }
 
         /************************************************************************/
@@ -1739,36 +1658,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void checkBox_snore_CheckedChanged(object sender, EventArgs e)
         {
-            if (player != null)
-            {//アラームON
-                if (radio_alarmOn.Checked)
-                {
-                    if (checkBox_snore.Checked && snore == 1)
-                    {// いびき判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else
-                    {// どちらもOFF
-                        if (!checkBox_apnea.Checked || apnea != 2)
-                        {
-                            if (playflg)
-                            {// 再生中
-                                player.Stop();
-                                playflg = false;
-                            }
-                        }
-                    }
-                }
-                else if (radio_alarmOff.Checked && playflg)
-                {// 再生中
-                    player.Stop();
-                    playflg = false;
-                }
-            }
+            alarm.snoreCheckedChanged();
         }
 
         /************************************************************************/
@@ -1779,36 +1669,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
         {
-            if (player != null)
-            {//アラームON
-                if (radio_alarmOn.Checked)
-                {
-                    if (checkBox_apnea.Checked && apnea == 2)
-                    {// 無呼吸判定ON
-                        if (!playflg)
-                        {// 再生中ではない
-                            player.PlayLooping();
-                            playflg = true;
-                        }
-                    }
-                    else
-                    {// どちらもOFF
-                        if (!checkBox_snore.Checked || snore != 1)
-                        {
-                            if (playflg)
-                            {// 再生中
-                                player.Stop();
-                                playflg = false;
-                            }
-                        }
-                    }
-                }
-                else if (radio_alarmOff.Checked && playflg)
-                {// 再生中
-                    player.Stop();
-                    playflg = false;
-                }
-            }
+            alarm.apneaCheckedChanged();
         }
 
         /************************************************************************/
@@ -1821,40 +1682,7 @@ namespace SleepCheckerApp
         {
             int index = comboBox_alarm.SelectedIndex;
 
-            if (player != null)
-            {
-                if(playflg)
-                {//再生中なら停止
-                    player.Stop();
-                }
-                player.Dispose();
-                player = null;
-            }
-
-            switch(index)
-            {
-                case (int)alarmIndex.SOUND_1000HZ:
-                    SoundFile = SOUND_1000HZ;
-                    break;
-                case (int)alarmIndex.SOUND_5000HZ:
-                    SoundFile = SOUND_5000HZ;
-                    break;
-                case (int)alarmIndex.SOUND_10000HZ:
-                    SoundFile = SOUND_10000HZ;
-                    break;
-                default:
-                    SoundFile = SOUND_1000HZ;
-                    break;
-            }
-            player = new System.Media.SoundPlayer(SoundFile);
-
-            if(player != null)
-            {
-                if(playflg)
-                {
-                    player.PlayLooping();
-                }
-            }
+            alarm.alarmComboboxTextChanged(index);
         }
 
         /************************************************************************/
