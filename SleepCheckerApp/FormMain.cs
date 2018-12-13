@@ -689,11 +689,11 @@ namespace SleepCheckerApp
             System.IO.DriveInfo drive;
 
             if (USBConnectConf())
-            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、CとDは除く)
+            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、Cは除く)
                 do
                 {
                     temp = path_char.ToString();
-                    if (temp != "C" && temp != "D")
+                    if (temp != "C")
                     {
                         drive = new System.IO.DriveInfo(temp);
                         if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
