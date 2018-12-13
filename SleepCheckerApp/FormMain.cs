@@ -304,27 +304,61 @@ namespace SleepCheckerApp
             player = new System.Media.SoundPlayer(SoundFile);
         }
 
-        private void buttonStart_Click(object sender, EventArgs e)
+        private void Form1_Shown(object sender, EventArgs e)
         {
-            if (buttonStart.Text == "開始")
+            Boolean ret = false;
+
+            setComPort_Lattepanda();
+
+            // ログ出力フォルダ作成
+            CreateRootDir();
+
+            // 解析スタートでLATTEPANDAのLEDを消灯。
+            requestLattepanda((byte)request.LED_OFF);
+            closeComPort_Lattepanda();
+#if AUTO_ANALYSIS
+            // 録音開始
+            ret = sound.startRecordApnea();
+
+            if (ret)
             {
-                com.PortName = comboBoxComport.Text;
-                com.BaudRate = 76800;
-                com.Parity = Parity.Even;
-                com.DataBits = 8;
-                com.StopBits = StopBits.One;
-                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                // 解析
+                ret = startAnalysis();
+                if (ret)
                 {
-                    Boolean ret = com.Start();
-                    if (ret)
-                    {
-                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中";
-                        buttonStart.Enabled = false;
-                        log_output("[START]Analysis(button)");
-                    }
+                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    buttonStart.Text = "データ取得中";
+                    buttonStart.Enabled = false;
+                    log_output("[START]Analysis_Auto");
+                }
+                else
+                {
+                    sound.stopRecordApnea();
                 }
             }
+#endif
+
+            if (!ret)
+            { //エラー処理
+                setComPort_Lattepanda();
+                requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
+                closeComPort_Lattepanda();
+                log_output("[ERROR]");
+                Application.Exit();
+            }
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            sound.stopRecordApnea();
+            com.Close();
+        }
+
+        public void log_output(string msg)
+        {
+#if LOG_OUT
+            File.AppendAllText(logPath, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff") + "    " + msg + Environment.NewLine);
+#endif
         }
 
         private void ComPort_DataReceived(byte[] buffer)
@@ -921,12 +955,6 @@ namespace SleepCheckerApp
             }
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            sound.stopRecordApnea();
-            com.Close();
-        }
-
         private void GraphUpdate()
         {
             int cnt = 0;
@@ -1218,137 +1246,71 @@ namespace SleepCheckerApp
   			}
         }
 
-        private void button1_Click(object sender, EventArgs e)
+/* ボタンクリックイベント */
+        /************************************************************************/
+        /* 関数名   : buttonStart_Click          					    		*/
+        /* 機能     : 開始ボタンクリック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void buttonStart_Click(object sender, EventArgs e)
         {
-        	// ファイル選択ダイアログ
-        	OpenFileDialog fbdobj = new OpenFileDialog();
-        	fbdobj.Title = "ファイルを選択してください";
-        	fbdobj.Filter = "CSVファイル(*.csv)|*.csv";
-        	fbdobj.InitialDirectory = @"C:\ax\test\";
-        	if (fbdobj.ShowDialog() == DialogResult.OK)
-        	{
-                // ■データクリア 関数化する
-                ResultIbikiQueue.Clear();
-                ApneaQueue.Clear();
-                ShinpakuSekisyokuDataQueue.Clear();
-                ShinpakuSekigaiDataQueue.Clear();
-                SpNormalDataQueue.Clear();
-                SpAcdcDataQueue.Clear();
-
-                Calculate(fbdobj.FileName);
-
-                GraphUpdate();
-                GraphUpdate_SpO2();
+            if (buttonStart.Text == "開始")
+            {
+                com.PortName = comboBoxComport.Text;
+                com.BaudRate = 76800;
+                com.Parity = Parity.Even;
+                com.DataBits = 8;
+                com.StopBits = StopBits.One;
+                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                {
+                    Boolean ret = com.Start();
+                    if (ret)
+                    {
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Text = "データ取得中";
+                        buttonStart.Enabled = false;
+                        log_output("[START]Analysis(button)");
+                    }
+                }
             }
         }
 
-        private void checkBox_rawclr_CheckedChanged(object sender, EventArgs e)
+        /************************************************************************/
+        /* 関数名   : button_recordstart_Click          				   		*/
+        /* 機能     : 録音開始ボタンクリック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void button_recordstart_Click(object sender, EventArgs e)
         {
-            Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色"];
-            if (checkBox_rawclr.Checked)
-            {
-                srs_rawsekisyoku.Enabled = true;
-            }
-            else
-            {
-                srs_rawsekisyoku.Enabled = false;
-            }
+            log_output("[BUTTON]Record Start");
+            sound.startRecordApnea();
         }
 
-        private void checkBox_rawinf_CheckedChanged(object sender, EventArgs e)
+        /************************************************************************/
+        /* 関数名   : button_recordstop_Click          		    		   		*/
+        /* 機能     : 録音停止ボタンクリック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void button_recordstop_Click(object sender, EventArgs e)
         {
-            Series srs_rawsekigai = chartRawData_SpO2.Series["赤外"];
-            if (checkBox_rawinf.Checked)
-            {
-                srs_rawsekigai.Enabled = true;
-            }
-            else
-            {
-                srs_rawsekigai.Enabled = false;
-            }
+            log_output("[BUTTON]Record Stop");
+            sound.stopRecordApnea();
         }
 
-        private void checkBox_dcclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_dcsekisyoku = chartRawData_SpO2.Series["赤色(DC抜)"];
-            if (checkBox_dcclr.Checked)
-            {
-                srs_dcsekisyoku.Enabled = true;
-            }
-            else
-            {
-                srs_dcsekisyoku.Enabled = false;
-            }
-        }
-
-        private void checkBox_dcinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_dcsekigai = chartRawData_SpO2.Series["赤外(DC抜)"];
-            if (checkBox_dcinf.Checked)
-            {
-                srs_dcsekigai.Enabled = true;
-            }
-            else
-            {
-                srs_dcsekigai.Enabled = false;
-            }
-        }
-
-        private void checkBox_fftclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_fftclr = chartRawData_Acc.Series["赤色(FFT)"];
-            if (checkBox_fftclr.Checked)
-            {
-                srs_fftclr.Enabled = true;
-            }
-            else
-            {
-                srs_fftclr.Enabled = false;
-            }
-        }
-
-        private void checkBox_fftinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_fftinf = chartRawData_Acc.Series["赤外(FFT)"];
-            if (checkBox_fftinf.Checked)
-            {
-                srs_fftinf.Enabled = true;
-            }
-            else
-            {
-                srs_fftinf.Enabled = false;
-            }
-        }
-
-        private void checkBox_ifftclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_ifftclr = chartRawData_Acc.Series["赤色(IFFT)"];
-            if (checkBox_ifftclr.Checked)
-            {
-                srs_ifftclr.Enabled = true;
-            }
-            else
-            {
-                srs_ifftclr.Enabled = false;
-            }
-        }
-
-        private void checkBox_ifftinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_ifftinf = chartRawData_Acc.Series["赤外(IFFT)"];
-            if (checkBox_ifftinf.Checked)
-            {
-                srs_ifftinf.Enabled = true;
-            }
-            else
-            {
-                srs_ifftinf.Enabled = false;
-            }
-        }
-
+/* チェックボックスイベント */
+/* 呼吸切替 */
+        /************************************************************************/
+        /* 関数名   : checkBox_rawresp_CheckedChanged				    		*/
+        /* 機能     : 呼吸(生データ)チェック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_rawresp_CheckedChanged(object sender, EventArgs e)
         {
-            Series srs = chartRawData.Series["呼吸"];
+            Series srs = chartRawData.Series["呼吸(生データ)"];
             if (checkBox_rawresp.Checked)
             {
                 srs.Enabled = true;
@@ -1359,9 +1321,15 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_rawsnore_CheckedChanged     			    		*/
+        /* 機能     : いびき(生データ)チェック時のイベント                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_rawsnore_CheckedChanged(object sender, EventArgs e)
         {
-            Series srs = chartRawData.Series["いびき"];
+            Series srs = chartRawData.Series["いびき(生データ)"];
             if (checkBox_rawsnore.Checked)
             {
                 srs.Enabled = true;
@@ -1372,6 +1340,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_dcresp_CheckedChanged     			    		*/
+        /* 機能     : 呼吸(移動平均)チェック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_dcresp_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartRawData.Series["呼吸(移動平均)"];
@@ -1385,6 +1359,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_apneaave_CheckedChanged  			    		*/
+        /* 機能     : 無呼吸(ave)チェック時のイベント                           */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_apneaave_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["無呼吸(ave)"];
@@ -1398,6 +1378,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_apneaeval_CheckedChanged    			    		*/
+        /* 機能     : 無呼吸(eval)チェック時のイベント                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_apneaeval_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["無呼吸(eval)"];
@@ -1411,6 +1397,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_apnearms_CheckedChanged        		    		*/
+        /* 機能     : 無呼吸(rms)チェック時のイベント                           */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_apnearms_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["無呼吸(rms)"];
@@ -1424,6 +1416,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_apneapoint_CheckedChanged     	        		*/
+        /* 機能     : 無呼吸(point)チェック時のイベント                         */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_apneapoint_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["無呼吸(point)"];
@@ -1437,6 +1435,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_snorexy2_CheckedChanged   			    		*/
+        /* 機能     : いびき(xy2)チェック時のイベント                           */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_snorexy2_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["いびき(xy2)"];
@@ -1450,6 +1454,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_snore_interval_CheckedChanged      	    		*/
+        /* 機能     : いびき(interval)チェック時のイベント                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_snore_interval_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chart1.Series["いびき(interval)"];
@@ -1460,6 +1470,159 @@ namespace SleepCheckerApp
             else
             {
                 srs.Enabled = false;
+            }
+        }
+
+/* SpO2切替 */
+        /************************************************************************/
+        /* 関数名   : checkBox_rawclr_CheckedChanged       			    		*/
+        /* 機能     : 赤色(生データ)チェック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_rawclr_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色(生データ)"];
+            if (checkBox_rawclr.Checked)
+            {
+                srs_rawsekisyoku.Enabled = true;
+            }
+            else
+            {
+                srs_rawsekisyoku.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_rawinf_CheckedChanged   			        		*/
+        /* 機能     : 赤外(生データ)チェック時のイベント                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_rawinf_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_rawsekigai = chartRawData_SpO2.Series["赤外(生データ)"];
+            if (checkBox_rawinf.Checked)
+            {
+                srs_rawsekigai.Enabled = true;
+            }
+            else
+            {
+                srs_rawsekigai.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_dcclr_CheckedChanged   				    		*/
+        /* 機能     : 赤色(DC抜)チェック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_dcclr_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_dcsekisyoku = chartRawData_SpO2.Series["赤色(DC抜)"];
+            if (checkBox_dcclr.Checked)
+            {
+                srs_dcsekisyoku.Enabled = true;
+            }
+            else
+            {
+                srs_dcsekisyoku.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_dcinf_CheckedChanged    				    		*/
+        /* 機能     : 赤外(DC抜)チェック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_dcinf_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_dcsekigai = chartRawData_SpO2.Series["赤外(DC抜)"];
+            if (checkBox_dcinf.Checked)
+            {
+                srs_dcsekigai.Enabled = true;
+            }
+            else
+            {
+                srs_dcsekigai.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_fftclr_CheckedChanged          		    		*/
+        /* 機能     : 赤色(FFT)チェック時のイベント                             */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_fftclr_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_fftclr = chartRawData_Acc.Series["赤色(FFT)"];
+            if (checkBox_fftclr.Checked)
+            {
+                srs_fftclr.Enabled = true;
+            }
+            else
+            {
+                srs_fftclr.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_fftinf_CheckedChanged    			    		*/
+        /* 機能     : 赤外(FFT)チェック時のイベント                             */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_fftinf_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_fftinf = chartRawData_Acc.Series["赤外(FFT)"];
+            if (checkBox_fftinf.Checked)
+            {
+                srs_fftinf.Enabled = true;
+            }
+            else
+            {
+                srs_fftinf.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_ifftclr_CheckedChanged          		    		*/
+        /* 機能     : 赤色(IFFT)チェック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_ifftclr_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_ifftclr = chartRawData_Acc.Series["赤色(IFFT)"];
+            if (checkBox_ifftclr.Checked)
+            {
+                srs_ifftclr.Enabled = true;
+            }
+            else
+            {
+                srs_ifftclr.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_ifftinf_CheckedChanged       		    		*/
+        /* 機能     : 赤外(IFFT)チェック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_ifftinf_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs_ifftinf = chartRawData_Acc.Series["赤外(IFFT)"];
+            if (checkBox_ifftinf.Checked)
+            {
+                srs_ifftinf.Enabled = true;
+            }
+            else
+            {
+                srs_ifftinf.Enabled = false;
             }
         }
 
@@ -1670,49 +1833,6 @@ namespace SleepCheckerApp
             return ret;
         }
 
-        private void Form1_Shown(object sender, EventArgs e)
-        {
-            Boolean ret = false;
-
-            setComPort_Lattepanda();
-
-            // ログ出力フォルダ作成
-            CreateRootDir();
-
-            // 解析スタートでLATTEPANDAのLEDを消灯。
-            requestLattepanda((byte)request.LED_OFF); 
-            closeComPort_Lattepanda();
-#if AUTO_ANALYSIS
-            // 録音開始
-            ret = sound.startRecordApnea();
-
-            if (ret)
-            {
-                // 解析
-                ret = startAnalysis();
-                if (ret)
-                {
-                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                    buttonStart.Text = "データ取得中";
-                    buttonStart.Enabled = false;
-                    log_output("[START]Analysis_Auto");
-                }
-                else
-                {
-                    sound.stopRecordApnea();
-                }
-            }
-#endif
-
-            if (!ret)
-            { //エラー処理
-                setComPort_Lattepanda();
-                requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
-                closeComPort_Lattepanda();
-                log_output("[ERROR]");
-                Application.Exit();
-            }
-        }
 
         private Boolean USBConnectConf()
         {
@@ -1786,28 +1906,9 @@ namespace SleepCheckerApp
             } while (true);
         }
 
-        private void button_recordstart_Click(object sender, EventArgs e)
-        {
-            log_output("[BUTTON]Record Start");
-            sound.startRecordApnea();
-        }
-
-        private void button_recordstop_Click(object sender, EventArgs e)
-        {
-            log_output("[BUTTON]Record Stop");
-            sound.stopRecordApnea();
-        }
-
         public string getRecordFilePath()
         {
             return recordFilePath;
-        }
-
-        public void log_output(string msg)
-        {
-#if LOG_OUT
-            File.AppendAllText(logPath, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff") + "    " + msg + Environment.NewLine);
-#endif
         }
     }
 }
