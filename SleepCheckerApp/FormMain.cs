@@ -1,5 +1,5 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
-#define LATTEPANDA // LATTEPANDAのLED出力
+
 #define C_DRIVE // Cドライブ直下にログ出力
 #define AUTO_ANALYSIS // 解析自動スタート
 #define LOG_OUT // ログ出力
@@ -77,6 +77,7 @@ namespace SleepCheckerApp
         private ComPort com = null;
         private SoundRecord record = null;
         private SoundAlarm alarm = null;
+        private LattePanda panda = null;
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
 
@@ -306,14 +307,14 @@ namespace SleepCheckerApp
         {
             Boolean ret = false;
 
-            setComPort_Lattepanda();
+            panda.setComPort_Lattepanda();
 
             // ログ出力フォルダ作成
             CreateRootDir();
 
             // 解析スタートでLATTEPANDAのLEDを消灯。
-            requestLattepanda((byte)request.LED_OFF);
-            closeComPort_Lattepanda();
+            panda.requestLattepanda((byte)request.LED_OFF);
+            panda.closeComPort_Lattepanda();
 #if AUTO_ANALYSIS
             // 録音開始
             ret = record.startRecordApnea();
@@ -338,9 +339,9 @@ namespace SleepCheckerApp
 
             if (!ret)
             { //エラー処理
-                setComPort_Lattepanda();
-                requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
-                closeComPort_Lattepanda();
+                panda.setComPort_Lattepanda();
+                panda.requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
+                panda.closeComPort_Lattepanda();
                 log_output("[ERROR]");
                 Application.Exit();
             }
@@ -1849,75 +1850,6 @@ namespace SleepCheckerApp
             log_output("USBConnectConf:" + ret);
 
             return ret;
-        }
-
-        /************************************************************************/
-        /* 関数名   : setComPort_Lattepanda        		                		*/
-        /* 機能     : ラテパンダのCOMポート接続                                 */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void setComPort_Lattepanda()
-        {
-#if LATTEPANDA
-            com.PortName = "COM5"; //固定
-            com.BaudRate = 9600;
-            com.Parity = Parity.Even;
-            com.DataBits = 8;
-            com.StopBits = StopBits.One;
-
-            comSerch();
-            com.Start();
-#endif
-        }
-
-        /************************************************************************/
-        /* 関数名   : closeComPort_Lattepanda      		                		*/
-        /* 機能     : ラテパンダのCOMポート切断                                 */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void closeComPort_Lattepanda()
-        {
-#if LATTEPANDA
-            com.Close();
-#endif
-        }
-
-        /************************************************************************/
-        /* 関数名   : requestLattepanda          		                		*/
-        /* 機能     : ラテパンダにコマンドを送信する                            */
-        /* 引数     : [byte] pattern - コマンド                                 */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void requestLattepanda(byte pattern)
-        {
-#if LATTEPANDA
-            byte[] param = new byte[1];
-            param[0] = pattern;
-            com.WriteData(param);
-#endif
-        }
-
-        /************************************************************************/
-        /* 関数名   : comSerch          		                          		*/
-        /* 機能     : ラテパンダと接続するCOM5を検索する                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void comSerch()
-        {
-            do
-            {
-                string[] ports = com.GetPortNames();
-                foreach (string port in ports)
-                {
-                    if (port == "COM5")
-                    {
-                        return;
-                    }
-                }
-            } while (true);
         }
 
         /************************************************************************/
