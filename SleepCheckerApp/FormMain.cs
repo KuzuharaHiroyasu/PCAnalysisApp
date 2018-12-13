@@ -1661,6 +1661,13 @@ namespace SleepCheckerApp
             }
         }
 
+/* アラーム */
+        /************************************************************************/
+        /* 関数名   : radio_alarmOff_CheckedChanged          		    		*/
+        /* 機能     : アラームのON/OFFチェック時のイベント                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void radio_alarmOff_CheckedChanged(object sender, EventArgs e)
         {
             if (player != null)
@@ -1700,6 +1707,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_snore_CheckedChanged          		    		*/
+        /* 機能     : いびきチェック時のイベント                                */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_snore_CheckedChanged(object sender, EventArgs e)
         {
             if (player != null)
@@ -1734,6 +1747,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : checkBox_Apnea_CheckedChanged          		    		*/
+        /* 機能     : 無呼吸チェック時のイベント                                */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
         {
             if (player != null)
@@ -1768,6 +1787,12 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : comboBox_alarm_TextChanged             		    		*/
+        /* 機能     : アラーム音選択時のイベント                                */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void comboBox_alarm_TextChanged(object sender, EventArgs e)
         {
             int index = comboBox_alarm.SelectedIndex;
@@ -1808,6 +1833,13 @@ namespace SleepCheckerApp
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : startAnalysis             		                		*/
+        /* 機能     : 解析スタート処理                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : Boolean : 成功 - true                                     */
+        /*                      失敗 - false                  					*/
+        /************************************************************************/
         private Boolean startAnalysis()
         {
             Boolean ret = false;
@@ -1833,7 +1865,13 @@ namespace SleepCheckerApp
             return ret;
         }
 
-
+        /************************************************************************/
+        /* 関数名   : USBConnectConf             		                		*/
+        /* 機能     : USBストレージ挿入確認                                     */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : Boolean : 成功 - true                                     */
+        /*                      失敗 - false                  					*/
+        /************************************************************************/
         private Boolean USBConnectConf()
         {
             Boolean ret = false;
@@ -1841,7 +1879,7 @@ namespace SleepCheckerApp
             string[] Array_DeviceID;//取得ID分解用配列
             ManagementObjectCollection MyCollection;
 
-            // USBメモリーが挿さっているか確認
+            // USBストレージが挿さっているか確認
             MyCollection = MyOCS.Get();
             foreach (ManagementObject MyObject in MyCollection)
             {
@@ -1860,6 +1898,12 @@ namespace SleepCheckerApp
             return ret;
         }
 
+        /************************************************************************/
+        /* 関数名   : setComPort_Lattepanda        		                		*/
+        /* 機能     : ラテパンダのCOMポート接続                                 */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void setComPort_Lattepanda()
         {
 #if LATTEPANDA
@@ -1874,6 +1918,12 @@ namespace SleepCheckerApp
 #endif
         }
 
+        /************************************************************************/
+        /* 関数名   : closeComPort_Lattepanda      		                		*/
+        /* 機能     : ラテパンダのCOMポート切断                                 */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void closeComPort_Lattepanda()
         {
 #if LATTEPANDA
@@ -1881,16 +1931,27 @@ namespace SleepCheckerApp
 #endif
         }
 
+        /************************************************************************/
+        /* 関数名   : requestLattepanda          		                		*/
+        /* 機能     : ラテパンダにコマンドを送信する                            */
+        /* 引数     : byte : pattern - コマンド                                 */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void requestLattepanda(byte pattern)
         {
 #if LATTEPANDA
             byte[] param = new byte[1];
             param[0] = pattern;
-            //データは何でもいい。Arduino側で制御する。
             com.WriteData(param);
 #endif
         }
 
+        /************************************************************************/
+        /* 関数名   : comSerch          		                          		*/
+        /* 機能     : ラテパンダと接続するCOM5を検索する                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void comSerch()
         {
             do
@@ -1906,6 +1967,12 @@ namespace SleepCheckerApp
             } while (true);
         }
 
+        /************************************************************************/
+        /* 関数名   : getRecordFilePath    		                          		*/
+        /* 機能     : 録音ファイルのファイルパスを返す                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : string : recordFilePath - ファイルパス         			*/
+        /************************************************************************/
         public string getRecordFilePath()
         {
             return recordFilePath;
