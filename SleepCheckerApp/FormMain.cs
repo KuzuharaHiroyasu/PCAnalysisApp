@@ -687,31 +687,35 @@ namespace SleepCheckerApp
 #if USB_OUTPUT
             char path_char = 'A';
             System.IO.DriveInfo drive;
-            // AドライブからZドライブかまで検索(ただし、CとDは除く)
-            do
-            {
-                temp = path_char.ToString();
-                if (temp != "C" && temp != "D")
+
+            if (USBConnectConf())
+            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、CとDは除く)
+                do
                 {
-                    drive = new System.IO.DriveInfo(temp);
-                    if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                    temp = path_char.ToString();
+                    if (temp != "C" && temp != "D")
                     {
-                        drivePath = temp + ":\\";
-                        break;
+                        drive = new System.IO.DriveInfo(temp);
+                        if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                        {
+                            drivePath = temp + ":\\";
+                            break;
+                        }
+                        else
+                        {
+                            path_char++;
+                            if (path_char > 'Z')
+                            { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                                break;
+                            }
+                        }
                     }
                     else
                     {
                         path_char++;
-                        if (path_char > 'Z')
-                        { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
-                            break;
-                        }
                     }
-                }else
-                {
-                    path_char++;
-                }
-            } while (path_char <= 'Z');
+                } while (path_char <= 'Z');
+            }
 #endif
             // rootパス
             ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
@@ -1670,39 +1674,35 @@ namespace SleepCheckerApp
         {
             Boolean ret = false;
 
-            ret = USBConnectConf();
+            setComPort_Lattepanda();
+
+            // ログ出力フォルダ作成
+            CreateRootDir();
+
+            // 解析スタートでLATTEPANDAのLEDを消灯。
+            requestLattepanda((byte)request.LED_OFF); 
+            closeComPort_Lattepanda();
+#if AUTO_ANALYSIS
+            // 録音開始
+            ret = sound.startRecordApnea();
+
             if (ret)
             {
-                setComPort_Lattepanda();
-
-                // ログ出力フォルダ作成
-                CreateRootDir();
-
-                // 解析スタートでLATTEPANDAのLEDを消灯。
-                requestLattepanda((byte)request.LED_OFF); 
-                closeComPort_Lattepanda();
-#if AUTO_ANALYSIS
-                // 録音開始
-                ret = sound.startRecordApnea();
-
+                // 解析
+                ret = startAnalysis();
                 if (ret)
                 {
-                    // 解析
-                    ret = startAnalysis();
-                    if (ret)
-                    {
-                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中";
-                        buttonStart.Enabled = false;
-                        log_output("[START]Analysis_Auto");
-                    }
-                    else
-                    {
-                        sound.stopRecordApnea();
-                    }
+                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    buttonStart.Text = "データ取得中";
+                    buttonStart.Enabled = false;
+                    log_output("[START]Analysis_Auto");
                 }
-#endif
+                else
+                {
+                    sound.stopRecordApnea();
+                }
             }
+#endif
 
             if (!ret)
             { //エラー処理
@@ -1736,6 +1736,7 @@ namespace SleepCheckerApp
             ret = true; // 無条件でtrue
 #endif
             log_output("USBConnectConf:" + ret);
+
             return ret;
         }
 
