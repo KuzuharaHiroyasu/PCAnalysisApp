@@ -274,7 +274,7 @@
             this.chartSpO2.Series.Add(series38);
             this.chartSpO2.Size = new System.Drawing.Size(705, 193);
             this.chartSpO2.TabIndex = 14;
-            this.chartSpO2.Text = "心拍数";
+            this.chartSpO2.Text = "脈拍数";
             title13.Name = "Title";
             title13.Text = "SpO2";
             this.chartSpO2.Titles.Add(title13);
@@ -298,11 +298,11 @@
             series39.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series39.Legend = "Legend1";
             series39.MarkerBorderWidth = 5;
-            series39.Name = "呼吸";
+            series39.Name = "呼吸(生データ)";
             series40.ChartArea = "ChartAreaTime";
             series40.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series40.Legend = "Legend1";
-            series40.Name = "いびき";
+            series40.Name = "いびき(生データ)";
             series41.ChartArea = "ChartAreaTime";
             series41.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series41.Legend = "Legend1";
@@ -333,11 +333,11 @@
             series42.ChartArea = "ChartAreaTime";
             series42.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series42.Legend = "Legend1";
-            series42.Name = "赤色";
+            series42.Name = "赤色(生データ)";
             series43.ChartArea = "ChartAreaTime";
             series43.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series43.Legend = "Legend1";
-            series43.Name = "赤外";
+            series43.Name = "赤外(生データ)";
             series44.ChartArea = "ChartAreaTime";
             series44.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series44.Legend = "Legend1";

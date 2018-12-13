@@ -193,6 +193,7 @@ namespace SleepCheckerApp
             com = new ComPort();
             record = new SoundRecord();
             alarm = new SoundAlarm();
+            panda = new LattePanda();
 
             record.form = this;
             alarm.form = this;
