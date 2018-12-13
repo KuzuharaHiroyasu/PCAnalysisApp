@@ -11,6 +11,13 @@ namespace SleepCheckerApp
         private WaveFileWriter waveWriter = null;
         public FormMain form;
 
+        /************************************************************************/
+        /* 関数名   : startRecordApnea     		                                */
+        /* 機能     : 録音開始                                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [Boolean] 成功 - true                                     */
+        /*          : [Boolean] 失敗 - false                  					*/
+        /************************************************************************/
         public Boolean startRecordApnea()
         {
             WaveInCapabilities capabilities;
@@ -68,14 +75,12 @@ namespace SleepCheckerApp
             return ret;
         }
 
-        public void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            if (waveWriter == null) return;
-
-            waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
-            waveWriter.Flush();
-        }
-
+        /************************************************************************/
+        /* 関数名   : stopRecordApnea                                           */
+        /* 機能     : 録音停止                                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし                                                      */
+        /************************************************************************/
         public void stopRecordApnea()
         {
             if (sourceStream != null)
@@ -91,6 +96,20 @@ namespace SleepCheckerApp
                 waveWriter.Dispose();
                 waveWriter = null;
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : sourceStream_DataAvailable                                */
+        /* 機能     : 録音データ書き込み                                        */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし                                                      */
+        /************************************************************************/
+        public void sourceStream_DataAvailable(object sender, WaveInEventArgs e)
+        {
+            if (waveWriter == null) return;
+
+            waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
+            waveWriter.Flush();
         }
     }
 }
