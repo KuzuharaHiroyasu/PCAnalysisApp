@@ -1,5 +1,4 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
-
 #define C_DRIVE // Cドライブ直下にログ出力
 #define AUTO_ANALYSIS // 解析自動スタート
 #define LOG_OUT // ログ出力
@@ -459,6 +458,7 @@ namespace SleepCheckerApp
         {
             string text = "";
 
+            //Console.WriteLine("ComPort_DataReceived");
             try
             {
                 text = amari + Encoding.ASCII.GetString(buffer);
@@ -498,9 +498,13 @@ namespace SleepCheckerApp
                         {
                             // For 加速度
                             SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
-                            log_output("DataReceived:Acc");
+                            //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
+                            //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
+                        } else
+                        {
+                            //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]));
+                            //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]));
                         }
-                        log_output("DataReceived");
                     }
                     else
                     {
