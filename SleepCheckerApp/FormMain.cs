@@ -175,7 +175,11 @@ namespace SleepCheckerApp
 
         public FormMain()
         {
+            string icon = "analysis.ico";
             InitializeComponent();
+
+            if(File.Exists(icon))
+                this.Icon = new System.Drawing.Icon(icon);
 
             //CalcDataList1 = new List<int>(CalcData1);
             //CalcDataList2 = new List<int>(CalcData2);
