@@ -297,8 +297,6 @@ namespace SleepCheckerApp
             timer.Start();
 
             calc_snore_init();
-
-            comboBox_alarm.SelectedIndex = 0;
         }
 
         /************************************************************************/
@@ -1872,19 +1870,6 @@ namespace SleepCheckerApp
         private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
         {
             alarm.apneaCheckedChanged();
-        }
-
-        /************************************************************************/
-        /* 関数名   : comboBox_alarm_TextChanged             		    		*/
-        /* 機能     : アラーム音選択時のイベント                                */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void comboBox_alarm_TextChanged(object sender, EventArgs e)
-        {
-            int index = comboBox_alarm.SelectedIndex;
-
-            alarm.alarmComboboxTextChanged(index);
         }
     }
 }

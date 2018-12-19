@@ -117,7 +117,6 @@
             this.groupBoxCom = new System.Windows.Forms.GroupBox();
             this.comboBoxComport = new System.Windows.Forms.ComboBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.comboBox_alarm = new System.Windows.Forms.ComboBox();
             this.checkBox_apnea = new System.Windows.Forms.CheckBox();
             this.checkBox_snore = new System.Windows.Forms.CheckBox();
             this.radio_alarmOff = new System.Windows.Forms.RadioButton();
@@ -784,7 +783,6 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.comboBox_alarm);
             this.groupBox3.Controls.Add(this.checkBox_apnea);
             this.groupBox3.Controls.Add(this.checkBox_snore);
             this.groupBox3.Controls.Add(this.radio_alarmOff);
@@ -795,19 +793,6 @@
             this.groupBox3.TabIndex = 22;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "アラーム";
-            // 
-            // comboBox_alarm
-            // 
-            this.comboBox_alarm.FormattingEnabled = true;
-            this.comboBox_alarm.Items.AddRange(new object[] {
-            "1000Hz",
-            "5000Hz",
-            "10000Hz"});
-            this.comboBox_alarm.Location = new System.Drawing.Point(37, 71);
-            this.comboBox_alarm.Name = "comboBox_alarm";
-            this.comboBox_alarm.Size = new System.Drawing.Size(131, 20);
-            this.comboBox_alarm.TabIndex = 4;
-            this.comboBox_alarm.TextChanged += new System.EventHandler(this.comboBox_alarm_TextChanged);
             // 
             // checkBox_apnea
             // 
@@ -960,7 +945,6 @@
         private System.Windows.Forms.CheckBox checkBox_snore_interval;
         private System.Windows.Forms.CheckBox checkBox_snorexy2;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.ComboBox comboBox_alarm;
         private System.Windows.Forms.Button button_recordstop;
         private System.Windows.Forms.Button button_recordstart;
         public System.Windows.Forms.RadioButton radio_alarmOff;

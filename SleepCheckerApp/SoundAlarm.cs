@@ -5,22 +5,13 @@ namespace SleepCheckerApp
     class SoundAlarm
     {
         // アラーム
+        private const string ALARM_SOUND = "1000Hz_intermittent.wav";
+
         private System.Media.SoundPlayer player = null;
-        private string SoundFile = SOUND_1000HZ; //デフォルト
+        private string SoundFile = ALARM_SOUND; //デフォルト
         private Boolean playflg = false;
 
-        private const string SOUND_1000HZ = "1000Hz.wav";
-        private const string SOUND_5000HZ = "5000Hz.wav";
-        private const string SOUND_10000HZ = "10000Hz.wav";
-
         public FormMain form;
-
-        enum alarmIndex
-        {
-            SOUND_1000HZ = 0,
-            SOUND_5000HZ,
-            SOUND_10000HZ,
-        }
 
         /************************************************************************/
         /* 関数名   : SoundAlarm          		                                */
@@ -43,7 +34,7 @@ namespace SleepCheckerApp
         {
             if (!playflg)
             {// 再生中ではない
-                player.PlayLooping();
+                player.Play();
                 playflg = true;
             }
         }
@@ -176,55 +167,6 @@ namespace SleepCheckerApp
                 else if (form.radio_alarmOff.Checked)
                 {//アラームOFF
                     stopAlarm();
-                }
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : alarmComboboxTextChanged                                  */
-        /* 機能     : 選択(変更)されたアラーム音を再生する                      */
-        /* 引数     : [int] index - コンボボックス(アラーム音)のアイテム番号    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        public void alarmComboboxTextChanged(int index)
-        {
-            if (player != null)
-            {
-                if (playflg)
-                {//再生中なら停止
-                    player.Stop();
-                }
-                // 一度破棄
-                player.Dispose();
-                player = null;
-            }
-
-            // アラーム音セット
-            switch (index)
-            {
-                case (int)alarmIndex.SOUND_1000HZ:
-                    SoundFile = SOUND_1000HZ;
-                    break;
-                case (int)alarmIndex.SOUND_5000HZ:
-                    SoundFile = SOUND_5000HZ;
-                    break;
-                case (int)alarmIndex.SOUND_10000HZ:
-                    SoundFile = SOUND_10000HZ;
-                    break;
-                default:
-                    SoundFile = SOUND_1000HZ;
-                    break;
-            }
-
-            // インスタンス生成
-            player = new System.Media.SoundPlayer(SoundFile);
-
-            if (player != null)
-            {
-                if (playflg)
-                {
-                    // アラーム再生
-                    player.PlayLooping();
                 }
             }
         }
