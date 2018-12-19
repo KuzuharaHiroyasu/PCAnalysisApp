@@ -9,7 +9,6 @@ namespace SleepCheckerApp
 
         private System.Media.SoundPlayer player = null;
         private string SoundFile = ALARM_SOUND; //デフォルト
-        private Boolean playflg = false;
 
         public FormMain form;
 
@@ -32,11 +31,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void playAlarm()
         {
-            if (!playflg)
-            {// 再生中ではない
-                player.Play();
-                playflg = true;
-            }
+            player.Play();
         }
 
         /************************************************************************/
@@ -47,11 +42,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void stopAlarm()
         {
-            if (playflg)
-            {// 再生中
-                player.Stop();
-                playflg = false;
-            }
+            player.Stop();
         }
 
         /************************************************************************/
