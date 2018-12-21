@@ -1,14 +1,14 @@
 ﻿using System;
+using System.IO;
 
 namespace SleepCheckerApp
 {
     class SoundAlarm
     {
         // アラーム
-        private const string ALARM_SOUND = "1000Hz_intermittent.wav";
-
         private System.Media.SoundPlayer player = null;
-        private string SoundFile = ALARM_SOUND; //デフォルト
+        private const string filePath = "C:\\PCAnalysisApp\\";
+        private string AlarmFile = ""; //デフォルト
 
         public FormMain form;
 
@@ -20,7 +20,21 @@ namespace SleepCheckerApp
         /************************************************************************/
         public SoundAlarm()
         {
-            player = new System.Media.SoundPlayer(SoundFile);
+            if(File.Exists(filePath + "500Hz_intermittent_4.wav"))
+            {
+                AlarmFile = filePath + "500Hz_intermittent_4.wav";
+            } else if(File.Exists(filePath + "1000Hz_intermittent_4.wav"))
+            {
+                AlarmFile = filePath + "1000Hz_intermittent_4.wav";
+            } else if (File.Exists(filePath + "1500Hz_intermittent_4.wav"))
+            {
+                AlarmFile = filePath + "1500Hz_intermittent_4.wav";
+            }
+
+            if (!string.IsNullOrEmpty(AlarmFile))
+            {
+                player = new System.Media.SoundPlayer(AlarmFile);
+            }
         }
 
         /************************************************************************/
@@ -29,7 +43,7 @@ namespace SleepCheckerApp
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private void playAlarm()
+        public void playAlarm()
         {
             player.Play();
         }
@@ -160,6 +174,17 @@ namespace SleepCheckerApp
                     stopAlarm();
                 }
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : getAlarmFile            	                                */
+        /* 機能     : アラーム音のファイル名を取得する                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        public string getAlarmFile()
+        {
+            return AlarmFile;
         }
     }
 }

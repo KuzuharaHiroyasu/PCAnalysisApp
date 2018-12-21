@@ -147,5 +147,4 @@ namespace SleepCheckerApp
              return System.IO.Ports.SerialPort.GetPortNames();
         }
     }
-
 }

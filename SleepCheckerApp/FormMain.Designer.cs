@@ -123,6 +123,7 @@
             this.radio_alarmOn = new System.Windows.Forms.RadioButton();
             this.button_recordstop = new System.Windows.Forms.Button();
             this.button_recordstart = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chartResultIbiki)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSinpaku)).BeginInit();
@@ -783,6 +784,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.button1);
             this.groupBox3.Controls.Add(this.checkBox_apnea);
             this.groupBox3.Controls.Add(this.checkBox_snore);
             this.groupBox3.Controls.Add(this.radio_alarmOff);
@@ -860,6 +862,16 @@
             this.button_recordstart.Text = "録音開始";
             this.button_recordstart.UseVisualStyleBackColor = true;
             this.button_recordstart.Click += new System.EventHandler(this.button_recordstart_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(86, 73);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // FormMain
             // 
@@ -951,6 +963,7 @@
         public System.Windows.Forms.RadioButton radio_alarmOn;
         public System.Windows.Forms.CheckBox checkBox_apnea;
         public System.Windows.Forms.CheckBox checkBox_snore;
+        private System.Windows.Forms.Button button1;
     }
 }
 

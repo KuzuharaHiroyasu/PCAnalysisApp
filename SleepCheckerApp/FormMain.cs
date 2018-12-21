@@ -1,7 +1,6 @@
 ﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
 #define C_DRIVE // Cドライブ直下にログ出力
 #define AUTO_ANALYSIS // 解析自動スタート
-#define LOG_OUT // ログ出力
 
 using System;
 using System.Collections.Generic;
@@ -208,6 +207,7 @@ namespace SleepCheckerApp
             logPath = logPath + "\\log.txt";
 
             log_output("[START-UP]App");
+            log_output("AlarmFile:" + alarm.getAlarmFile());
 
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
@@ -445,9 +445,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void log_output(string msg)
         {
-#if LOG_OUT
             Logging(logPath, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff") + "    " + msg + Environment.NewLine);
-#endif
         }
 
         /************************************************************************/
@@ -1836,8 +1834,6 @@ namespace SleepCheckerApp
             }
         }
 
-
-
 /* アラーム */
         /************************************************************************/
         /* 関数名   : radio_alarmOff_CheckedChanged          		    		*/
@@ -1870,6 +1866,11 @@ namespace SleepCheckerApp
         private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
         {
             alarm.apneaCheckedChanged();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            alarm.playAlarm();
         }
     }
 }
