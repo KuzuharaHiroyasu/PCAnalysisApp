@@ -84,6 +84,7 @@ namespace SleepCheckerApp
             LED_OFF = 0,    //解析スタート
             LED_ERROR,      //エラー
             SET_CLOCK,      //時刻設定
+            VIBRATION,      //バイブレーション
         }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
@@ -316,7 +317,7 @@ namespace SleepCheckerApp
 
             // 解析スタートでLATTEPANDAのLEDを消灯。
             panda.requestLattepanda((byte)request.LED_OFF);
-            panda.closeComPort_Lattepanda();
+            //panda.closeComPort_Lattepanda();
 #if AUTO_ANALYSIS
             // 録音開始
             ret = record.startRecordApnea();
@@ -358,6 +359,7 @@ namespace SleepCheckerApp
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             record.stopRecordApnea();
+            panda.closeComPort_Lattepanda();
             com.Close();
         }
 
@@ -1868,9 +1870,27 @@ namespace SleepCheckerApp
             alarm.apneaCheckedChanged();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        /************************************************************************/
+        /* 関数名   : button_alarmplay_Click          		    		        */
+        /* 機能     : アラーム再生ボタンクリック時のイベント                    */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void button_alarmplay_Click(object sender, EventArgs e)
         {
             alarm.playAlarm();
+        }
+
+/* バイブレーション */
+        /************************************************************************/
+        /* 関数名   : button_vibstart_Click          		    		        */
+        /* 機能     : バイブボタンクリック時のイベント                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void button_vibstart_Click(object sender, EventArgs e)
+        {
+            panda.requestLattepanda((byte)request.VIBRATION);
         }
     }
 }
