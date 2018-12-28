@@ -69,53 +69,17 @@ namespace SleepCheckerApp
         {
             if (player != null)
             {
-                //アラームON
-                if (form.radio_alarmOn.Checked)
-                {
-                    if (form.checkBox_snore.Checked && form.snore == 1)
-                    {// いびき判定ON
-                        playAlarm();
-                    }
-                    else if (form.checkBox_apnea.Checked && form.apnea == 2)
-                    {// 無呼吸判定ON
-                        playAlarm();
-                    }
-                    else
-                    {// どちらもOFF
-                        stopAlarm();
-                    }
+                if (form.checkBox_alarm_snore.Checked && form.snore == 1)
+                {// いびき判定ON
+                    playAlarm();
                 }
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : alarmOffStatusChanged  	                                */
-        /* 機能     : アラームOFF変更時のアラーム処理                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        public void alarmOffStatusChanged()
-        {
-            if (player != null)
-            {//アラームON
-                if (form.radio_alarmOn.Checked)
-                {
-                    if (form.checkBox_snore.Checked && form.snore == 1)
-                    {// いびき判定ON
-                        playAlarm();
-                    }
-                    else if (form.checkBox_apnea.Checked && form.apnea == 2)
-                    {// 無呼吸判定ON
-                        playAlarm();
-                    }
-                    else
-                    {// どちらもOFF
-                        stopAlarm();
-                    }
+                else if (form.checkBox_alarm_apnea.Checked && form.apnea == 2)
+                {// 無呼吸判定ON
+                    playAlarm();
                 }
-                else if (form.radio_alarmOff.Checked)
-                {//アラームOFF
-                    stopAlarm();
+                else
+                {// どちらもOFF
+//                    stopAlarm();
                 }
             }
         }
@@ -129,21 +93,17 @@ namespace SleepCheckerApp
         public void snoreCheckedChanged()
         {
             if (player != null)
-            {//アラームON
-                if (form.radio_alarmOn.Checked)
-                {
-                    if (form.checkBox_snore.Checked && form.snore == 1)
-                    {// いびき判定ON
-                        playAlarm();
-                    }
-                    else if (!form.checkBox_apnea.Checked || form.apnea != 2)
-                    {// どちらもOFF
+            {
+                if (form.checkBox_alarm_snore.Checked && form.snore == 1)
+                {// いびき判定ON
+                    playAlarm();
+                }
+                else if (!form.checkBox_alarm_snore.Checked)
+                {// いびきのチェックをはずした時
+                    if (!form.checkBox_alarm_apnea.Checked || form.apnea != 2)
+                    {// 無呼吸のチェックが入っていないか無呼吸判定されていない場合
                         stopAlarm();
                     }
-                }
-                else if (form.radio_alarmOff.Checked)
-                {//アラームOFF
-                    stopAlarm();
                 }
             }
         }
@@ -157,21 +117,17 @@ namespace SleepCheckerApp
         public void apneaCheckedChanged()
         {
             if (player != null)
-            {//アラームON
-                if (form.radio_alarmOn.Checked)
-                {
-                    if (form.checkBox_apnea.Checked && form.apnea == 2)
-                    {// 無呼吸判定ON
-                        playAlarm();
-                    }
-                    else if (!form.checkBox_snore.Checked || form.snore != 1)
-                    {// どちらもOFF
+            {
+                if (form.checkBox_alarm_apnea.Checked && form.apnea == 2)
+                {// 無呼吸判定ON
+                    playAlarm();
+                }
+                else　if(!form.checkBox_alarm_apnea.Checked)
+                {// 無呼吸のチェックをはずした時
+                    if (!form.checkBox_alarm_snore.Checked || form.snore != 1)
+                    {// いびきのチェックが入っていないかいびき判定されていない場合
                         stopAlarm();
                     }
-                }
-                else if (form.radio_alarmOff.Checked)
-                {//アラームOFF
-                    stopAlarm();
                 }
             }
         }

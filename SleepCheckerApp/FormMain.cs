@@ -76,6 +76,8 @@ namespace SleepCheckerApp
         private SoundRecord record = null;
         private SoundAlarm alarm = null;
         private LattePanda panda = null;
+        private Vibration vib = null;
+
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
 
@@ -197,9 +199,12 @@ namespace SleepCheckerApp
             record = new SoundRecord();
             alarm = new SoundAlarm();
             panda = new LattePanda();
+            vib = new Vibration();
 
             record.form = this;
             alarm.form = this;
+            vib.form = this;
+            vib.panda = panda;
 
             if (!Directory.Exists(logPath))
             {
@@ -317,7 +322,6 @@ namespace SleepCheckerApp
 
             // 解析スタートでLATTEPANDAのLEDを消灯。
             panda.requestLattepanda((byte)request.LED_OFF);
-            //panda.closeComPort_Lattepanda();
 #if AUTO_ANALYSIS
             // 録音開始
             ret = record.startRecordApnea();
@@ -981,6 +985,8 @@ namespace SleepCheckerApp
                     ApneaQueue.Enqueue(apnea);
 
                     alarm.confirmAlarm();
+
+                    vib.confirmVib((byte)request.VIBRATION);
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
@@ -1837,17 +1843,6 @@ namespace SleepCheckerApp
         }
 
 /* アラーム */
-        /************************************************************************/
-        /* 関数名   : radio_alarmOff_CheckedChanged          		    		*/
-        /* 機能     : アラームOFFのチェック状態が変更された時のイベント         */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void radio_alarmOff_CheckedChanged(object sender, EventArgs e)
-        {
-            alarm.alarmOffStatusChanged();
-        }
-
         /************************************************************************/
         /* 関数名   : checkBox_snore_CheckedChanged          		    		*/
         /* 機能     : いびきチェック時のイベント                                */
