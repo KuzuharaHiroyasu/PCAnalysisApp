@@ -984,8 +984,10 @@ namespace SleepCheckerApp
                     }
                     ApneaQueue.Enqueue(apnea);
 
+                    // アラーム鳴動
                     alarm.confirmAlarm();
 
+                    // バイブレーション
                     vib.confirmVib((byte)request.VIBRATION);
                 }
                 Marshal.FreeCoTaskMem(ptr);

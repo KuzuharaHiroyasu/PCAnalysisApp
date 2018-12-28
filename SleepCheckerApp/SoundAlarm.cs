@@ -45,6 +45,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void playAlarm()
         {
+            form.log_output("playAlarm");
             player.Play();
         }
 

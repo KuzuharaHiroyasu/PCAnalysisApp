@@ -21,6 +21,11 @@ namespace SleepCheckerApp
         {
             if (form.checkBox_vib_snore.Checked && form.snore == 1)
             {// いびき判定ON
+                form.log_output("[Vibration]snore");
+                panda.requestLattepanda(request);
+            } else if (form.checkBox_vib_apnea.Checked && form.apnea == 2)
+            {// 無呼吸判定ON
+                form.log_output("[Vibration]apnea");
                 panda.requestLattepanda(request);
             }
         }
