@@ -1413,7 +1413,7 @@ namespace SleepCheckerApp
         public void Interval(object sender, EventArgs e)
         {
             GraphUpdate_Apnea();
-            GraphUpdate_SpO2();
+//            GraphUpdate_SpO2();
             GraphUpdate_Acc();
         }
 
