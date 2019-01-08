@@ -30,7 +30,7 @@ namespace SleepCheckerApp
             {
                 AlarmFile = filePath + "1500Hz_intermittent_4.wav";
             }
-
+            
             if (!string.IsNullOrEmpty(AlarmFile))
             {
                 player = new System.Media.SoundPlayer(AlarmFile);

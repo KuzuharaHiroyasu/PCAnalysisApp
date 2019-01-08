@@ -11,6 +11,7 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Management;
+using OpenCvSharp;
 
 namespace SleepCheckerApp
 {
@@ -77,6 +78,7 @@ namespace SleepCheckerApp
         private SoundAlarm alarm = null;
         private LattePanda panda = null;
         private Vibration vib = null;
+        private VideoRecord video = null;
 
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
@@ -200,11 +202,13 @@ namespace SleepCheckerApp
             alarm = new SoundAlarm();
             panda = new LattePanda();
             vib = new Vibration();
+            video = new VideoRecord();
 
             record.form = this;
             alarm.form = this;
             vib.form = this;
             vib.panda = panda;
+            video.form = this;
 
             if (!Directory.Exists(logPath))
             {
@@ -301,7 +305,7 @@ namespace SleepCheckerApp
             timer.Tick += new EventHandler(Interval);
             timer.Interval = 500;           // ms単位
             timer.Start();
-
+            
             calc_snore_init();
         }
 
@@ -336,6 +340,7 @@ namespace SleepCheckerApp
                     buttonStart.Text = "データ取得中";
                     buttonStart.Enabled = false;
                     log_output("[START]Analysis_Auto");
+                    video.videoStart();
                 }
                 else
                 {
@@ -365,6 +370,7 @@ namespace SleepCheckerApp
             record.stopRecordApnea();
             panda.closeComPort_Lattepanda();
             com.Close();
+            video.videoStop();
         }
 
         /************************************************************************/
@@ -1888,6 +1894,11 @@ namespace SleepCheckerApp
         private void button_vibstart_Click(object sender, EventArgs e)
         {
             panda.requestLattepanda((byte)request.VIBRATION);
+        }
+
+        public void videoWriteFrame(IplImage reImage)
+        {
+            pictureBoxIpl_video.ImageIpl = reImage;
         }
     }
 }

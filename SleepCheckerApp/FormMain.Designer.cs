@@ -124,9 +124,10 @@
             this.button_recordstart = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button_vibstart = new System.Windows.Forms.Button();
-            this.checkBox_vib_snore = new System.Windows.Forms.CheckBox();
             this.checkBox_vib_apnea = new System.Windows.Forms.CheckBox();
+            this.checkBox_vib_snore = new System.Windows.Forms.CheckBox();
+            this.button_vibstart = new System.Windows.Forms.Button();
+            this.pictureBoxIpl_video = new OpenCvSharp.UserInterface.PictureBoxIpl();
             ((System.ComponentModel.ISupportInitialize)(this.chartResultIbiki)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSinpaku)).BeginInit();
@@ -142,6 +143,7 @@
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxIpl_video)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -252,6 +254,7 @@
             title3.Name = "Title";
             title3.Text = "脈拍数";
             this.chartSinpaku.Titles.Add(title3);
+            this.chartSinpaku.Visible = false;
             // 
             // chartSpO2
             // 
@@ -283,6 +286,7 @@
             title4.Name = "Title";
             title4.Text = "SpO2";
             this.chartSpO2.Titles.Add(title4);
+            this.chartSpO2.Visible = false;
             // 
             // chartRawData
             // 
@@ -373,6 +377,7 @@
             title6.Name = "Title";
             title6.Text = "生データ(SpO2)";
             this.chartRawData_SpO2.Titles.Add(title6);
+            this.chartRawData_SpO2.Visible = false;
             // 
             // chartRawData_Acc
             // 
@@ -415,6 +420,7 @@
             title7.Name = "Title";
             title7.Text = "演算途中データ";
             this.chartRawData_Acc.Titles.Add(title7);
+            this.chartRawData_Acc.Visible = false;
             // 
             // chart1
             // 
@@ -876,15 +882,15 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "バイブレーション";
             // 
-            // button_vibstart
+            // checkBox_vib_apnea
             // 
-            this.button_vibstart.Location = new System.Drawing.Point(17, 18);
-            this.button_vibstart.Name = "button_vibstart";
-            this.button_vibstart.Size = new System.Drawing.Size(90, 23);
-            this.button_vibstart.TabIndex = 0;
-            this.button_vibstart.Text = "テストバイブ";
-            this.button_vibstart.UseVisualStyleBackColor = true;
-            this.button_vibstart.Click += new System.EventHandler(this.button_vibstart_Click);
+            this.checkBox_vib_apnea.AutoSize = true;
+            this.checkBox_vib_apnea.Location = new System.Drawing.Point(124, 26);
+            this.checkBox_vib_apnea.Name = "checkBox_vib_apnea";
+            this.checkBox_vib_apnea.Size = new System.Drawing.Size(60, 16);
+            this.checkBox_vib_apnea.TabIndex = 4;
+            this.checkBox_vib_apnea.Text = "無呼吸";
+            this.checkBox_vib_apnea.UseVisualStyleBackColor = true;
             // 
             // checkBox_vib_snore
             // 
@@ -898,22 +904,31 @@
             this.checkBox_vib_snore.Text = "いびき";
             this.checkBox_vib_snore.UseVisualStyleBackColor = true;
             // 
-            // checkBox_vib_apnea
+            // button_vibstart
             // 
-            this.checkBox_vib_apnea.AutoSize = true;
-            this.checkBox_vib_apnea.Location = new System.Drawing.Point(124, 26);
-            this.checkBox_vib_apnea.Name = "checkBox_vib_apnea";
-            this.checkBox_vib_apnea.Size = new System.Drawing.Size(60, 16);
-            this.checkBox_vib_apnea.TabIndex = 4;
-            this.checkBox_vib_apnea.Text = "無呼吸";
-            this.checkBox_vib_apnea.UseVisualStyleBackColor = true;
+            this.button_vibstart.Location = new System.Drawing.Point(17, 18);
+            this.button_vibstart.Name = "button_vibstart";
+            this.button_vibstart.Size = new System.Drawing.Size(90, 23);
+            this.button_vibstart.TabIndex = 0;
+            this.button_vibstart.Text = "テストバイブ";
+            this.button_vibstart.UseVisualStyleBackColor = true;
+            this.button_vibstart.Click += new System.EventHandler(this.button_vibstart_Click);
+            // 
+            // pictureBoxIpl_video
+            // 
+            this.pictureBoxIpl_video.Location = new System.Drawing.Point(722, 125);
+            this.pictureBoxIpl_video.Name = "pictureBoxIpl_video";
+            this.pictureBoxIpl_video.Size = new System.Drawing.Size(705, 590);
+            this.pictureBoxIpl_video.TabIndex = 27;
+            this.pictureBoxIpl_video.TabStop = false;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1459, 934);
+            this.ClientSize = new System.Drawing.Size(1476, 934);
+            this.Controls.Add(this.pictureBoxIpl_video);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -954,6 +969,7 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxIpl_video)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1005,6 +1021,7 @@
         private System.Windows.Forms.Button button_vibstart;
         public System.Windows.Forms.CheckBox checkBox_vib_apnea;
         public System.Windows.Forms.CheckBox checkBox_vib_snore;
+        private OpenCvSharp.UserInterface.PictureBoxIpl pictureBoxIpl_video;
     }
 }
 

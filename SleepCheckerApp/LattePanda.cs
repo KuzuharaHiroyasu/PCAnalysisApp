@@ -1,4 +1,4 @@
-﻿#define LATTEPANDA // LATTEPANDAのLED出力
+﻿//#define LATTEPANDA // LATTEPANDAのLED出力
 
 using System.IO.Ports;
 
