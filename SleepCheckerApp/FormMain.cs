@@ -162,7 +162,9 @@ namespace SleepCheckerApp
         private string PulseRootPath_;
         private string AcceRootPath_;
         private string RecordRootPath_;
+        private string VideoRootPath_;
         private string recordFilePath;
+        private string videoFilePath;
 
         private int ApneaCalcCount_;
         private int PulseCalcCount_;
@@ -447,6 +449,17 @@ namespace SleepCheckerApp
         public string getRecordFilePath()
         {
             return recordFilePath;
+        }
+
+        /************************************************************************/
+        /* 関数名   : getVideoFilePath    		                          		*/
+        /* 機能     : 録画ファイルのファイルパスを返す                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [string] videoFilePath - ファイルパス         			*/
+        /************************************************************************/
+        public string getVideoFilePath()
+        {
+            return videoFilePath;
         }
 
         /************************************************************************/
@@ -831,6 +844,25 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+
+            // rootパス
+            VideoRootPath_ = drivePath + "\\ax\\video\\" + datestr + "\\";
+            temp = VideoRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = VideoRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    videoFilePath = temp;
+                    break;
+                }
+            }
+
         }
 
         /************************************************************************/

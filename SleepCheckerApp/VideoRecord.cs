@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using System.IO;
 
 namespace SleepCheckerApp
 {
@@ -55,7 +56,7 @@ namespace SleepCheckerApp
         public void videoStart()
         {
             // .aviファイルを開く
-            video = new CvVideoWriter("video.avi", FourCC.MJPG, fps, new CvSize(width, height));
+            video = new CvVideoWriter(getFilePath(), FourCC.MJPG, fps, new CvSize(width, height));
 
             // DoWorkイベントハンドラの実行を開始
             worker.RunWorkerAsync();
@@ -119,6 +120,36 @@ namespace SleepCheckerApp
             }
 
             form.videoWriteFrame(reImage);
+        }
+
+        /************************************************************************/
+        /* 関数名   : getFilePath                                               */
+        /* 機能     : 録画保存先パスを取得                                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [string] filePath - ファイルパス             				*/
+        /************************************************************************/
+        private string getFilePath()
+        {
+            string fileName = "video";
+            string filePath = form.getVideoFilePath();
+            string temp;
+
+            temp = fileName + ".avi";
+            for (int i = 1; i < 20; i++)
+            {
+                if (File.Exists(filePath + temp))
+                {
+                    temp = fileName + "(" + i + ")" + ".avi";
+                }
+                else
+                {
+                    fileName = temp;
+                    break;
+                }
+            }
+            filePath = filePath + fileName;
+
+            return filePath;
         }
     }
 }
