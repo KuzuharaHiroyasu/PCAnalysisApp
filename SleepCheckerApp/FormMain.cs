@@ -1,6 +1,7 @@
-﻿#define USB_OUTPUT // 無効化するとCドライブ直下に出力する
-#define C_DRIVE // Cドライブ直下にログ出力
-#define AUTO_ANALYSIS // 解析自動スタート
+﻿#define USB_OUTPUT      // 無効化するとCドライブ直下に出力する
+#define C_DRIVE         // Cドライブ直下にログ出力
+#define AUTO_ANALYSIS   // 解析自動スタート
+#define SOUND_RECORD    // 音声録音
 
 using System;
 using System.Collections.Generic;
@@ -330,8 +331,11 @@ namespace SleepCheckerApp
             panda.requestLattepanda((byte)request.LED_OFF);
 #if AUTO_ANALYSIS
             // 録音開始
+#if SOUND_RECORD
             ret = record.startRecordApnea();
-
+#else
+            ret = true;
+#endif
             if (ret)
             {
                 // 解析

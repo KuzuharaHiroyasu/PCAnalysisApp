@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define VIDEO_RECORD    // ビデオ録画
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,8 +22,8 @@ namespace SleepCheckerApp
         private int width = 705;
         private int height = 590;
         public FormMain form;
-        BackgroundWorker worker;
-        CvVideoWriter video;
+        BackgroundWorker worker = null;
+        CvVideoWriter video = null;
 
         /************************************************************************/
         /* 関数名   : VideoRecord          		                                */
@@ -31,6 +33,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         public VideoRecord()
         {
+#if VIDEO_RECORD
             worker = new BackgroundWorker();
 
             // 非同期をキャンセルさせる
@@ -45,6 +48,7 @@ namespace SleepCheckerApp
             // RunWorkerAsyncメソッドで呼ばれるDoWorkに、
             // 別スレッドでUSBカメラの画像を取得し続けるイベントハンドラを追加
             worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+#endif
         }
 
         /************************************************************************/
@@ -55,11 +59,13 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void videoStart()
         {
+#if VIDEO_RECORD
             // .aviファイルを開く
             video = new CvVideoWriter(getFilePath(), FourCC.MJPG, fps, new CvSize(width, height));
 
             // DoWorkイベントハンドラの実行を開始
             worker.RunWorkerAsync();
+#endif
         }
 
         /************************************************************************/
@@ -71,7 +77,10 @@ namespace SleepCheckerApp
         public void videoStop()
         {
             // 動画ファイルを閉じる
-            video.Dispose();
+            if (video != null)
+            {
+                video.Dispose();
+            }
         }
 
         /************************************************************************/
