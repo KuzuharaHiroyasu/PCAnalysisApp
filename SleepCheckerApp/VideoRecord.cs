@@ -1,6 +1,7 @@
 ﻿#define VIDEO_RECORD    // ビデオ録画
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,15 +13,14 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
-using System.IO;
 
 namespace SleepCheckerApp
 {
     class VideoRecord
     {
         private double fps = 30;
-        private int width = 705;
-        private int height = 590;
+        private int width = 300;
+        private int height = 240;
         public FormMain form;
         BackgroundWorker worker = null;
         CvVideoWriter video = null;
