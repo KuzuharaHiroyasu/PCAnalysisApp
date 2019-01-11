@@ -842,7 +842,6 @@ namespace SleepCheckerApp
                 }
                 else
                 {
-                    temp = temp + "\\";
                     Directory.CreateDirectory(temp);
                     recordFilePath = temp;
                     break;
@@ -860,7 +859,6 @@ namespace SleepCheckerApp
                 }
                 else
                 {
-                    temp = temp + "\\";
                     Directory.CreateDirectory(temp);
                     videoFilePath = temp;
                     break;
