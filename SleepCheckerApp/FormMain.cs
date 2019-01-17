@@ -819,7 +819,6 @@ namespace SleepCheckerApp
                 }
                 else
                 {
-                    temp = temp + "\\";
                     Directory.CreateDirectory(temp);
                     recordFilePath = temp;
                     break;
