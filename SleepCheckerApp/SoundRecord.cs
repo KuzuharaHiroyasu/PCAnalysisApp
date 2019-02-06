@@ -48,7 +48,7 @@ namespace SleepCheckerApp
             sourceStream.DeviceNumber = deviceNumber;
             sourceStream.WaveFormat = new WaveFormat(4000, WaveIn.GetCapabilities(deviceNumber).Channels);
 
-            // 録音のコールバックkな数
+            // 録音のコールバック関数
             sourceStream.DataAvailable += new EventHandler<WaveInEventArgs>(sourceStream_DataAvailable);
 
             temp = fileName + ".wav";

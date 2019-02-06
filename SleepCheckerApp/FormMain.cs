@@ -350,7 +350,6 @@ namespace SleepCheckerApp
 
             if (!ret)
             { //エラー処理
-                panda.setComPort_Lattepanda();
                 panda.requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
                 panda.closeComPort_Lattepanda();
                 log_output("[ERROR]");
