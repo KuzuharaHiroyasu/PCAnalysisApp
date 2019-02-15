@@ -20,7 +20,10 @@ namespace SleepCheckerApp
         /************************************************************************/
         public SoundAlarm()
         {
-            if(File.Exists(filePath + "500Hz_intermittent_4.wav"))
+            if (File.Exists(filePath + "300Hz_intermittent_4.wav"))
+            {
+                AlarmFile = filePath + "300Hz_intermittent_4.wav";
+            } else if (File.Exists(filePath + "500Hz_intermittent_4.wav"))
             {
                 AlarmFile = filePath + "500Hz_intermittent_4.wav";
             } else if(File.Exists(filePath + "1000Hz_intermittent_4.wav"))
@@ -29,6 +32,9 @@ namespace SleepCheckerApp
             } else if (File.Exists(filePath + "1500Hz_intermittent_4.wav"))
             {
                 AlarmFile = filePath + "1500Hz_intermittent_4.wav";
+            } else if (File.Exists(filePath + "2000Hz_intermittent_4.wav"))
+            {
+                AlarmFile = filePath + "2000Hz_intermittent_4.wav";
             }
 
             if (!string.IsNullOrEmpty(AlarmFile))
