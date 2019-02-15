@@ -15,6 +15,7 @@ namespace SleepCheckerApp
         public Parity Parity { get; set; }
         public int DataBits { get; set; }
         public StopBits StopBits { get; set; }
+        public Boolean micPosition;
 
         /************************************************************************/
         /* 関数名   : ComPort     	        	                                */
@@ -92,7 +93,7 @@ namespace SleepCheckerApp
             myPort.Write(buffer, 0, buffer.Length);
         }
 
-        public delegate void DataReceivedHandler(byte[] data);
+        public delegate void DataReceivedHandler(byte[] data, Boolean micPosition);
         public event DataReceivedHandler DataReceived;
 
         /************************************************************************/
@@ -122,7 +123,7 @@ namespace SleepCheckerApp
                     }
                     if (rbyte > 0)
                     {
-                        DataReceived(buffer);
+                        DataReceived(buffer, micPosition);
                     }
                 }
                 catch (IOException ex)
