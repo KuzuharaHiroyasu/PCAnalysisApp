@@ -81,6 +81,7 @@ double	xy2_[DATA_SIZE];
 double	interval_[DATA_SIZE];
 
 char path_[256];
+char pathAcce_[256];
 
 static B	SnoreTime_[RIREKI];
 static UB	SnoreFlg_; // ONカウント中 or OFFカウント中
@@ -692,15 +693,15 @@ DLLEXPORT void __stdcall get_accelerometer(double data_x, double data_y, double 
 	int pos = 0;
 	if (ppath) {
 		while (ppath[pos] != '\0') {
-			path_[pos] = ppath[pos];
+			pathAcce_[pos] = ppath[pos];
 			pos += 1;
 		}
-		path_[pos] = '\0';
+		pathAcce_[pos] = '\0';
 	}
 
-	debug_out("acce_x", &data_x, 1, path_);
-	debug_out("acce_y", &data_y, 1, path_);
-	debug_out("acce_z", &data_z, 1, path_);
+	debug_out("acce_x", &data_x, 1, pathAcce_);
+	debug_out("acce_y", &data_y, 1, pathAcce_);
+	debug_out("acce_z", &data_z, 1, pathAcce_);
 }
 
 /************************************************************/

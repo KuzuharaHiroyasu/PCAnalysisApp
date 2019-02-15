@@ -20,12 +20,12 @@ void	debug_out( char *f , double d[] , int size , const char* ppath)
 		printf("_fsopen failed\n");
 		exit(1);
 	}
-
+	
 	for(int i = 0; i < size; i++)
 	{
 		fprintf( fp , "%lf\n" , d[i] );
 	}
-
+	
 	fclose(fp);
 }
 /*==============================================================================*/

@@ -997,7 +997,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+/*
             // rootパス
             PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
             temp = PulseRootPath_;
@@ -1014,7 +1014,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+*/
             // rootパス
             AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
             temp = AcceRootPath_;
@@ -1298,9 +1298,7 @@ namespace SleepCheckerApp
                         // 演算結果データ
                         state = get_state();
                         snore_right = state & 0x01;
-                        snore_right = 1;
                         apnea_right = (state & 0xC0) >> 6;
-                        apnea_right = 2;
                         if (ResultIbikiQueue_right.Count >= BufNumApneaGraph)
                         {
                             ResultIbikiQueue_right.Dequeue();
