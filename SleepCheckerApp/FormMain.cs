@@ -181,12 +181,13 @@ namespace SleepCheckerApp
         Queue<double> SpNormalDataQueue = new Queue<double>();
         Queue<double> SpAcdcDataQueue = new Queue<double>();
         object lockData_SpO2 = new object();
-        
+
         // 演算結果保存向けデータ-------
         // 保存rootパス
+        private string ApneaRootPath_;
         private string ApneaRootPathLeft_;
         private string ApneaRootPathRight_;
-        private string PulseRootPath_;
+//        private string PulseRootPath_;
         private string AcceRootPath_;
         private string RecordRootPath_;
         private string recordFilePath;
@@ -365,6 +366,7 @@ namespace SleepCheckerApp
             }
             GraphUpdate_Apnea();
 //            GraphUpdate_SpO2();
+            GraphUpdate_Acc();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -964,6 +966,22 @@ namespace SleepCheckerApp
             }
 #endif
             // rootパス
+            ApneaRootPath_ = drivePath + "\\ax\\apnea\\general\\" + datestr + "\\";
+            temp = ApneaRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = ApneaRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
+            }
+
             // 左
             ApneaRootPathLeft_ = drivePath + "\\ax\\apnea\\left\\" + datestr + "\\";
             temp = ApneaRootPathLeft_;
