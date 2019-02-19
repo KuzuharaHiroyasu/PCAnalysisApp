@@ -826,7 +826,7 @@ namespace SleepCheckerApp
             if (SpO2_CalcDataList1.Count >= CalcDataNumSpO2)     // 1と2は同じ個数が入る前提
             {
                 //演算
-                Calc_SpO2();
+//                Calc_SpO2();
                 //結果表示
                 double shinpaku_sekisyoku = get_sinpak_clr();
                 double shinpaku_sekigai   = get_sinpak_inf();
@@ -1083,6 +1083,7 @@ namespace SleepCheckerApp
         /* 引数     : [int] Count - データ数                                    */
         /* 戻り値   : なし														*/
         /************************************************************************/
+/*
         private string CreatePulseDir(int Count)
         {
            string path = PulseRootPath_ + Count.ToString("D");
@@ -1093,7 +1094,7 @@ namespace SleepCheckerApp
             
             return path;
         }
-
+*/
         /************************************************************************/
         /* 関数名   : CreateAcceDir                     		    			*/
         /* 機能     : 加速度センサー結果保存用パスの作成                        */
@@ -1370,6 +1371,7 @@ namespace SleepCheckerApp
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
+/*
         private void Calc_SpO2()
         {
             try
@@ -1463,7 +1465,7 @@ namespace SleepCheckerApp
                 Console.WriteLine(ex.Message);
             }
         }
-
+*/
         /************************************************************************/
         /* 関数名   : GraphUpdate_Apnea                			    			*/
         /* 機能     : 呼吸グラフを更新                                          */
