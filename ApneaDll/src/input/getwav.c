@@ -40,6 +40,7 @@ DLLEXPORT int	__stdcall get_result_apnea(double* data);
 DLLEXPORT int   __stdcall get_result_snore_count();
 DLLEXPORT void   __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath);
 DLLEXPORT void __stdcall calc_snore_init(void);
+DLLEXPORT void __stdcall get_general_result(double snore, double apnea, char* ppath);
 
 static int proc_on(int Pos);
 static int proc_off(int Pos);
@@ -82,6 +83,7 @@ double	interval_[DATA_SIZE];
 
 char path_[256];
 char pathAcce_[256];
+char pathGeneral_[256];
 
 static B	SnoreTime_[RIREKI];
 static UB	SnoreFlg_; // ONカウント中 or OFFカウント中
@@ -702,6 +704,23 @@ DLLEXPORT void __stdcall get_accelerometer(double data_x, double data_y, double 
 	debug_out("acce_x", &data_x, 1, pathAcce_);
 	debug_out("acce_y", &data_y, 1, pathAcce_);
 	debug_out("acce_z", &data_z, 1, pathAcce_);
+}
+
+// 総合判定をファイル出力
+DLLEXPORT void __stdcall get_general_result(double snore, double apnea, char* ppath)
+{
+	// ファイル出力パスを保存
+	int pos = 0;
+	if (ppath) {
+		while (ppath[pos] != '\0') {
+			pathGeneral_[pos] = ppath[pos];
+			pos += 1;
+		}
+		pathGeneral_[pos] = '\0';
+	}
+
+	debug_out("snore_general_result", &snore, 1, pathGeneral_);
+	debug_out("apnea_general_result", &apnea, 1, pathGeneral_);
 }
 
 /************************************************************/

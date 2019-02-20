@@ -40,6 +40,8 @@ namespace SleepCheckerApp
         static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
         [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
+        [DllImport("Apnea.dll")]
+        static extern void get_general_result(double snore, double apnea, IntPtr path);
 
         // For PulseOximeter
         [DllImport("PulseOximeter.dll")]
@@ -184,7 +186,7 @@ namespace SleepCheckerApp
 
         // 演算結果保存向けデータ-------
         // 保存rootパス
-        private string ApneaRootPath_;
+        private string ApneaRootPathGeneral_;
         private string ApneaRootPathLeft_;
         private string ApneaRootPathRight_;
 //        private string PulseRootPath_;
@@ -192,6 +194,7 @@ namespace SleepCheckerApp
         private string RecordRootPath_;
         private string recordFilePath;
 
+        private int ApneaCalcCountGeneral_;
         private int ApneaCalcCountLeft_;
         private int ApneaCalcCountRight_;
         private int PulseCalcCount_;
@@ -966,13 +969,13 @@ namespace SleepCheckerApp
             }
 #endif
             // rootパス
-            ApneaRootPath_ = drivePath + "\\ax\\apnea\\general\\" + datestr + "\\";
-            temp = ApneaRootPath_;
+            ApneaRootPathGeneral_ = drivePath + "\\ax\\apnea\\general\\" + datestr + "\\";
+            temp = ApneaRootPathGeneral_;
             for (i = 1; i < 20; i++)
             {
                 if (Directory.Exists(temp))
                 {
-                    temp = ApneaRootPath_ + "(" + i + ")";
+                    temp = ApneaRootPathGeneral_ + "(" + i + ")";
                 }
                 else
                 {
@@ -1096,23 +1099,44 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
+        /* 関数名   : CreateApneaDirGeneral                     		    	*/
+        /* 機能     : 無呼吸演算結果保存用パスの作成                            */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private string CreateApneaDirGeneral(int Count)
+        {
+            string path = ApneaRootPathGeneral_ + Count.ToString("D");
+
+            if (Directory.Exists(path))
+            {
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
+        }
+
+        /************************************************************************/
         /* 関数名   : CreatePulseDir                     		    			*/
         /* 機能     : SpO2演算結果保存用パスの作成                              */
         /* 引数     : [int] Count - データ数                                    */
         /* 戻り値   : なし														*/
         /************************************************************************/
-/*
-        private string CreatePulseDir(int Count)
-        {
-           string path = PulseRootPath_ + Count.ToString("D");
-            if(Directory.Exists(path)){
-            }else{
-                Directory.CreateDirectory(path);
-            }
-            
-            return path;
-        }
-*/
+        /*
+                private string CreatePulseDir(int Count)
+                {
+                   string path = PulseRootPath_ + Count.ToString("D");
+                    if(Directory.Exists(path)){
+                    }else{
+                        Directory.CreateDirectory(path);
+                    }
+
+                    return path;
+                }
+        */
         /************************************************************************/
         /* 関数名   : CreateAcceDir                     		    			*/
         /* 機能     : 加速度センサー結果保存用パスの作成                        */
@@ -1335,21 +1359,26 @@ namespace SleepCheckerApp
                         if(snore_left == 1 || snore_right == 1)
                         { //どちらかがいびき判定
                             snore = 1;
-                            // アラーム鳴動
-                            alarm.confirmAlarm();
-
-                            // バイブレーション
-                            vib.confirmVib((byte)request.VIBRATION);
                         }
                         else if(apnea_left != 0 && apnea_right != 0)
                         { //どちらも無呼吸判定
                             apnea = 2;
+                        }
+
+                        if(snore == 1 || apnea == 2)
+                        {
                             // アラーム鳴動
                             alarm.confirmAlarm();
 
                             // バイブレーション
                             vib.confirmVib((byte)request.VIBRATION);
                         }
+
+                        // ログ出力
+                        path = CreateApneaDirGeneral(ApneaCalcCountGeneral_);
+                        ApneaCalcCountGeneral_ += 1;
+                        pathptr = Marshal.StringToHGlobalAnsi(path);
+                        get_general_result((double)snore, (double)apnea, pathptr);
 
                         if (ResultIbikiQueue.Count >= BufNumApneaGraph)
                         {
