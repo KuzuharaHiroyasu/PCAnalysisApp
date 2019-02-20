@@ -393,6 +393,8 @@ namespace SleepCheckerApp
             Boolean ret_left = false;
             Boolean ret_right = false;
 
+            initGraphShow();
+
             panda.setComPort_Lattepanda();
 
             // ログ出力フォルダ作成
@@ -1986,7 +1988,146 @@ namespace SleepCheckerApp
   			}
         }
 
-/* ボタンクリックイベント */
+        /************************************************************************/
+        /* 関数名   : initGraphShow                  			    			*/
+        /* 機能     : グラフ表示の初期設定                                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void initGraphShow()
+        {
+            Series srs = chartRawData_left.Series["呼吸(生データ)"];
+            Series srs2 = chartRawData_right.Series["呼吸(生データ)"];
+            if (checkBox_rawresp.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartRawData_left.Series["いびき(生データ)"];
+            srs2 = chartRawData_right.Series["いびき(生データ)"];
+            if (checkBox_rawsnore.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartRawData_left.Series["呼吸(移動平均)"];
+            srs2 = chartRawData_right.Series["呼吸(移動平均)"];
+            if (checkBox_dcresp.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["無呼吸(ave)"];
+            srs2 = chartOperation_right.Series["無呼吸(ave)"];
+            if (checkBox_apneaave.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["無呼吸(eval)"];
+            srs2 = chartOperation_right.Series["無呼吸(eval)"];
+            if (checkBox_apneaeval.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["無呼吸(rms)"];
+            srs2 = chartOperation_right.Series["無呼吸(rms)"];
+            if (checkBox_apnearms.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["無呼吸(rms)"];
+            srs2 = chartOperation_right.Series["無呼吸(rms)"];
+            if (checkBox_apneapoint.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["無呼吸(point)"];
+            srs2 = chartOperation_right.Series["無呼吸(point)"];
+            if (checkBox_apneapoint.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["いびき(xy2)"];
+            srs2 = chartOperation_right.Series["いびき(xy2)"];
+            if (checkBox_snorexy2.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+
+            srs = chartOperation_left.Series["いびき(interval)"];
+            srs2 = chartOperation_right.Series["いびき(interval)"];
+            if (checkBox_snore_interval.Checked)
+            {
+                srs.Enabled = true;
+                srs2.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+                srs2.Enabled = false;
+            }
+        }
+
+        /* ボタンクリックイベント */
         /************************************************************************/
         /* 関数名   : buttonStart_Click          					    		*/
         /* 機能     : 開始ボタンクリック時のイベント                            */
@@ -2051,13 +2192,16 @@ namespace SleepCheckerApp
         private void checkBox_rawresp_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartRawData_left.Series["呼吸(生データ)"];
+            Series srs2 = chartRawData_right.Series["呼吸(生データ)"];
             if (checkBox_rawresp.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2070,13 +2214,16 @@ namespace SleepCheckerApp
         private void checkBox_rawsnore_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartRawData_left.Series["いびき(生データ)"];
+            Series srs2 = chartRawData_right.Series["いびき(生データ)"];
             if (checkBox_rawsnore.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2089,13 +2236,16 @@ namespace SleepCheckerApp
         private void checkBox_dcresp_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartRawData_left.Series["呼吸(移動平均)"];
+            Series srs2 = chartRawData_right.Series["呼吸(移動平均)"];
             if (checkBox_dcresp.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2108,13 +2258,16 @@ namespace SleepCheckerApp
         private void checkBox_apneaave_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["無呼吸(ave)"];
+            Series srs2 = chartOperation_right.Series["無呼吸(ave)"];
             if (checkBox_apneaave.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2127,13 +2280,16 @@ namespace SleepCheckerApp
         private void checkBox_apneaeval_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["無呼吸(eval)"];
+            Series srs2 = chartOperation_right.Series["無呼吸(eval)"];
             if (checkBox_apneaeval.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2146,13 +2302,16 @@ namespace SleepCheckerApp
         private void checkBox_apnearms_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["無呼吸(rms)"];
+            Series srs2 = chartOperation_right.Series["無呼吸(rms)"];
             if (checkBox_apnearms.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2165,13 +2324,16 @@ namespace SleepCheckerApp
         private void checkBox_apneapoint_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["無呼吸(point)"];
+            Series srs2 = chartOperation_right.Series["無呼吸(point)"];
             if (checkBox_apneapoint.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2184,13 +2346,16 @@ namespace SleepCheckerApp
         private void checkBox_snorexy2_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["いびき(xy2)"];
+            Series srs2 = chartOperation_right.Series["いびき(xy2)"];
             if (checkBox_snorexy2.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
@@ -2203,13 +2368,16 @@ namespace SleepCheckerApp
         private void checkBox_snore_interval_CheckedChanged(object sender, EventArgs e)
         {
             Series srs = chartOperation_left.Series["いびき(interval)"];
+            Series srs2 = chartOperation_right.Series["いびき(interval)"];
             if (checkBox_snore_interval.Checked)
             {
                 srs.Enabled = true;
+                srs2.Enabled = true;
             }
             else
             {
                 srs.Enabled = false;
+                srs2.Enabled = false;
             }
         }
 
