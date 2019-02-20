@@ -338,8 +338,6 @@
             // checkBox_snorexy2
             // 
             this.checkBox_snorexy2.AutoSize = true;
-            this.checkBox_snorexy2.Checked = true;
-            this.checkBox_snorexy2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_snorexy2.Location = new System.Drawing.Point(6, 62);
             this.checkBox_snorexy2.Name = "checkBox_snorexy2";
             this.checkBox_snorexy2.Size = new System.Drawing.Size(79, 16);
@@ -351,8 +349,6 @@
             // checkBox_apneapoint
             // 
             this.checkBox_apneapoint.AutoSize = true;
-            this.checkBox_apneapoint.Checked = true;
-            this.checkBox_apneapoint.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_apneapoint.Location = new System.Drawing.Point(307, 40);
             this.checkBox_apneapoint.Name = "checkBox_apneapoint";
             this.checkBox_apneapoint.Size = new System.Drawing.Size(93, 16);
@@ -364,8 +360,6 @@
             // checkBox_apnearms
             // 
             this.checkBox_apnearms.AutoSize = true;
-            this.checkBox_apnearms.Checked = true;
-            this.checkBox_apnearms.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_apnearms.Location = new System.Drawing.Point(215, 40);
             this.checkBox_apnearms.Name = "checkBox_apnearms";
             this.checkBox_apnearms.Size = new System.Drawing.Size(87, 16);
@@ -377,8 +371,6 @@
             // checkBox_apneaeval
             // 
             this.checkBox_apneaeval.AutoSize = true;
-            this.checkBox_apneaeval.Checked = true;
-            this.checkBox_apneaeval.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_apneaeval.Location = new System.Drawing.Point(108, 40);
             this.checkBox_apneaeval.Name = "checkBox_apneaeval";
             this.checkBox_apneaeval.Size = new System.Drawing.Size(89, 16);
@@ -390,8 +382,6 @@
             // checkBox_apneaave
             // 
             this.checkBox_apneaave.AutoSize = true;
-            this.checkBox_apneaave.Checked = true;
-            this.checkBox_apneaave.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_apneaave.Location = new System.Drawing.Point(6, 40);
             this.checkBox_apneaave.Name = "checkBox_apneaave";
             this.checkBox_apneaave.Size = new System.Drawing.Size(86, 16);
@@ -403,8 +393,6 @@
             // checkBox_dcresp
             // 
             this.checkBox_dcresp.AutoSize = true;
-            this.checkBox_dcresp.Checked = true;
-            this.checkBox_dcresp.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_dcresp.Location = new System.Drawing.Point(215, 18);
             this.checkBox_dcresp.Name = "checkBox_dcresp";
             this.checkBox_dcresp.Size = new System.Drawing.Size(104, 16);
