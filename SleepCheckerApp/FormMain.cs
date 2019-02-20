@@ -197,7 +197,7 @@ namespace SleepCheckerApp
         private int ApneaCalcCountGeneral_;
         private int ApneaCalcCountLeft_;
         private int ApneaCalcCountRight_;
-        private int PulseCalcCount_;
+//        private int PulseCalcCount_;
         private int AcceCalcCount_;
 
         public int snore = 0;
@@ -263,12 +263,13 @@ namespace SleepCheckerApp
                 comboBoxComport.Items.Add(port);
                 //Console.WriteLine(port);
             }
-            
+
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
+            ApneaCalcCountGeneral_ = 0;
             ApneaCalcCountLeft_ = 0;
             ApneaCalcCountRight_ = 0;
-            PulseCalcCount_ = 0;
+//            PulseCalcCount_ = 0;
             AcceCalcCount_  = 0;
 
             // グラフ表示初期化
@@ -1108,11 +1109,8 @@ namespace SleepCheckerApp
         {
             string path = ApneaRootPathGeneral_ + Count.ToString("D");
 
-            if (Directory.Exists(path))
-            {
-            }
-            else
-            {
+            if (Directory.Exists(path)){
+            }else{
                 Directory.CreateDirectory(path);
             }
 
