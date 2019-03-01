@@ -109,12 +109,8 @@ namespace SleepCheckerApp
         Queue<double> AccelerometerZQueue = new Queue<double>();
 
         // 演算途中データ
-        Queue<double> ApneaAveQueue = new Queue<double>();
-        Queue<int> ApneaEvalQueue = new Queue<int>();
         Queue<double> ApneaRmsQueue = new Queue<double>();
         Queue<double> ApneaPointQueue = new Queue<double>();
-        Queue<double> SnoreXy2Queue = new Queue<double>();
-        Queue<double> SnoreIntervalQueue = new Queue<double>();
         
         // 演算結果データ
         private const int BufNumApneaGraph = 11;            // 1分(10データ)分だけ表示する // 0点も打つので+1
@@ -158,7 +154,7 @@ namespace SleepCheckerApp
         // 演算結果保存向けデータ-------
         // 保存rootパス
         private string ApneaRootPath_;
-        private string PulseRootPath_;
+        private string PulseRootPath_ = null;
         private string AcceRootPath_;
         private string RecordRootPath_;
         private string recordFilePath;
@@ -207,6 +203,9 @@ namespace SleepCheckerApp
             vib.form = this;
             vib.panda = panda;
 
+            // グラフ初期設定
+            initGraphShow();
+
             if (!Directory.Exists(logPath))
             {
                 Directory.CreateDirectory(logPath);
@@ -234,36 +233,29 @@ namespace SleepCheckerApp
             RawDataRespQueue.Clear();
             RawDataSnoreQueue.Clear();
             RawDataDcQueue.Clear();
-            ApneaAveQueue.Clear();
-            ApneaEvalQueue.Clear();
             ApneaRmsQueue.Clear();
             ApneaPointQueue.Clear();
-            SnoreXy2Queue.Clear();
-            SnoreIntervalQueue.Clear();
             AccelerometerXQueue.Clear();
             AccelerometerYQueue.Clear();
             AccelerometerZQueue.Clear();
+            ResultIbikiQueue.Clear();
+            ApneaQueue.Clear();
 
             for (int i = 0; i < ApneaGraphDataNum; i++)
             {
                 RawDataRespQueue.Enqueue(0);
                 RawDataSnoreQueue.Enqueue(0);
                 RawDataDcQueue.Enqueue(0);
-                ApneaAveQueue.Enqueue(0);
-                ApneaEvalQueue.Enqueue(0);
                 ApneaRmsQueue.Enqueue(0);
                 ApneaPointQueue.Enqueue(0);
-                SnoreXy2Queue.Enqueue(0);
-                SnoreIntervalQueue.Enqueue(0);
             }
-            
-            ResultIbikiQueue.Clear();
-            ApneaQueue.Clear();
+
             for (int i = 0; i < BufNumApneaGraph; i++)
             {
                 ApneaQueue.Enqueue(0);
                 ResultIbikiQueue.Enqueue(0);
             }
+/*
             // For PulseOximeter
             for (int i = 0; i < SpO2_RawDataRirekiNum; i++)
             {
@@ -278,12 +270,14 @@ namespace SleepCheckerApp
                 RawDataSekisyokuQueue.Enqueue(0);
                 RawDataSekigaiQueue.Enqueue(0);
             }
+*/
             for (int i = 0; i < Acc_RawDataRirekiNum; i++)
             {
                 AccelerometerXQueue.Enqueue(0);
                 AccelerometerYQueue.Enqueue(0);
                 AccelerometerZQueue.Enqueue(0);
             }
+/*
             for (int i = 0; i < ShipakuDataRirekiNum; i++)
             {
                 ShinpakuSekisyokuDataQueue.Enqueue(0);
@@ -294,8 +288,8 @@ namespace SleepCheckerApp
                 SpNormalDataQueue.Enqueue(0);
                 SpAcdcDataQueue.Enqueue(0);
             }
+*/
             GraphUpdate_Apnea();
-            GraphUpdate_SpO2();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -371,6 +365,18 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
+        /* 関数名   : initGraphShow                    			    			*/
+        /* 機能     : グラフ初期設定             	                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void initGraphShow()
+        {
+            Series srs = chartRawData.Series["呼吸(移動平均)"];
+            srs.Enabled = false;
+        }
+
+        /************************************************************************/
         /* 関数名   : startAnalysis             		                		*/
         /* 機能     : 解析スタート処理                                          */
         /* 引数     : なし                                                      */
@@ -390,6 +396,7 @@ namespace SleepCheckerApp
                 com.PortName = comboBoxComport.Items[i].ToString();
                 if (com.PortName != "COM1" && com.PortName != "COM5")
                 {
+                    comboBoxComport.SelectedIndex = i;
                     if (String.IsNullOrWhiteSpace(com.PortName) == false)
                     {
                         ret = com.Start();
@@ -519,8 +526,8 @@ namespace SleepCheckerApp
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
                         // For PulseOximeter
-                        SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-                        if (Convert.ToInt32(datas[4]) != 999)
+                        //SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
+                        if (Convert.ToInt32(datas[4]) > 250)
                         {
                             // For 加速度
                             SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
@@ -776,7 +783,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+/*
             // rootパス
             PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
             temp = PulseRootPath_;
@@ -793,7 +800,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+*/
             // rootパス
             AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
             temp = AcceRootPath_;
@@ -810,7 +817,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-
+#if SOUND_RECORD
             // rootパス
             RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
             temp = RecordRootPath_;
@@ -827,6 +834,10 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+#else
+            RecordRootPath_ = null;
+            recordFilePath = RecordRootPath_;
+#endif
         }
 
         /************************************************************************/
@@ -918,23 +929,6 @@ namespace SleepCheckerApp
                         RawDataDcQueue.Enqueue(arrayd[ii]);
                     }
 
-                    // 無呼吸(ave)データをQueueに置く
-                    get_apnea_ave(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
-                    {
-                        ApneaAveQueue.Dequeue();
-                        ApneaAveQueue.Enqueue(arrayd[ii]);
-                    }
-
-                    // 無呼吸(eval)データをQueueに置く
-                    get_apnea_eval(pi);
-                    Marshal.Copy(pi, arrayi, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
-                    {
-                        ApneaEvalQueue.Dequeue();
-                        ApneaEvalQueue.Enqueue(arrayi[ii]);
-                    }
                     // 無呼吸(rms)データをQueueに置く
                     get_apnea_rms(pd);
                     Marshal.Copy(pd, arrayd, 0, num);
@@ -951,24 +945,6 @@ namespace SleepCheckerApp
                     {
                         ApneaPointQueue.Dequeue();
                         ApneaPointQueue.Enqueue(arrayd[ii]);
-                    }
-
-                    // いびき(xy2)データをQueueに置く
-                    get_snore_xy2(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
-                    {
-                        SnoreXy2Queue.Dequeue();
-                        SnoreXy2Queue.Enqueue(arrayd[ii]);
-                    }
-
-                    // いびき(interval)データをQueueに置く
-                    get_snore_interval(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
-                    {
-                        SnoreIntervalQueue.Dequeue();
-                        SnoreIntervalQueue.Enqueue(arrayd[ii]);
                     }
 
                     // 演算結果データ
@@ -1117,12 +1093,7 @@ namespace SleepCheckerApp
 
             lock (lockData)
             {
-                // いびき回数グラフを更新
-                Series srs_result_ibiki = chartResultIbiki.Series["データ"]; //■
-                Series srs_result_ibiki_thre = chartResultIbiki.Series["閾値"]; //■
-                srs_result_ibiki.Points.Clear();
-                srs_result_ibiki_thre.Points.Clear();
-                // 無呼吸・低呼吸グラフを更新
+                // いびき、呼吸状態グラフを更新
                 Series srs_apnea = chartApnea.Series["呼吸状態"]; //■
                 Series srs_snore = chartApnea.Series["いびき"]; //■
                 srs_apnea.Points.Clear();
@@ -1167,30 +1138,10 @@ namespace SleepCheckerApp
                 }
                 
                 // 演算途中データグラフを更新
-                Series srs_apnea_ave = chart1.Series["無呼吸(ave)"];
-                Series srs_apnea_eval = chart1.Series["無呼吸(eval)"];
                 Series srs_apnea_rms = chart1.Series["無呼吸(rms)"];
                 Series srs_apnea_point = chart1.Series["無呼吸(point)"];
-                Series srs_snore_xy2 = chart1.Series["いびき(xy2)"];
-                Series srs_snore_interval = chart1.Series["いびき(interval)"];
-                srs_apnea_ave.Points.Clear();
-                srs_apnea_eval.Points.Clear();
                 srs_apnea_rms.Points.Clear();
                 srs_apnea_point.Points.Clear();
-                srs_snore_xy2.Points.Clear();
-                srs_snore_interval.Points.Clear();
-                cnt = 0;
-                foreach (double data in ApneaAveQueue)
-                {
-                    srs_apnea_ave.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in ApneaEvalQueue)
-                {
-                    srs_apnea_eval.Points.AddXY(cnt, data);
-                    cnt++;
-                }
                 cnt = 0;
                 foreach (double data in ApneaRmsQueue)
                 {
@@ -1203,167 +1154,11 @@ namespace SleepCheckerApp
                     srs_apnea_point.Points.AddXY(cnt, data);
                     cnt++;
                 }
-                cnt = 0;
-                foreach (double data in SnoreXy2Queue)
-                {
-                    srs_snore_xy2.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in SnoreIntervalQueue)
-                {
-                    srs_snore_interval.Points.AddXY(cnt, data);
-                    cnt++;
-                }
             }
             // 更新実行
-            chartResultIbiki.Invalidate();
             chartApnea.Invalidate();
             chartRawData.Invalidate();
             chart1.Invalidate();
-        }
-
-        /************************************************************************/
-        /* 関数名   : GraphUpdate_SpO2                			    			*/
-        /* 機能     : SpO2グラフを更新                                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void GraphUpdate_SpO2()
-        {
-            int cnt = 0;
-
-            lock (lockData_SpO2)
-            {
-                // 脈拍数グラフを更新
-                Series srs_sekisyoku = chartSinpaku.Series["赤色"];
-                Series srs_sekigai = chartSinpaku.Series["赤外"];
-                srs_sekisyoku.Points.Clear();
-                cnt = 0;
-                foreach (double data in ShinpakuSekisyokuDataQueue)
-                {
-                    srs_sekisyoku.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                srs_sekigai.Points.Clear();
-                cnt = 0;
-                foreach (double data in ShinpakuSekigaiDataQueue)
-                {
-                    srs_sekigai.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
-                // SpO2グラフを更新
-                Series srs_normal = chartSpO2.Series["SpO2"];
-                srs_normal.Points.Clear();
-                cnt = 0;
-                foreach (double data in SpNormalDataQueue)
-                {
-                    srs_normal.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
-                // Acdcグラフを更新
-/*                Series srs_acdc = chartSpO2.Series["AC比"];
-                srs_acdc.Points.Clear();
-                cnt = 0;
-                foreach (double data in SpAcdcDataQueue)
-                {
-                    srs_acdc.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-*/
-                // 生データSpO2グラフを更新
-                Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色(生データ)"];
-                Series srs_rawsekigai = chartRawData_SpO2.Series["赤外(生データ)"];
-                Series srs_dcsekisyoku = chartRawData_SpO2.Series["赤色(DC抜)"];
-                Series srs_dcsekigai = chartRawData_SpO2.Series["赤外(DC抜)"];
-                Series srs_cutsekisyoku = chartRawData_SpO2.Series["赤色(CUT)"];
-                Series srs_cutsekigai = chartRawData_SpO2.Series["赤外(CUT)"];
-                srs_rawsekisyoku.Points.Clear();
-                cnt = 0;
-                foreach (double data in RawDataSekisyokuQueue)
-                {
-                    srs_rawsekisyoku.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                srs_rawsekigai.Points.Clear();
-                cnt = 0;
-                foreach (double data in RawDataSekigaiQueue)
-                {
-                    srs_rawsekigai.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                srs_dcsekisyoku.Points.Clear();
-                cnt = 0;
-                foreach (double data in DcSekisyokuDataQueue)
-                {
-                    srs_dcsekisyoku.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                srs_dcsekigai.Points.Clear();
-                cnt = 0;
-                foreach (double data in DcSekigaiDataQueue)
-                {
-                    srs_dcsekigai.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                srs_cutsekisyoku.Points.Clear();
-                cnt = 0;
-                foreach (double data in NewIfftSekisyokuDataQueue)
-                {
-                    srs_cutsekisyoku.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                srs_cutsekigai.Points.Clear();
-                cnt = 0;
-                foreach (double data in NewIfftSekigaiDataQueue)
-                {
-                    srs_cutsekigai.Points.AddXY(cnt, data);  // 個数表記
-                    cnt++;
-                }
-                // 演算途中データグラフを更新
-                Series srs_fftclr = chartRawData_Acc.Series["赤色(FFT)"];
-                Series srs_fftinf = chartRawData_Acc.Series["赤外(FFT)"];
-                Series srs_ifftclr = chartRawData_Acc.Series["赤色(IFFT)"];
-                Series srs_ifftinf = chartRawData_Acc.Series["赤外(IFFT)"];
-                srs_fftclr.Points.Clear();
-                cnt = 0;
-                foreach (double data in FftSekisyokuDataQueue)
-                {
-                    double tmp = (double)cnt;
-                    srs_fftclr.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                srs_fftinf.Points.Clear();
-                cnt = 0;
-                foreach (double data in FftSekigaiDataQueue)
-                {
-                    double tmp = (double)cnt;
-                    srs_fftinf.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                srs_ifftclr.Points.Clear();
-                cnt = 0;
-                foreach (double data in IfftSekisyokuDataQueue)
-                {
-                    double tmp = (double)cnt;
-                    srs_ifftclr.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                srs_ifftinf.Points.Clear();
-                cnt = 0;
-                foreach (double data in IfftSekigaiDataQueue)
-                {
-                    double tmp = (double)cnt;
-                    srs_ifftinf.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-            }
-            // 更新実行
-            chartSinpaku.Invalidate();
-            chartSpO2.Invalidate();
-            chartRawData_SpO2.Invalidate();
         }
 
         /************************************************************************/
@@ -1504,8 +1299,11 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void button_recordstart_Click(object sender, EventArgs e)
         {
+#if SOUND_RECORD
             log_output("[BUTTON]Record Start");
+
             record.startRecordApnea();
+#endif
         }
 
         /************************************************************************/
@@ -1516,8 +1314,10 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void button_recordstop_Click(object sender, EventArgs e)
         {
+#if SOUND_RECORD
             log_output("[BUTTON]Record Stop");
             record.stopRecordApnea();
+#endif
         }
 
 /* チェックボックスイベント */
@@ -1580,44 +1380,6 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : checkBox_apneaave_CheckedChanged  			    		*/
-        /* 機能     : 無呼吸(ave)チェック時のイベント                           */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_apneaave_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chart1.Series["無呼吸(ave)"];
-            if (checkBox_apneaave.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_apneaeval_CheckedChanged    			    		*/
-        /* 機能     : 無呼吸(eval)チェック時のイベント                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_apneaeval_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chart1.Series["無呼吸(eval)"];
-            if (checkBox_apneaeval.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
         /* 関数名   : checkBox_apnearms_CheckedChanged        		    		*/
         /* 機能     : 無呼吸(rms)チェック時のイベント                           */
         /* 引数     : なし                                                      */
@@ -1652,197 +1414,6 @@ namespace SleepCheckerApp
             else
             {
                 srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_snorexy2_CheckedChanged   			    		*/
-        /* 機能     : いびき(xy2)チェック時のイベント                           */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_snorexy2_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chart1.Series["いびき(xy2)"];
-            if (checkBox_snorexy2.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_snore_interval_CheckedChanged      	    		*/
-        /* 機能     : いびき(interval)チェック時のイベント                      */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_snore_interval_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chart1.Series["いびき(interval)"];
-            if (checkBox_snore_interval.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-/* SpO2切替 */
-        /************************************************************************/
-        /* 関数名   : checkBox_rawclr_CheckedChanged       			    		*/
-        /* 機能     : 赤色(生データ)チェック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_rawclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_rawsekisyoku = chartRawData_SpO2.Series["赤色(生データ)"];
-            if (checkBox_rawclr.Checked)
-            {
-                srs_rawsekisyoku.Enabled = true;
-            }
-            else
-            {
-                srs_rawsekisyoku.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_rawinf_CheckedChanged   			        		*/
-        /* 機能     : 赤外(生データ)チェック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_rawinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_rawsekigai = chartRawData_SpO2.Series["赤外(生データ)"];
-            if (checkBox_rawinf.Checked)
-            {
-                srs_rawsekigai.Enabled = true;
-            }
-            else
-            {
-                srs_rawsekigai.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_dcclr_CheckedChanged   				    		*/
-        /* 機能     : 赤色(DC抜)チェック時のイベント                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_dcclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_dcsekisyoku = chartRawData_SpO2.Series["赤色(DC抜)"];
-            if (checkBox_dcclr.Checked)
-            {
-                srs_dcsekisyoku.Enabled = true;
-            }
-            else
-            {
-                srs_dcsekisyoku.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_dcinf_CheckedChanged    				    		*/
-        /* 機能     : 赤外(DC抜)チェック時のイベント                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_dcinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_dcsekigai = chartRawData_SpO2.Series["赤外(DC抜)"];
-            if (checkBox_dcinf.Checked)
-            {
-                srs_dcsekigai.Enabled = true;
-            }
-            else
-            {
-                srs_dcsekigai.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_fftclr_CheckedChanged          		    		*/
-        /* 機能     : 赤色(FFT)チェック時のイベント                             */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_fftclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_fftclr = chartRawData_Acc.Series["赤色(FFT)"];
-            if (checkBox_fftclr.Checked)
-            {
-                srs_fftclr.Enabled = true;
-            }
-            else
-            {
-                srs_fftclr.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_fftinf_CheckedChanged    			    		*/
-        /* 機能     : 赤外(FFT)チェック時のイベント                             */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_fftinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_fftinf = chartRawData_Acc.Series["赤外(FFT)"];
-            if (checkBox_fftinf.Checked)
-            {
-                srs_fftinf.Enabled = true;
-            }
-            else
-            {
-                srs_fftinf.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_ifftclr_CheckedChanged          		    		*/
-        /* 機能     : 赤色(IFFT)チェック時のイベント                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_ifftclr_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_ifftclr = chartRawData_Acc.Series["赤色(IFFT)"];
-            if (checkBox_ifftclr.Checked)
-            {
-                srs_ifftclr.Enabled = true;
-            }
-            else
-            {
-                srs_ifftclr.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_ifftinf_CheckedChanged       		    		*/
-        /* 機能     : 赤外(IFFT)チェック時のイベント                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_ifftinf_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs_ifftinf = chartRawData_Acc.Series["赤外(IFFT)"];
-            if (checkBox_ifftinf.Checked)
-            {
-                srs_ifftinf.Enabled = true;
-            }
-            else
-            {
-                srs_ifftinf.Enabled = false;
             }
         }
 
