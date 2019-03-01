@@ -238,8 +238,8 @@ namespace SleepCheckerApp
             AccelerometerXQueue.Clear();
             AccelerometerYQueue.Clear();
             AccelerometerZQueue.Clear();
-            ResultIbikiQueue.Clear();
             ApneaQueue.Clear();
+            ResultIbikiQueue.Clear();
 
             for (int i = 0; i < ApneaGraphDataNum; i++)
             {
@@ -290,6 +290,7 @@ namespace SleepCheckerApp
             }
 */
             GraphUpdate_Apnea();
+            GraphUpdate_Acc();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -515,8 +516,8 @@ namespace SleepCheckerApp
                         //SetTextInput(lines[i] + "\r\n");
                         //演算
                         int result;
-                        if (!int.TryParse(datas[0], out result)) continue;      // 赤色AD値
-                        if (!int.TryParse(datas[1], out result)) continue;      // 赤外AD値
+//                        if (!int.TryParse(datas[0], out result)) continue;      // 赤色AD値
+//                        if (!int.TryParse(datas[1], out result)) continue;      // 赤外AD値
                         if (!int.TryParse(datas[2], out result)) continue;      // マイク(呼吸)
                         if (!int.TryParse(datas[3], out result)) continue;      // マイク(いびき)
                         if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(X)
@@ -1098,7 +1099,6 @@ namespace SleepCheckerApp
                 Series srs_snore = chartApnea.Series["いびき"]; //■
                 srs_apnea.Points.Clear();
                 srs_snore.Points.Clear();
-                cnt = 0;
                 foreach (int data in ApneaQueue)
                 {
                     srs_apnea.Points.AddXY(cnt, data);
