@@ -323,6 +323,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 	// (40) = Param3
 	
 	// (37)
+/* // 使用していないためコメントアウト
 	for(int ii=0;ii<DSize;++ii){
 		int min=0;
 		int loop=0;
@@ -360,7 +361,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 		}
 	}
 	debug_out("eval2", eval_, DSize, path_);
-	
+*/	
 	// (41) ... 使用していないため省略
 	// (42)
 	// (43) = prms
@@ -391,24 +392,27 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 	
 	// (46)
 	if(datasize == 0){
+		// 現状通らない
 		apnea_ = APNEA_NORMAL;
 	}
 	else if(datasize > 9){
-		apnea_ = APNEA_WARN;
+		apnea_ = APNEA_ERROR;
 		int loop = datasize - 9;
 		for(int ii=0;ii<loop;++ii){
 			double apnea = 0;
-			for(int jj=0;jj<9;++jj){
+			for (int jj = 0; jj < datasize; ++jj) {
 				apnea += point_[ii + jj];
-			}
-			if(apnea != 0){
-				apnea_ = APNEA_NORMAL;
+				if (APNEA_JUDGE_CNT < apnea) {
+					apnea_ = APNEA_NORMAL;
+					break;
+				}
 			}
 		}
 	}else{
+		// 現状通らない
 		apnea_ = APNEA_NORMAL;
 	}
-	
+/* //低呼吸も無呼吸と判定するため
 	// 完全無呼吸の判定
 	if(apnea_ == APNEA_WARN){
 		apnea_ = APNEA_ERROR;
@@ -419,7 +423,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 			}
 		}
 	}
-	
+*/	
 	double tmpapnea = (double)apnea_;
 	debug_out("apnea", &tmpapnea, 1, path_);
 }

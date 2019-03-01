@@ -45,6 +45,8 @@
 #define SNORE_PARAM_NORMAL_CNT			(80)
 // 許容誤差 0.4s
 #define SNORE_PARAM_GOSA				(8)
+// 無呼吸判定カウント
+#define APNEA_JUDGE_CNT					(2)
 
 /************************************************************/
 /* 型定義													*/
