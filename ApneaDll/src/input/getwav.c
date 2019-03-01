@@ -144,7 +144,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	}
 
 	// (21) - (34)
-	getwav_pp(ptest1, len, APNEA_PARAM_PEAK_THRE);
+//	getwav_pp(ptest1, len, APNEA_PARAM_PEAK_THRE);
 //	getwav_pp(testdata, 200, 0.003f);
 	
 	// (35) - (47)
