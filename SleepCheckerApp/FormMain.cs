@@ -528,7 +528,7 @@ namespace SleepCheckerApp
                         SetCalcData_Apnea(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
                         // For PulseOximeter
                         //SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-                        if (Convert.ToInt32(datas[4]) > 250)
+                        if (Convert.ToInt32(datas[4]) < 250)
                         {
                             // For 加速度
                             SetCalcData_Acc(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]));
