@@ -295,7 +295,7 @@ namespace SleepCheckerApp
             // インターバル処理
             Timer timer = new Timer();
             timer.Tick += new EventHandler(Interval);
-            timer.Interval = 500;           // ms単位
+            timer.Interval = 100;           // ms単位
             timer.Start();
 
             calc_snore_init();

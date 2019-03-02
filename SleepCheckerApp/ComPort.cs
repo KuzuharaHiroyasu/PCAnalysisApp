@@ -112,7 +112,7 @@ namespace SleepCheckerApp
                 try
                 {
 //                    int rbyte = myPort.BytesToRead;
-                    int rbyte = 500;    // 500バイトまとめて取得する
+                    int rbyte = 100;    // 500バイトまとめて取得する
                     byte[] buffer = new byte[rbyte];
                     int read = 0;
                     while (read < rbyte)
