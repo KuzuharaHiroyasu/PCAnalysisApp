@@ -12,6 +12,7 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Management;
+using System.Drawing;
 
 namespace SleepCheckerApp
 {
@@ -295,6 +296,29 @@ namespace SleepCheckerApp
                 SpAcdcDataQueue.Enqueue(0);
             }
 */
+            
+            // いびきの閾値
+             StripLine stripLine = new StripLine
+                                      {
+                                          Interval          = 0,
+                                          IntervalOffset    = 350,    // いびきの閾値(SNORE_PARAM_THRE)
+                 BorderWidth       = 1,
+                                          BorderDashStyle   = ChartDashStyle.Solid,
+                                          BorderColor       = Color.Green,
+                                      };
+            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+
+            // 無呼吸の閾値
+            stripLine = new StripLine
+                            {
+                                Interval = 0,
+                                IntervalOffset = 0.002f,    // 無呼吸の閾値(APNEA_PARAM_BIN_THRE)
+                                BorderWidth = 1,
+                                BorderDashStyle = ChartDashStyle.Solid,
+                                BorderColor = Color.Blue,
+                            };
+            chart1.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+
             GraphUpdate_Apnea();
             GraphUpdate_Acc();
 
