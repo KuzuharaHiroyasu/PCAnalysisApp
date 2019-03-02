@@ -104,7 +104,7 @@ namespace SleepCheckerApp
         Queue<double> RawDataDcQueue = new Queue<double>();
 
         // 加速度センサー
-        private const int Acc_RawDataRirekiNum = 120;       // 生データ履歴数 500ms * 120個 = 60秒
+        private const int Acc_RawDataRirekiNum = 200;       // 生データ履歴数 500ms * 200個 = 100秒
         Queue<double> AccelerometerXQueue = new Queue<double>();
         Queue<double> AccelerometerYQueue = new Queue<double>();
         Queue<double> AccelerometerZQueue = new Queue<double>();

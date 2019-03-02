@@ -198,8 +198,8 @@
             // 
             // chartAccelerometer
             // 
-            chartArea4.AxisX.Interval = 10D;
-            chartArea4.AxisX.Maximum = 120D;
+            chartArea4.AxisX.Interval = 20D;
+            chartArea4.AxisX.Maximum = 200D;
             chartArea4.AxisX.Minimum = 0D;
             chartArea4.AxisX.Title = "個数";
             chartArea4.AxisY.Maximum = 127D;
