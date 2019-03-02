@@ -167,12 +167,12 @@
             // 
             // chart1
             // 
-            chartArea3.AxisX.Interval = 200D;
-            chartArea3.AxisX.Maximum = 2000D;
+            chartArea3.AxisX.Interval = 10D;
+            chartArea3.AxisX.Maximum = 100D;
             chartArea3.AxisX.Minimum = 0D;
             chartArea3.AxisX.Title = "個数";
-            chartArea3.AxisX2.Interval = 128D;
-            chartArea3.AxisX2.Maximum = 1280D;
+            chartArea3.AxisX2.Interval = 0.1D;
+            chartArea3.AxisX2.Maximum = 0.5D;
             chartArea3.AxisX2.Minimum = 0D;
             chartArea3.Name = "ChartAreaTime";
             this.chart1.ChartAreas.Add(chartArea3);
@@ -473,7 +473,6 @@
             this.Controls.Add(this.groupBoxCom);
             this.Name = "FormMain";
             this.Text = "快眠チェッカー";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);

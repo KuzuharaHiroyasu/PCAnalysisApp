@@ -81,6 +81,7 @@ namespace SleepCheckerApp
 
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
+        private const int CalcDataNumCalculationApnea = 10;
 
         enum request
         {
@@ -109,6 +110,7 @@ namespace SleepCheckerApp
         Queue<double> AccelerometerZQueue = new Queue<double>();
 
         // 演算途中データ
+        private const int ApneaGraphCalculationDataNum = CalcDataNumCalculationApnea * 10 + 1;
         Queue<double> ApneaRmsQueue = new Queue<double>();
         Queue<double> ApneaPointQueue = new Queue<double>();
         
@@ -246,6 +248,10 @@ namespace SleepCheckerApp
                 RawDataRespQueue.Enqueue(0);
                 RawDataSnoreQueue.Enqueue(0);
                 RawDataDcQueue.Enqueue(0);
+            }
+            
+            for (int i = 0; i < ApneaGraphCalculationDataNum; i++)
+            {
                 ApneaRmsQueue.Enqueue(0);
                 ApneaPointQueue.Enqueue(0);
             }
@@ -557,6 +563,194 @@ namespace SleepCheckerApp
         public delegate void SetTextDelegate(string str);
 
         /************************************************************************/
+        /* 関数名   : CreateRootDir                     			   			*/
+        /* 機能     : 演算結果保存用パスの作成                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void CreateRootDir()
+        {
+            string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
+            string temp;
+            string drivePath;
+            int i;
+#if USB_OUTPUT
+            drivePath = "C:\\"; //初期値
+#else
+#if C_DRIVE
+            drivePath = "C:\\";
+#else
+            drivePath = "."; //exeと同ディレクトリ
+#endif
+#endif
+
+#if USB_OUTPUT
+            char path_char = 'A';
+            System.IO.DriveInfo drive;
+
+            if (USBConnectConf())
+            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、Cは除く)
+                do
+                {
+                    temp = path_char.ToString();
+                    if (temp != "C")
+                    {
+                        drive = new System.IO.DriveInfo(temp);
+                        if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                        {
+                            drivePath = temp + ":\\";
+                            break;
+                        }
+                        else
+                        {
+                            path_char++;
+                            if (path_char > 'Z')
+                            { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        path_char++;
+                    }
+                } while (path_char <= 'Z');
+            }
+#endif
+            // rootパス
+            ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
+            temp = ApneaRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = ApneaRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
+            }
+            /*
+                        // rootパス
+                        PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
+                        temp = PulseRootPath_;
+                        for (i = 1; i < 20; i++)
+                        {
+                            if (Directory.Exists(temp))
+                            {
+                                temp = PulseRootPath_ + "(" + i + ")";
+                            }
+                            else
+                            {
+                                temp = temp + "\\";
+                                Directory.CreateDirectory(temp);
+                                break;
+                            }
+                        }
+            */
+            // rootパス
+            AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
+            temp = AcceRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = AcceRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    temp = temp + "\\";
+                    Directory.CreateDirectory(temp);
+                    break;
+                }
+            }
+#if SOUND_RECORD
+            // rootパス
+            RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
+            temp = RecordRootPath_;
+            for (i = 1; i < 20; i++)
+            {
+                if (Directory.Exists(temp))
+                {
+                    temp = RecordRootPath_ + "(" + i + ")";
+                }
+                else
+                {
+                    Directory.CreateDirectory(temp);
+                    recordFilePath = temp;
+                    break;
+                }
+            }
+#else
+            RecordRootPath_ = null;
+            recordFilePath = RecordRootPath_;
+#endif
+        }
+
+        /************************************************************************/
+        /* 関数名   : CreateApneaDir                     		    			*/
+        /* 機能     : 無呼吸演算結果保存用パスの作成                            */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private string CreateApneaDir(int Count)
+        {
+            string path = ApneaRootPath_ + Count.ToString("D");
+            if (Directory.Exists(path))
+            {
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
+        }
+
+        /************************************************************************/
+        /* 関数名   : CreatePulseDir                     		    			*/
+        /* 機能     : SpO2演算結果保存用パスの作成                              */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private string CreatePulseDir(int Count)
+        {
+            string path = PulseRootPath_ + Count.ToString("D");
+            if (Directory.Exists(path))
+            {
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
+        }
+
+        /************************************************************************/
+        /* 関数名   : CreateAcceDir                     		    			*/
+        /* 機能     : 加速度センサー結果保存用パスの作成                        */
+        /* 引数     : [int] Count - データ数                                    */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private string CreateAcceDir(int Count)
+        {
+
+            string path = AcceRootPath_ + Count.ToString("D");
+            if (Directory.Exists(path))
+            {
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
+        /************************************************************************/
         /* 関数名   : SetCalcData_Apnea               			    			*/
         /* 機能     : 呼吸・いびきのデータをセット                              */
         /* 引数     : [int] data1 - 呼吸の生データ                              */
@@ -714,188 +908,6 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : CreateRootDir                     			   			*/
-        /* 機能     : 演算結果保存用パスの作成                                  */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void CreateRootDir()
-        {
-            string datestr = DateTime.Now.ToString("yyyyMMddHHmm");
-            string temp;
-            string drivePath;
-            int i;
-#if USB_OUTPUT
-            drivePath = "C:\\"; //初期値
-#else
-#if C_DRIVE
-            drivePath = "C:\\";
-#else
-            drivePath = "."; //exeと同ディレクトリ
-#endif
-#endif
-
-#if USB_OUTPUT
-            char path_char = 'A';
-            System.IO.DriveInfo drive;
-
-            if (USBConnectConf())
-            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、Cは除く)
-                do
-                {
-                    temp = path_char.ToString();
-                    if (temp != "C")
-                    {
-                        drive = new System.IO.DriveInfo(temp);
-                        if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
-                        {
-                            drivePath = temp + ":\\";
-                            break;
-                        }
-                        else
-                        {
-                            path_char++;
-                            if (path_char > 'Z')
-                            { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        path_char++;
-                    }
-                } while (path_char <= 'Z');
-            }
-#endif
-            // rootパス
-            ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
-            temp = ApneaRootPath_;
-            for (i = 1; i < 20; i++)
-            {
-                if (Directory.Exists(temp))
-                {
-                    temp = ApneaRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    temp = temp + "\\";
-                    Directory.CreateDirectory(temp);
-                    break;
-                }
-            }
-/*
-            // rootパス
-            PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
-            temp = PulseRootPath_;
-            for (i = 1; i < 20; i++)
-            {
-                if (Directory.Exists(temp))
-                {
-                    temp = PulseRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    temp = temp + "\\";
-                    Directory.CreateDirectory(temp);
-                    break;
-                }
-            }
-*/
-            // rootパス
-            AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
-            temp = AcceRootPath_;
-            for (i = 1; i < 20; i++)
-            {
-                if (Directory.Exists(temp))
-                {
-                    temp = AcceRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    temp = temp + "\\";
-                    Directory.CreateDirectory(temp);
-                    break;
-                }
-            }
-#if SOUND_RECORD
-            // rootパス
-            RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
-            temp = RecordRootPath_;
-            for (i = 1; i < 20; i++)
-            {
-                if (Directory.Exists(temp))
-                {
-                    temp = RecordRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    Directory.CreateDirectory(temp);
-                    recordFilePath = temp;
-                    break;
-                }
-            }
-#else
-            RecordRootPath_ = null;
-            recordFilePath = RecordRootPath_;
-#endif
-        }
-
-        /************************************************************************/
-        /* 関数名   : CreateApneaDir                     		    			*/
-        /* 機能     : 無呼吸演算結果保存用パスの作成                            */
-        /* 引数     : [int] Count - データ数                                    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private string CreateApneaDir(int Count)
-        {
-           string path = ApneaRootPath_ + Count.ToString("D");
-            if(Directory.Exists(path)){
-            }else{
-                Directory.CreateDirectory(path);
-            }
-            
-            return path;
-        }
-
-        /************************************************************************/
-        /* 関数名   : CreatePulseDir                     		    			*/
-        /* 機能     : SpO2演算結果保存用パスの作成                              */
-        /* 引数     : [int] Count - データ数                                    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private string CreatePulseDir(int Count)
-        {
-           string path = PulseRootPath_ + Count.ToString("D");
-            if(Directory.Exists(path)){
-            }else{
-                Directory.CreateDirectory(path);
-            }
-            
-            return path;
-        }
-
-        /************************************************************************/
-        /* 関数名   : CreateAcceDir                     		    			*/
-        /* 機能     : 加速度センサー結果保存用パスの作成                        */
-        /* 引数     : [int] Count - データ数                                    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private string CreateAcceDir(int Count)
-        {
-
-            string path = AcceRootPath_ + Count.ToString("D");
-            if (Directory.Exists(path))
-            {
-            }
-            else
-            {
-                 Directory.CreateDirectory(path);
-            }
-            return path;
-        }
-
-        /************************************************************************/
         /* 関数名   : Calc_Apnea                    			    			*/
         /* 機能     : 呼吸データの演算                                          */
         /* 引数     : なし                                                      */
@@ -932,8 +944,8 @@ namespace SleepCheckerApp
 
                     // 無呼吸(rms)データをQueueに置く
                     get_apnea_rms(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
+                    Marshal.Copy(pd, arrayd, 0, CalcDataNumCalculationApnea);
+                    for (int ii = 0; ii < CalcDataNumCalculationApnea; ++ii)
                     {
                         ApneaRmsQueue.Dequeue();
                         ApneaRmsQueue.Enqueue(arrayd[ii]);
@@ -941,8 +953,8 @@ namespace SleepCheckerApp
 
                     // 無呼吸(point)データをQueueに置く
                     get_apnea_point(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
+                    Marshal.Copy(pd, arrayd, 0, CalcDataNumCalculationApnea);
+                    for (int ii = 0; ii < CalcDataNumCalculationApnea; ++ii)
                     {
                         ApneaPointQueue.Dequeue();
                         ApneaPointQueue.Enqueue(arrayd[ii]);
