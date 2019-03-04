@@ -216,15 +216,27 @@ namespace SleepCheckerApp
             logPath = logPath + "\\log.txt";
 
             log_output("[START-UP]App");
-            log_output("AlarmFile:" + alarm.getAlarmFile());
 
+            // COMポート取得
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
             {
                 comboBoxComport.Items.Add(port);
-                //Console.WriteLine(port);
             }
-            
+
+            // アラーム音取得
+            string alarmFile;
+            string[] alarmFilesPath = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.wav", System.IO.SearchOption.TopDirectoryOnly);
+            foreach (string alarmFilePath in alarmFilesPath)
+            {
+                alarmFile = Path.GetFileName(alarmFilePath);
+                comboBoxAlarm.Items.Add(alarmFile);
+            }
+            // アラーム音設定
+            alarm.setInitAlarm(alarmFilesPath);
+            comboBoxAlarm.SelectedItem = alarm.getAlarmFile();
+            log_output("AlarmFile:" + alarm.getAlarmFile());
+
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
@@ -1474,6 +1486,17 @@ namespace SleepCheckerApp
         private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
         {
             alarm.apneaCheckedChanged();
+        }
+
+        /************************************************************************/
+        /* 関数名   : comboBoxAlarm_SelectedIndexChanged      		    		*/
+        /* 機能     : アラーム音変更時のイベント                                */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void comboBoxAlarm_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            alarm.changeAlarmContents();
         }
 
         /************************************************************************/

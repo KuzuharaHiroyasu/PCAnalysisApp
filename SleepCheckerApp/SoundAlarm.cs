@@ -1,13 +1,22 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using System.Runtime.InteropServices;
 
 namespace SleepCheckerApp
 {
     class SoundAlarm
     {
+        [DllImport("KERNEL32.DLL")]
+        public static extern uint
+        GetPrivateProfileString(string lpAppName,
+        string lpKeyName, string lpDefault,
+        StringBuilder lpReturnedString, uint nSize,
+        string lpFileName);
+
         // アラーム
         private System.Media.SoundPlayer player = null;
-        private const string filePath = "C:\\PCAnalysisApp\\";
+        private string filePath = AppDomain.CurrentDomain.BaseDirectory;
         private string AlarmFile = ""; //デフォルト
 
         public FormMain form;
@@ -20,27 +29,55 @@ namespace SleepCheckerApp
         /************************************************************************/
         public SoundAlarm()
         {
-            if (File.Exists(filePath + "300Hz_intermittent_4.wav"))
-            {
-                AlarmFile = filePath + "300Hz_intermittent_4.wav";
-            } else if (File.Exists(filePath + "500Hz_intermittent_4.wav"))
-            {
-                AlarmFile = filePath + "500Hz_intermittent_4.wav";
-            } else if(File.Exists(filePath + "1000Hz_intermittent_4.wav"))
-            {
-                AlarmFile = filePath + "1000Hz_intermittent_4.wav";
-            } else if (File.Exists(filePath + "1500Hz_intermittent_4.wav"))
-            {
-                AlarmFile = filePath + "1500Hz_intermittent_4.wav";
-            } else if (File.Exists(filePath + "2000Hz_intermittent_4.wav"))
-            {
-                AlarmFile = filePath + "2000Hz_intermittent_4.wav";
-            }
+        }
 
-            if (!string.IsNullOrEmpty(AlarmFile))
+        /************************************************************************/
+        /* 関数名   : setInitAlarm          		                            */
+        /* 機能     : アラーム初期設定                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        public void setInitAlarm(string[] alarmFilesPath)
+        {
+            // iniファイルからアラームファイル取得
+            // iniファイル名を決める（実行ファイルが置かれたフォルダと同じ場所）
+            string iniFileName = filePath + "setting.ini";
+
+            // iniファイルから文字列を取得
+            StringBuilder sb = new StringBuilder(1024);
+            GetPrivateProfileString(
+                "SECTION",
+                "KEY",
+                alarmFilesPath[0],   // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                iniFileName);
+
+            AlarmFile = Path.GetFileName(sb.ToString());
+
+            // チェックが付いていたらインスタンス生成
+            if (form.checkBox_alarm_apnea.Checked || form.checkBox_alarm_snore.Checked)
             {
-                player = new System.Media.SoundPlayer(AlarmFile);
+                foreach(string alarmFile in alarmFilesPath)
+                {
+                    if(AlarmFile.Equals(alarmFile, StringComparison.Ordinal))
+                    {// ファイルが存在する
+                        player = new System.Media.SoundPlayer(filePath + AlarmFile);
+                    }
+                }
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : setAlarm               		                            */
+        /* 機能     : アラーム設定                                              */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        public void setAlarm()
+        {
+            //コンボボックスに表示のファイルを設定する
+            player = new System.Media.SoundPlayer(filePath + form.comboBoxAlarm.SelectedItem);
         }
 
         /************************************************************************/
@@ -51,8 +88,11 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void playAlarm()
         {
-            form.log_output("playAlarm");
-            player.Play();
+            if (player != null)
+            {
+                form.log_output("playAlarm");
+                player.Play();
+            }
         }
 
         /************************************************************************/
@@ -63,7 +103,10 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void stopAlarm()
         {
-            player.Stop();
+            if (player != null)
+            {
+                player.Stop();
+            }
         }
 
         /************************************************************************/
@@ -84,10 +127,6 @@ namespace SleepCheckerApp
                 {// 無呼吸判定ON
                     playAlarm();
                 }
-                else
-                {// どちらもOFF
-//                    stopAlarm();
-                }
             }
         }
 
@@ -99,18 +138,11 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void snoreCheckedChanged()
         {
-            if (player != null)
-            {
-                if (form.checkBox_alarm_snore.Checked && form.snore == 1)
-                {// いびき判定ON
-                    playAlarm();
-                }
-                else if (!form.checkBox_alarm_snore.Checked)
-                {// いびきのチェックをはずした時
-                    if (!form.checkBox_alarm_apnea.Checked || form.apnea != 2)
-                    {// 無呼吸のチェックが入っていないか無呼吸判定されていない場合
-                        stopAlarm();
-                    }
+            if (form.checkBox_alarm_snore.Checked)
+            {// チェックON
+                if (player == null)
+                {// インスタンス未生成の場合生成
+                    setAlarm();
                 }
             }
         }
@@ -123,19 +155,27 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void apneaCheckedChanged()
         {
-            if (player != null)
+            if (form.checkBox_alarm_apnea.Checked)
+            {// チェックON
+                if (player == null)
+                {// インスタンス未生成の場合生成
+                    setAlarm();
+                }
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : apneaCheckedChanged   	                                */
+        /* 機能     : 無呼吸チェック時のアラーム処理                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        public void changeAlarmContents()
+        {
+            if(player != null)
             {
-                if (form.checkBox_alarm_apnea.Checked && form.apnea == 2)
-                {// 無呼吸判定ON
-                    playAlarm();
-                }
-                else　if(!form.checkBox_alarm_apnea.Checked)
-                {// 無呼吸のチェックをはずした時
-                    if (!form.checkBox_alarm_snore.Checked || form.snore != 1)
-                    {// いびきのチェックが入っていないかいびき判定されていない場合
-                        stopAlarm();
-                    }
-                }
+                stopAlarm();
+                setAlarm();
             }
         }
 
