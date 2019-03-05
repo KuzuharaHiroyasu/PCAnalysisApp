@@ -177,7 +177,7 @@ namespace SleepCheckerApp
 
         public FormMain()
         {
-            string icon = "analysis.ico";
+            string icon = AppDomain.CurrentDomain.BaseDirectory + "analysis.ico";
             InitializeComponent();
 
             if(File.Exists(icon))

@@ -46,8 +46,8 @@ namespace SleepCheckerApp
             // iniファイルから文字列を取得
             StringBuilder sb = new StringBuilder(1024);
             GetPrivateProfileString(
-                "SECTION",
-                "KEY",
+                "ALARM",
+                "FILE_NAME",
                 alarmFilesPath[0],   // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
@@ -174,9 +174,10 @@ namespace SleepCheckerApp
         {
             if(player != null)
             {
-                stopAlarm();
-                setAlarm();
+                stopAlarm();        //停止
+                player.Dispose();   //リソース開放
             }
+            setAlarm();
         }
 
         /************************************************************************/
