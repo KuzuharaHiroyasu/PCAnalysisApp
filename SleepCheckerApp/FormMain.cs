@@ -18,7 +18,15 @@ namespace SleepCheckerApp
 {
     public partial class FormMain : Form
     {
+        [DllImport("KERNEL32.DLL")]
+        public static extern uint
+        GetPrivateProfileString(string lpAppName,
+            string lpKeyName, string lpDefault,
+            StringBuilder lpReturnedString, uint nSize,
+            string lpFileName);
         // For Apnea
+        [DllImport("Apnea.dll")]
+        static extern void setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
         [DllImport("Apnea.dll")]
         static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
         [DllImport("Apnea.dll")]
@@ -166,6 +174,11 @@ namespace SleepCheckerApp
         private int PulseCalcCount_;
         private int AcceCalcCount_;
 
+        private int SnoreParamThre;         // いびき閾値
+        private int SnoreParamNormalCnt;    // いびき無しへのカウント
+        private int ApneaJudgeCnt;          // 無呼吸判定カウント
+        private double ApneaParamBinThre;   // 2値化50%閾値
+
         public int snore = 0;
         public int apnea = 0;
 
@@ -174,6 +187,7 @@ namespace SleepCheckerApp
 
         // ログ出力パス
         string logPath = "C:\\log";
+        string iniFileName = "setting.ini";
 
         public FormMain()
         {
@@ -195,20 +209,6 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void Form1_Load(object sender, EventArgs e)
         {
-            com = new ComPort();
-            record = new SoundRecord();
-            alarm = new SoundAlarm();
-            panda = new LattePanda();
-            vib = new Vibration();
-
-            record.form = this;
-            alarm.form = this;
-            vib.form = this;
-            vib.panda = panda;
-
-            // グラフ初期設定
-            initGraphShow();
-
             if (!Directory.Exists(logPath))
             {
                 Directory.CreateDirectory(logPath);
@@ -217,6 +217,18 @@ namespace SleepCheckerApp
 
             log_output("[START-UP]App");
 
+            // インスタンス生成
+            initInstance();
+
+            // 閾値などをiniファイルから取得
+            getIniFileThresholdData();
+
+            // グラフ初期設定
+            initGraphShow();
+
+            // アラーム音初期設定
+            initAlarm();
+
             // COMポート取得
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
@@ -224,113 +236,13 @@ namespace SleepCheckerApp
                 comboBoxComport.Items.Add(port);
             }
 
-            // アラーム音取得
-            string alarmFile;
-            string[] alarmFilesPath = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.wav", System.IO.SearchOption.TopDirectoryOnly);
-            foreach (string alarmFilePath in alarmFilesPath)
-            {
-                alarmFile = Path.GetFileName(alarmFilePath);
-                comboBoxAlarm.Items.Add(alarmFile);
-            }
-            // アラーム音設定
-            alarm.setInitAlarm(alarmFilesPath);
-            comboBoxAlarm.SelectedItem = alarm.getAlarmFile();
-            log_output("AlarmFile:" + alarm.getAlarmFile());
-
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
             PulseCalcCount_ = 0;
             AcceCalcCount_  = 0;
 
-            // グラフ表示初期化
-            // For Apnea
-            RawDataRespQueue.Clear();
-            RawDataSnoreQueue.Clear();
-            RawDataDcQueue.Clear();
-            ApneaRmsQueue.Clear();
-            ApneaPointQueue.Clear();
-            AccelerometerXQueue.Clear();
-            AccelerometerYQueue.Clear();
-            AccelerometerZQueue.Clear();
-            ApneaQueue.Clear();
-            ResultIbikiQueue.Clear();
-
-            for (int i = 0; i < ApneaGraphDataNum; i++)
-            {
-                RawDataRespQueue.Enqueue(0);
-                RawDataSnoreQueue.Enqueue(0);
-                RawDataDcQueue.Enqueue(0);
-            }
-            
-            for (int i = 0; i < ApneaGraphCalculationDataNum; i++)
-            {
-                ApneaRmsQueue.Enqueue(0);
-                ApneaPointQueue.Enqueue(0);
-            }
-
-            for (int i = 0; i < BufNumApneaGraph; i++)
-            {
-                ApneaQueue.Enqueue(0);
-                ResultIbikiQueue.Enqueue(0);
-            }
-/*
-            // For PulseOximeter
-            for (int i = 0; i < SpO2_RawDataRirekiNum; i++)
-            {
-                DcSekisyokuDataQueue.Enqueue(0);
-                DcSekigaiDataQueue.Enqueue(0);
-                FftSekisyokuDataQueue.Enqueue(0);
-                FftSekigaiDataQueue.Enqueue(0);
-                IfftSekisyokuDataQueue.Enqueue(0);
-                IfftSekigaiDataQueue.Enqueue(0);
-                NewIfftSekisyokuDataQueue.Enqueue(0);
-                NewIfftSekigaiDataQueue.Enqueue(0);
-                RawDataSekisyokuQueue.Enqueue(0);
-                RawDataSekigaiQueue.Enqueue(0);
-            }
-*/
-            for (int i = 0; i < Acc_RawDataRirekiNum; i++)
-            {
-                AccelerometerXQueue.Enqueue(0);
-                AccelerometerYQueue.Enqueue(0);
-                AccelerometerZQueue.Enqueue(0);
-            }
-/*
-            for (int i = 0; i < ShipakuDataRirekiNum; i++)
-            {
-                ShinpakuSekisyokuDataQueue.Enqueue(0);
-                ShinpakuSekigaiDataQueue.Enqueue(0);
-            }
-            for (int i = 0; i < SpDataRirekiNum; i++)
-            {
-                SpNormalDataQueue.Enqueue(0);
-                SpAcdcDataQueue.Enqueue(0);
-            }
-*/
-            
-            // いびきの閾値
-             StripLine stripLine = new StripLine
-                                      {
-                                          Interval          = 0,
-                                          IntervalOffset    = 350,    // いびきの閾値(SNORE_PARAM_THRE)
-                 BorderWidth       = 1,
-                                          BorderDashStyle   = ChartDashStyle.Solid,
-                                          BorderColor       = Color.Green,
-                                      };
-            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLine);
-
-            // 無呼吸の閾値
-            stripLine = new StripLine
-                            {
-                                Interval = 0,
-                                IntervalOffset = 0.002f,    // 無呼吸の閾値(APNEA_PARAM_BIN_THRE)
-                                BorderWidth = 1,
-                                BorderDashStyle = ChartDashStyle.Solid,
-                                BorderColor = Color.Blue,
-                            };
-            chart1.ChartAreas[0].AxisY.StripLines.Add(stripLine);
-
+            // グラフ更新
             GraphUpdate_Apnea();
             GraphUpdate_Acc();
 
@@ -408,15 +320,175 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
+        /* 関数名   : initInstance                    			    			*/
+        /* 機能     : インスタンス生成           	                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void initInstance()
+        {
+            com = new ComPort();
+            record = new SoundRecord();
+            alarm = new SoundAlarm();
+            panda = new LattePanda();
+            vib = new Vibration();
+
+            record.form = this;
+            alarm.form = this;
+            vib.form = this;
+            vib.panda = panda;
+        }
+
+        /************************************************************************/
+        /* 関数名   : getIniFileData                   			    			*/
+        /* 機能     : iniファイルから閾値などのデータを取得                     */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void getIniFileThresholdData()
+        {
+            // iniファイル名を決める（実行ファイルが置かれたフォルダと同じ場所）
+            StringBuilder sb = new StringBuilder(1024);
+            string filePath = AppDomain.CurrentDomain.BaseDirectory + iniFileName;
+
+            // iniファイルからいびきの閾値を取得
+            GetPrivateProfileString(
+                "SNORE",
+                "THRESHOLD",
+                "350",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            SnoreParamThre = int.Parse(sb.ToString());
+
+            // iniファイルからいびき無しへのカウントを取得
+            GetPrivateProfileString(
+                "SNORE",
+                "NORMAL_COUNT",
+                "80",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            SnoreParamNormalCnt = int.Parse(sb.ToString());
+
+            // iniファイルから無呼吸判定カウントを取得
+            GetPrivateProfileString(
+                "APNEA",
+                "APNEA_JUDGE_CNT",
+                "2",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            ApneaJudgeCnt = int.Parse(sb.ToString());
+
+            // iniファイルから 2値化50%閾値を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "APNEA_PARAM_BIN_THRE",
+                "0.002",       // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            ApneaParamBinThre = double.Parse(sb.ToString());
+
+            // iniファイルから取得した閾値をApneaにセットする
+            setThreshold(SnoreParamThre, SnoreParamNormalCnt, ApneaJudgeCnt, ApneaParamBinThre);
+        }
+
+        /************************************************************************/
         /* 関数名   : initGraphShow                    			    			*/
-        /* 機能     : グラフ初期設定             	                            */
+        /* 機能     : グラフ表示の初期化           	                            */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
         private void initGraphShow()
         {
+            // いびきの閾値表示
+            StripLine stripLine = new StripLine
+            {
+                Interval = 0,
+                IntervalOffset = SnoreParamThre,    // いびきの閾値(SNORE_PARAM_THRE)
+                BorderWidth = 1,
+                BorderDashStyle = ChartDashStyle.Solid,
+                BorderColor = Color.Green,
+            };
+            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+            
+            // 無呼吸の閾値表示
+            stripLine = new StripLine
+            {
+                Interval = 0,
+                IntervalOffset = ApneaParamBinThre,    // 無呼吸の閾値(APNEA_PARAM_BIN_THRE)
+                BorderWidth = 1,
+                BorderDashStyle = ChartDashStyle.Solid,
+                BorderColor = Color.Blue,
+            };
+            chart1.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+
+            // グラフ表示初期化
+            // For Apnea
+            RawDataRespQueue.Clear();
+            RawDataSnoreQueue.Clear();
+            RawDataDcQueue.Clear();
+            ApneaRmsQueue.Clear();
+            ApneaPointQueue.Clear();
+            AccelerometerXQueue.Clear();
+            AccelerometerYQueue.Clear();
+            AccelerometerZQueue.Clear();
+            ApneaQueue.Clear();
+            ResultIbikiQueue.Clear();
+
+            for (int i = 0; i < ApneaGraphDataNum; i++)
+            {
+                RawDataRespQueue.Enqueue(0);
+                RawDataSnoreQueue.Enqueue(0);
+                RawDataDcQueue.Enqueue(0);
+            }
+
+            for (int i = 0; i < ApneaGraphCalculationDataNum; i++)
+            {
+                ApneaRmsQueue.Enqueue(0);
+                ApneaPointQueue.Enqueue(0);
+            }
+
+            for (int i = 0; i < BufNumApneaGraph; i++)
+            {
+                ApneaQueue.Enqueue(0);
+                ResultIbikiQueue.Enqueue(0);
+            }
+
+            for (int i = 0; i < Acc_RawDataRirekiNum; i++)
+            {
+                AccelerometerXQueue.Enqueue(0);
+                AccelerometerYQueue.Enqueue(0);
+                AccelerometerZQueue.Enqueue(0);
+            }
+
+            // 表示設定
             Series srs = chartRawData.Series["呼吸(移動平均)"];
             srs.Enabled = false;
+        }
+
+        /************************************************************************/
+        /* 関数名   : initAlarm                       			    			*/
+        /* 機能     : アラーム設定の初期処理       	                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void initAlarm()
+        {
+            // アラーム音取得
+            string alarmFile;
+            string[] alarmFilesPath = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.wav", System.IO.SearchOption.TopDirectoryOnly);
+            foreach (string alarmFilePath in alarmFilesPath)
+            {
+                alarmFile = Path.GetFileName(alarmFilePath);
+                comboBoxAlarm.Items.Add(alarmFile);
+            }
+            // アラーム音設定
+            alarm.setInitAlarm(alarmFilesPath);
+            comboBoxAlarm.SelectedItem = alarm.getAlarmFile();
+            log_output("AlarmFile:" + alarm.getAlarmFile());
         }
 
         /************************************************************************/

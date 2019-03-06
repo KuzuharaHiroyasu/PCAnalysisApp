@@ -33,6 +33,7 @@ void getwav_pp(const double* pData, int DSize, double Param1);
 void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, double Param3, double Param4);
 void getwav_snore(const double* pData, int DSize, double Param);
 
+DLLEXPORT void __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
 DLLEXPORT void __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore);
 DLLEXPORT int	__stdcall get_result_snore(double* data);
 DLLEXPORT int	__stdcall get_result_peak(double* data);
@@ -67,6 +68,10 @@ double	result_peak[BUF_SIZE];			// 結果ピーク間隔
 int		result_peak_size;
 int		apnea_ = APNEA_NONE;	// 呼吸状態
 int		snore_ = SNORE_OFF;		// いびき
+int		SnoreParamThre_;		// いびき閾値
+int		SnoreParamNormalCnt_;	// 無呼吸の閾値
+int		ApneaJudgeCnt_;			// 無呼吸判定カウント
+double	ApneaParamBinThre_;		// 2値化50%閾値
 
 // 演算途中データ
 double raw_[DATA_SIZE];
@@ -92,6 +97,14 @@ int temp_int_buf0[BUF_SIZE];
 /* ＲＯＭ定義												*/
 /************************************************************/
 extern	double	testdata[200];
+
+DLLEXPORT void    __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre)
+{
+	SnoreParamThre_ = SnoreParamThre;				// いびき閾値
+	SnoreParamNormalCnt_ = SnoreParamNormalCnt;		// 無呼吸の閾値
+	ApneaJudgeCnt_ = ApneaJudgeCnt;					// 無呼吸判定カウント
+	ApneaParamBinThre_ = ApneaParamBinThre;			// 2値化50%閾値
+}
 
 /************************************************************************/
 /* 関数     : getwav_init												*/
@@ -148,7 +161,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 //	getwav_pp(testdata, 200, 0.003f);
 	
 	// (35) - (47)
-	getwav_apnea(ptest1, len, APNEA_PARAM_AVE_CNT, APNEA_PARAM_AVE_THRE, APNEA_PARAM_BIN_THRE, APNEA_PARAM_APNEA_THRE);
+	getwav_apnea(ptest1, len, APNEA_PARAM_AVE_CNT, APNEA_PARAM_AVE_THRE, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
 //	getwav_apnea(testdata, 200, 450, 0.0015f, 0.002f);
 	
 	// (48) - (56)
@@ -402,7 +415,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 			double apnea = 0;
 			for (int jj = 0; jj < datasize; ++jj) {
 				apnea += point_[ii + jj];
-				if (APNEA_JUDGE_CNT < apnea) {
+				if (ApneaJudgeCnt_ < apnea) {
 					apnea_ = APNEA_NORMAL;
 					break;
 				}
@@ -454,7 +467,7 @@ void getwav_snore(const double* pData, int DSize, double Param)
 		temp_int_buf0[ii] = 0;
 		size = ii + SNORE_PARAM_SIZE;
 		for (jj = ii; jj<size; ++jj) {
-			if (pData[jj] >= SNORE_PARAM_THRE) {
+			if (pData[jj] >= SnoreParamThre_) {
 				temp_int_buf0[ii] += 1;
 			}
 		}
@@ -539,7 +552,7 @@ static int proc_off(int Pos)
 		}
 		else {
 			SnoreCnt_ += 1;
-			if (SnoreCnt_ >= SNORE_PARAM_NORMAL_CNT) {
+			if (SnoreCnt_ >= SnoreParamNormalCnt_) {
 				Reset();
 			}
 		}
