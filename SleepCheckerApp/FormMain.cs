@@ -266,7 +266,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void Form1_Shown(object sender, EventArgs e)
         {
-            Boolean ret = false;
+            Boolean ret = true;
 
             panda.setComPort_Lattepanda();
 
@@ -282,9 +282,6 @@ namespace SleepCheckerApp
                 {
                     // 録音開始
                     ret = record.startRecordApnea();
-                }else
-                {
-                    ret = true;
                 }
 
                 if (ret)
