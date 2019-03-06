@@ -341,7 +341,7 @@ namespace SleepCheckerApp
 
         /************************************************************************/
         /* 関数名   : getIniFileData                   			    			*/
-        /* 機能     : iniファイルから閾値などのデータを取得                     */
+        /* 機能     : iniファイルから閾値データを取得                           */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
@@ -478,15 +478,27 @@ namespace SleepCheckerApp
         private void initAlarm()
         {
             // アラーム音取得
-            string alarmFile;
+            StringBuilder sb = new StringBuilder(1024);
             string[] alarmFilesPath = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.wav", System.IO.SearchOption.TopDirectoryOnly);
+            string filePath = AppDomain.CurrentDomain.BaseDirectory + iniFileName;
+            string alarmFile;
+
             foreach (string alarmFilePath in alarmFilesPath)
             {
                 alarmFile = Path.GetFileName(alarmFilePath);
                 comboBoxAlarm.Items.Add(alarmFile);
             }
-            // アラーム音設定
-            alarm.setInitAlarm(alarmFilesPath);
+            // iniファイルからいびきの閾値を取得
+            GetPrivateProfileString(
+                "ALARM",
+                "FILE_NAME",
+                alarmFilesPath[0],   // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            alarmFile = Path.GetFileName(sb.ToString());
+
+            alarm.setInitAlarm(alarmFile);
             comboBoxAlarm.SelectedItem = alarm.getAlarmFile();
             log_output("AlarmFile:" + alarm.getAlarmFile());
         }

@@ -37,34 +37,14 @@ namespace SleepCheckerApp
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        public void setInitAlarm(string[] alarmFilesPath)
+        public void setInitAlarm(string alarmFile)
         {
-            // iniファイルからアラームファイル取得
-            // iniファイル名を決める（実行ファイルが置かれたフォルダと同じ場所）
-            string iniFileName = filePath + "setting.ini";
-
-            // iniファイルから文字列を取得
-            StringBuilder sb = new StringBuilder(1024);
-            GetPrivateProfileString(
-                "ALARM",
-                "FILE_NAME",
-                alarmFilesPath[0],   // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                iniFileName);
-
-            AlarmFile = Path.GetFileName(sb.ToString());
+            AlarmFile = alarmFile;
 
             // チェックが付いていたらインスタンス生成
             if (form.checkBox_alarm_apnea.Checked || form.checkBox_alarm_snore.Checked)
             {
-                foreach(string alarmFile in alarmFilesPath)
-                {
-                    if(AlarmFile.Equals(alarmFile, StringComparison.Ordinal))
-                    {// ファイルが存在する
-                        player = new System.Media.SoundPlayer(filePath + AlarmFile);
-                    }
-                }
+                player = new System.Media.SoundPlayer(filePath + AlarmFile);
             }
         }
 
