@@ -1,9 +1,4 @@
-﻿#define USB_OUTPUT      // 無効化するとCドライブ直下に出力する
-#define C_DRIVE         // Cドライブ直下にログ出力
-#define AUTO_ANALYSIS   // 解析自動スタート
-#define SOUND_RECORD    // 音声録音
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -81,6 +76,11 @@ namespace SleepCheckerApp
         static extern double get_dcavg_inf();
         [DllImport("PulseOximeter.dll")]
         static extern double get_acavg_ratio();
+
+        private Boolean USB_OUTPUT = true;
+        private Boolean C_DRIVE = true;
+        private Boolean AUTO_ANALYSIS = true;
+        private Boolean SOUND_RECORD = true;
 
         private ComPort com = null;
         private SoundRecord record = null;
@@ -220,6 +220,9 @@ namespace SleepCheckerApp
             // インスタンス生成
             initInstance();
 
+            // 機能設定をiniファイルから取得
+            getIniFileFuncSettingData();
+
             // 閾値などをiniファイルから取得
             getIniFileThresholdData();
 
@@ -272,30 +275,35 @@ namespace SleepCheckerApp
 
             // 解析スタートでLATTEPANDAのLEDを消灯。
             panda.requestLattepanda((byte)request.LED_OFF);
-#if AUTO_ANALYSIS
-#if SOUND_RECORD
-            // 録音開始
-            ret = record.startRecordApnea();
-#else
-            ret = true;
-#endif
-            if (ret)
+
+            if (AUTO_ANALYSIS)
             {
-                // 解析
-                ret = startAnalysis();
+                if(SOUND_RECORD)
+                {
+                    // 録音開始
+                    ret = record.startRecordApnea();
+                }else
+                {
+                    ret = true;
+                }
+
                 if (ret)
                 {
-                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                    buttonStart.Text = "データ取得中";
-                    buttonStart.Enabled = false;
-                    log_output("[START]Analysis_Auto");
-                }
-                else
-                {
-                    record.stopRecordApnea();
+                    // 解析
+                    ret = startAnalysis();
+                    if (ret)
+                    {
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Text = "データ取得中";
+                        buttonStart.Enabled = false;
+                        log_output("[START]Analysis_Auto");
+                    }
+                    else
+                    {
+                        record.stopRecordApnea();
+                    }
                 }
             }
-#endif
 
             if (!ret)
             { //エラー処理
@@ -337,6 +345,104 @@ namespace SleepCheckerApp
             alarm.form = this;
             vib.form = this;
             vib.panda = panda;
+        }
+
+        /************************************************************************/
+        /* 関数名   : getIniFileFuncSettingData            		    			*/
+        /* 機能     : iniファイルから機能設定を取得                             */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void getIniFileFuncSettingData()
+        {
+            // iniファイル名を決める（実行ファイルが置かれたフォルダと同じ場所）
+            StringBuilder sb = new StringBuilder(1024);
+            string filePath = AppDomain.CurrentDomain.BaseDirectory + iniFileName;
+
+            // iniファイルからUSB出力設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "USB_OUTPUT",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                USB_OUTPUT = true;
+            }
+            else
+            {
+                USB_OUTPUT = false;
+            }
+
+            // iniファイルからCドライブ出力設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "C_DRIVE",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                C_DRIVE = true;
+            }
+            else
+            {
+                C_DRIVE = false;
+            }
+
+            // iniファイルから解析オートスタート設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "AUTO_ANALYSIS",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                AUTO_ANALYSIS = true;
+            }
+            else
+            {
+                AUTO_ANALYSIS = false;
+            }
+
+            // iniファイルから音声録音設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "SOUND_RECORD",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                SOUND_RECORD = true;
+            }
+            else
+            {
+                SOUND_RECORD = false;
+            }
+
+            // iniファイルからラテパンダコマンド送信設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "LATTEPANDA",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                panda.setLattepandaFuncSetting(true);
+            }
+            else
+            {
+                panda.setLattepandaFuncSetting(false);
+            }
         }
 
         /************************************************************************/
@@ -546,24 +652,28 @@ namespace SleepCheckerApp
         private Boolean USBConnectConf()
         {
             Boolean ret = false;
-#if USB_OUTPUT
-            string[] Array_DeviceID;//取得ID分解用配列
-            ManagementObjectCollection MyCollection;
 
-            // USBストレージが挿さっているか確認
-            MyCollection = MyOCS.Get();
-            foreach (ManagementObject MyObject in MyCollection)
+            if (USB_OUTPUT)
             {
-                Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
-                if (Array_DeviceID[0].Contains("USBSTOR"))
+                string[] Array_DeviceID;//取得ID分解用配列
+                ManagementObjectCollection MyCollection;
+
+                // USBストレージが挿さっているか確認
+                MyCollection = MyOCS.Get();
+                foreach (ManagementObject MyObject in MyCollection)
                 {
-                    ret = true;
-                    break;
+                    Array_DeviceID = MyObject["DeviceID"].ToString().Split('\\');
+                    if (Array_DeviceID[0].Contains("USBSTOR"))
+                    {
+                        ret = true;
+                        break;
+                    }
                 }
             }
-#else
-            ret = true; // 無条件でtrue
-#endif
+            else
+            {
+                ret = true; // 無条件でtrue
+            }
             log_output("USBConnectConf:" + ret);
 
             return ret;
@@ -694,49 +804,55 @@ namespace SleepCheckerApp
             string temp;
             string drivePath;
             int i;
-#if USB_OUTPUT
-            drivePath = "C:\\"; //初期値
-#else
-#if C_DRIVE
-            drivePath = "C:\\";
-#else
-            drivePath = "."; //exeと同ディレクトリ
-#endif
-#endif
 
-#if USB_OUTPUT
-            char path_char = 'A';
-            System.IO.DriveInfo drive;
+            if (USB_OUTPUT)
+            {
+                char path_char = 'A';
+                System.IO.DriveInfo drive;
 
-            if (USBConnectConf())
-            { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、Cは除く)
-                do
-                {
-                    temp = path_char.ToString();
-                    if (temp != "C")
+                drivePath = "C:\\"; //初期値
+
+                if (USBConnectConf())
+                { //USBが挿さっていたらAドライブからZドライブまで検索(ただし、Cは除く)
+                    do
                     {
-                        drive = new System.IO.DriveInfo(temp);
-                        if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                        temp = path_char.ToString();
+                        if (temp != "C")
                         {
-                            drivePath = temp + ":\\";
-                            break;
+                            drive = new System.IO.DriveInfo(temp);
+                            if (drive.IsReady && drive.DriveType == System.IO.DriveType.Removable)
+                            {
+                                drivePath = temp + ":\\";
+                                break;
+                            }
+                            else
+                            {
+                                path_char++;
+                                if (path_char > 'Z')
+                                { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
+                                    break;
+                                }
+                            }
                         }
                         else
                         {
                             path_char++;
-                            if (path_char > 'Z')
-                            { //USBは挿しているがZドライブまで検索したが見つからなかった場合の救済措置として、強制的にCドライブに出力する。
-                                break;
-                            }
                         }
-                    }
-                    else
-                    {
-                        path_char++;
-                    }
-                } while (path_char <= 'Z');
+                    } while (path_char <= 'Z');
+                }
             }
-#endif
+            else
+            {
+                if (C_DRIVE)
+                {
+                    drivePath = "C:\\";
+                }
+                else
+                {
+                    drivePath = AppDomain.CurrentDomain.BaseDirectory; //exeと同ディレクトリ
+                }
+            }
+
             // rootパス
             ApneaRootPath_ = drivePath + "\\ax\\apnea\\" + datestr + "\\";
             temp = ApneaRootPath_;
@@ -787,27 +903,31 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-#if SOUND_RECORD
-            // rootパス
-            RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
-            temp = RecordRootPath_;
-            for (i = 1; i < 20; i++)
+
+            if (SOUND_RECORD)
             {
-                if (Directory.Exists(temp))
+                // rootパス
+                RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
+                temp = RecordRootPath_;
+                for (i = 1; i < 20; i++)
                 {
-                    temp = RecordRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    Directory.CreateDirectory(temp);
-                    recordFilePath = temp;
-                    break;
+                    if (Directory.Exists(temp))
+                    {
+                        temp = RecordRootPath_ + "(" + i + ")";
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(temp);
+                        recordFilePath = temp;
+                        break;
+                    }
                 }
             }
-#else
-            RecordRootPath_ = null;
-            recordFilePath = RecordRootPath_;
-#endif
+            else
+            {
+                RecordRootPath_ = null;
+                recordFilePath = RecordRootPath_;
+            }
         }
 
         /************************************************************************/
@@ -1431,11 +1551,12 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void button_recordstart_Click(object sender, EventArgs e)
         {
-#if SOUND_RECORD
-            log_output("[BUTTON]Record Start");
+            if (SOUND_RECORD)
+            {
+                log_output("[BUTTON]Record Start");
 
-            record.startRecordApnea();
-#endif
+                record.startRecordApnea();
+            }
         }
 
         /************************************************************************/
@@ -1446,10 +1567,11 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void button_recordstop_Click(object sender, EventArgs e)
         {
-#if SOUND_RECORD
-            log_output("[BUTTON]Record Stop");
-            record.stopRecordApnea();
-#endif
+            if (SOUND_RECORD)
+            {
+                log_output("[BUTTON]Record Stop");
+                record.stopRecordApnea();
+            }
         }
 
 /* チェックボックスイベント */

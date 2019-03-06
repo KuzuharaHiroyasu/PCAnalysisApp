@@ -1,24 +1,21 @@
-﻿#define LATTEPANDA // LATTEPANDAのLED出力
-
-using System.IO.Ports;
+﻿using System.IO.Ports;
 
 namespace SleepCheckerApp
 {
     class LattePanda
     {
         private ComPort com = null;
+        private bool LATTEPANDA = true;
 
         /************************************************************************/
-        /* 関数名   : LattePanda          		                                */
-        /* 機能     : コンストラクタ                                            */
+        /* 関数名   : setComPort_Lattepanda        		                		*/
+        /* 機能     : ラテパンダのCOMポート接続                                 */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        public LattePanda()
+        public void setLattepandaFuncSetting(bool setting)
         {
-#if LATTEPANDA
-            com = new ComPort();
-#endif
+            LATTEPANDA = setting;
         }
 
         /************************************************************************/
@@ -29,16 +26,18 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void setComPort_Lattepanda()
         {
-#if LATTEPANDA
-            com.PortName = "COM5"; //固定
-            com.BaudRate = 9600;
-            com.Parity = Parity.Even;
-            com.DataBits = 8;
-            com.StopBits = StopBits.One;
+            if (LATTEPANDA)
+            {
+                com = new ComPort();
+                com.PortName = "COM5"; //固定
+                com.BaudRate = 9600;
+                com.Parity = Parity.Even;
+                com.DataBits = 8;
+                com.StopBits = StopBits.One;
 
-            comSerch();
-            com.Start();
-#endif
+                comSerch();
+                com.Start();
+            }
         }
 
         /************************************************************************/
@@ -49,9 +48,10 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void closeComPort_Lattepanda()
         {
-#if LATTEPANDA
-            com.Close();
-#endif
+            if (LATTEPANDA)
+            {
+                com.Close();
+            }
         }
 
         /************************************************************************/
@@ -62,11 +62,12 @@ namespace SleepCheckerApp
         /************************************************************************/
         public void requestLattepanda(byte pattern)
         {
-#if LATTEPANDA
-            byte[] param = new byte[1];
-            param[0] = pattern;
-            com.WriteData(param);
-#endif
+            if (LATTEPANDA)
+            {
+                byte[] param = new byte[1];
+                param[0] = pattern;
+                com.WriteData(param);
+            }
         }
 
         /************************************************************************/
