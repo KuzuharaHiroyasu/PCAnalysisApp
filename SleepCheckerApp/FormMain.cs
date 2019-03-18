@@ -508,6 +508,24 @@ namespace SleepCheckerApp
             {
                 checkBox_alarm_apnea.Checked = false;
             }
+
+            // iniファイルから画面表示設定を取得
+            GetPrivateProfileString(
+                "WINDOW_STATE",
+                "STATE",
+                "MINIMIZED",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "NORMAL")
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+            else
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
+
         }
 
         /************************************************************************/
