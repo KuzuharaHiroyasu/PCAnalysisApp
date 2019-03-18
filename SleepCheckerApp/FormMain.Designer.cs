@@ -448,8 +448,6 @@
             // checkBox_vib_snore
             // 
             this.checkBox_vib_snore.AutoSize = true;
-            this.checkBox_vib_snore.Checked = true;
-            this.checkBox_vib_snore.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_vib_snore.Location = new System.Drawing.Point(38, 47);
             this.checkBox_vib_snore.Name = "checkBox_vib_snore";
             this.checkBox_vib_snore.Size = new System.Drawing.Size(53, 16);

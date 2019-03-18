@@ -440,6 +440,40 @@ namespace SleepCheckerApp
             {
                 panda.setLattepandaFuncSetting(false);
             }
+
+            // iniファイルからいびきのバイブ設定を取得
+            GetPrivateProfileString(
+                "VIBRATION",
+                "SNORE",
+                "OFF",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                checkBox_vib_snore.Checked = true;
+            }
+            else
+            {
+                checkBox_vib_snore.Checked = false;
+            }
+
+            // iniファイルから無呼吸のバイブ設定を取得
+            GetPrivateProfileString(
+                "VIBRATION",
+                "APNEA",
+                "OFF",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                checkBox_vib_apnea.Checked = true;
+            }
+            else
+            {
+                checkBox_vib_apnea.Checked = false;
+            }
         }
 
         /************************************************************************/
