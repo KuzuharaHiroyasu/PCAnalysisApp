@@ -474,6 +474,40 @@ namespace SleepCheckerApp
             {
                 checkBox_vib_apnea.Checked = false;
             }
+
+            // iniファイルからいびきのアラーム設定を取得
+            GetPrivateProfileString(
+                "ALARM",
+                "SNORE",
+                "OFF",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                checkBox_alarm_snore.Checked = true;
+            }
+            else
+            {
+                checkBox_alarm_snore.Checked = false;
+            }
+
+            // iniファイルから無呼吸のアラーム設定を取得
+            GetPrivateProfileString(
+                "ALARM",
+                "APNEA",
+                "OFF",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                checkBox_alarm_apnea.Checked = true;
+            }
+            else
+            {
+                checkBox_alarm_apnea.Checked = false;
+            }
         }
 
         /************************************************************************/
