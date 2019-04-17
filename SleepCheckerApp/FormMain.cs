@@ -842,21 +842,20 @@ namespace SleepCheckerApp
                         //SetTextInput(lines[i] + "\r\n");
                         //演算
                         int result;
-//                        if (!int.TryParse(datas[0], out result)) continue;      // 赤色AD値
-                        if (!int.TryParse(datas[1], out result)) continue;      // フォトセンサ
-                        if (!int.TryParse(datas[2], out result)) continue;      // マイク(呼吸)
-                        if (!int.TryParse(datas[3], out result)) continue;      // マイク(いびき)
-                        if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(X)
-                        if (!int.TryParse(datas[5], out result)) continue;      // 加速度センサ(Y)
-                        if (!int.TryParse(datas[6], out result)) continue;      // 加速度センサ(Z)
+                        if (!int.TryParse(datas[0], out result)) continue;      // マイク(呼吸)
+                        if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
+                        if (!int.TryParse(datas[2], out result)) continue;      // 加速度センサ(X)
+                        if (!int.TryParse(datas[3], out result)) continue;      // 加速度センサ(Y)
+                        if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(Z)
+                        if (!int.TryParse(datas[5], out result)) continue;      // フォトセンサ
 
                         // For Apnea
-                        SetCalcData_Apnea(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
+                        SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
                         if (Convert.ToInt32(datas[4]) < 250)
                         {
                             // For 加速度・フォトセンサー
-                            SetCalcData_AccAndPhoto(Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]), Convert.ToInt32(datas[6]), Convert.ToInt32(datas[1]));
+                            SetCalcData_AccAndPhoto(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]));
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                             //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                         } else
