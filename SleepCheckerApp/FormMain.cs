@@ -836,7 +836,7 @@ namespace SleepCheckerApp
 
                     //異常値チェック
                     string[] datas = lines[i].Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 7)
+                    if (datas.Length == 6)
                     {
                         //測定データ表示
                         //SetTextInput(lines[i] + "\r\n");
@@ -852,7 +852,7 @@ namespace SleepCheckerApp
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
-                        if (Convert.ToInt32(datas[4]) < 250)
+                        if (Convert.ToInt32(datas[2]) < 250)
                         {
                             // For 加速度・フォトセンサー
                             SetCalcData_AccAndPhoto(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]));
