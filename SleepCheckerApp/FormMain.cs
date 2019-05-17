@@ -708,7 +708,7 @@ namespace SleepCheckerApp
         private Boolean startAnalysis()
         {
             Boolean ret = false;
-            com.BaudRate = 76800;
+            com.BaudRate = 19200;
             com.Parity = Parity.Even;
             com.DataBits = 8;
             com.StopBits = StopBits.One;
@@ -852,14 +852,14 @@ namespace SleepCheckerApp
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
-                        if (Convert.ToInt32(datas[2]) < 250)
+                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99)
                         {
-                            // For 加速度・フォトセンサー
-                            SetCalcData_AccAndPhoto(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]));
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                             //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                         } else
                         {
+                            // For 加速度・フォトセンサー
+                            SetCalcData_AccAndPhoto(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]));
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]));
                             //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]));
                         }
