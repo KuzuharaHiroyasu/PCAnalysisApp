@@ -43,7 +43,7 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
         [DllImport("Apnea.dll")]
-        static extern void get_photosensor(double data, IntPtr ppath);
+        static extern void get_photoreflector(double data, IntPtr ppath);
         [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
 
@@ -114,12 +114,14 @@ namespace SleepCheckerApp
         Queue<double> RawDataSnoreQueue = new Queue<double>();
         Queue<double> RawDataDcQueue = new Queue<double>();
 
-        // 加速度センサー・フォトセンサー
-        private const int AccAndPhoto_RawDataRirekiNum = 200;       // 生データ履歴数 500ms * 200個 = 100秒
+        // 加速度センサー
+        private const int AcceAndPhotoRef_RawDataRirekiNum = 200;       // 生データ履歴数 500ms * 200個 = 100秒
         Queue<double> AccelerometerXQueue = new Queue<double>();
         Queue<double> AccelerometerYQueue = new Queue<double>();
         Queue<double> AccelerometerZQueue = new Queue<double>();
-        Queue<double> PhotoSensorQueue = new Queue<double>();
+
+        // フォトリフレクタ
+        Queue<double> PhotoRefQueue = new Queue<double>();
 
         // 演算途中データ
         private const int ApneaGraphCalculationDataNum = CalcDataNumCalculationApnea * 10 + 1;
@@ -132,7 +134,8 @@ namespace SleepCheckerApp
         Queue<double> ResultIbikiQueue = new Queue<double>();
 
         object lockData = new object();
-        object lockData_AccAndPhoto = new object();
+        object lockData_Acce = new object();
+        object lockData_PhotoRef = new object();
 
         // For PulseOximeter
         private List<int> SpO2_CalcDataList1 = new List<int>();
@@ -170,13 +173,13 @@ namespace SleepCheckerApp
         private string ApneaRootPath_;
         private string PulseRootPath_ = null;
         private string AcceRootPath_;
-        private string PhotoRootPath_;
+        private string PhotoRefRootPath_;
         private string RecordRootPath_;
         private string recordFilePath;
 
         private int ApneaCalcCount_;
         private int PulseCalcCount_;
-        private int AccePhotoCalcCount_;
+        private int Acce_PhotoRefCalcCount_;
 
         private int SnoreParamThre;         // いびき閾値
         private int SnoreParamNormalCnt;    // いびき無しへのカウント
@@ -247,11 +250,12 @@ namespace SleepCheckerApp
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
             PulseCalcCount_ = 0;
-            AccePhotoCalcCount_ = 0;
+            Acce_PhotoRefCalcCount_ = 0;
 
             // グラフ更新
             GraphUpdate_Apnea();
-            GraphUpdate_AccAndPhoto();
+            GraphUpdate_Acce();
+            GraphUpdate_PhotoRef();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -628,7 +632,7 @@ namespace SleepCheckerApp
             AccelerometerXQueue.Clear();
             AccelerometerYQueue.Clear();
             AccelerometerZQueue.Clear();
-            PhotoSensorQueue.Clear();
+            PhotoRefQueue.Clear();
             ApneaQueue.Clear();
             ResultIbikiQueue.Clear();
 
@@ -651,12 +655,12 @@ namespace SleepCheckerApp
                 ResultIbikiQueue.Enqueue(0);
             }
 
-            for (int i = 0; i < AccAndPhoto_RawDataRirekiNum; i++)
+            for (int i = 0; i < AcceAndPhotoRef_RawDataRirekiNum; i++)
             {
                 AccelerometerXQueue.Enqueue(0);
                 AccelerometerYQueue.Enqueue(0);
                 AccelerometerZQueue.Enqueue(0);
-                PhotoSensorQueue.Enqueue(0);
+                PhotoRefQueue.Enqueue(0);
             }
 
             // 表示設定
@@ -825,7 +829,7 @@ namespace SleepCheckerApp
                 //string[] lines = text.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 string[] lines = text.Split(new string[] { "\r\n" }, StringSplitOptions.None);
                 //for (int i = 0; i < lines.Length; i++)
-                Console.WriteLine("[Data]:" + text);
+//                Console.WriteLine("[Data]:" + text);
                 for (int i = 0; i < lines.Length - 1; i++)  // 最後のデータは切れている可能性があるので、次のデータと結合して処理する
                 {
                     //空行チェック
@@ -852,16 +856,19 @@ namespace SleepCheckerApp
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
-                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99)
+                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99 && Convert.ToInt32(datas[5]) == 0)
                         {
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                             //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                         } else
                         {
-                            // For 加速度・フォトセンサー
-                            SetCalcData_AccAndPhoto(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]), Convert.ToInt32(datas[5]));
-                            //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]));
-                            //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]));
+                            // For 加速度
+                            SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
+                            //Console.WriteLine("[DataReceived] X軸:" + Convert.ToInt32(datas[2]) + " Y軸:" + Convert.ToInt32(datas[3]) + " Z軸:" + Convert.ToInt32(datas[4]));
+                            // For フォトリフレクタ
+                            SetCalcData_PhotoRef(Convert.ToInt32(datas[5]));
+                            //Console.WriteLine("[DataReceived] フォトリフレクタ:" + Convert.ToInt32(datas[5]));
+                            Acce_PhotoRefCalcCount_++;
                         }
                     }
                     else
@@ -992,13 +999,13 @@ namespace SleepCheckerApp
                 }
             }
 
-            PhotoRootPath_ = drivePath + "\\ax\\photo\\" + datestr + "\\";
-            temp = PhotoRootPath_;
+            PhotoRefRootPath_ = drivePath + "\\ax\\photoref\\" + datestr + "\\";
+            temp = PhotoRefRootPath_;
             for (i = 1; i < 20; i++)
             {
                 if (Directory.Exists(temp))
                 {
-                    temp = PhotoRootPath_ + "(" + i + ")";
+                    temp = PhotoRefRootPath_ + "(" + i + ")";
                 }
                 else
                 {
@@ -1095,15 +1102,15 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : CreatePhotoDir                		    			    */
-        /* 機能     : フォトセンサー結果保存用パスの作成                        */
+        /* 関数名   : CreatePhotoRefDir                		    			    */
+        /* 機能     : フォトリフレクタ結果保存用パスの作成                      */
         /* 引数     : [int] Count - データ数                                    */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private string CreatePhotoDir(int Count)
+        private string CreatePhotoRefDir(int Count)
         {
 
-            string path = PhotoRootPath_ + Count.ToString("D");
+            string path = PhotoRefRootPath_ + Count.ToString("D");
             if (Directory.Exists(path))
             {
             }
@@ -1230,54 +1237,70 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : SetCalcData_AccAndPhoto               			    	*/
-        /* 機能     : 加速度センサーとフォトセンサーのデータをセット            */
+        /* 関数名   : SetCalcData_Acce                        			    	*/
+        /* 機能     : 加速度センサーのデータをセット                            */
         /* 引数     : [int] data1 - X軸                                         */
         /*          : [int] data2 - Y軸                                         */
         /*          : [int] data3 - Z軸                                         */
-        /*          : [int] data4 - フォトセンサー値                            */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private void SetCalcData_AccAndPhoto(int data1, int data2, int data3, int data4)
+        private void SetCalcData_Acce(int data1, int data2, int data3)
         {
-            lock (lockData_AccAndPhoto)
+            lock (lockData_Acce)
             {
                 //グラフ用データ追加
                 // X軸
-                if (AccelerometerXQueue.Count >= AccAndPhoto_RawDataRirekiNum)
+                if (AccelerometerXQueue.Count >= AcceAndPhotoRef_RawDataRirekiNum)
                 {
                     AccelerometerXQueue.Dequeue();
                 }
                 AccelerometerXQueue.Enqueue(data1);
                 // Y軸
-                if (AccelerometerYQueue.Count >= AccAndPhoto_RawDataRirekiNum)
+                if (AccelerometerYQueue.Count >= AcceAndPhotoRef_RawDataRirekiNum)
                 {
                     AccelerometerYQueue.Dequeue();
                 }
                 AccelerometerYQueue.Enqueue(data2);
                 // Z軸
-                if (AccelerometerZQueue.Count >= AccAndPhoto_RawDataRirekiNum)
+                if (AccelerometerZQueue.Count >= AcceAndPhotoRef_RawDataRirekiNum)
                 {
                     AccelerometerZQueue.Dequeue();
                 }
                 AccelerometerZQueue.Enqueue(data3);
-                // フォトセンサー
-                if (PhotoSensorQueue.Count >= AccAndPhoto_RawDataRirekiNum)
-                {
-                    PhotoSensorQueue.Dequeue();
-                }
-                PhotoSensorQueue.Enqueue(data4);
-
 
                 //10回に1回テキスト出力する(500ms毎)（暫定）
                 //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
                 //理想は1テキスト内に出力し続ける
-                string path = CreateAcceDir(AccePhotoCalcCount_);
+                string path = CreateAcceDir(Acce_PhotoRefCalcCount_);
                 IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
                 get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
-                path = CreatePhotoDir(AccePhotoCalcCount_);
-                get_photosensor((double)data4, pathptr);
-                AccePhotoCalcCount_++;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : SetCalcData_PhotoRef               			          	*/
+        /* 機能     : フォトリフレクタのデータをセット                          */
+        /* 引数     : [int] data1 - フォトリフレクタ値                          */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void SetCalcData_PhotoRef(int data1)
+        {
+            lock (lockData_PhotoRef)
+            {
+                //グラフ用データ追加
+                // フォトリフレクタ
+                if (PhotoRefQueue.Count >= AcceAndPhotoRef_RawDataRirekiNum)
+                {
+                    PhotoRefQueue.Dequeue();
+                }
+                PhotoRefQueue.Enqueue(data1);
+
+                //10回に1回テキスト出力する(500ms毎)（暫定）
+                //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
+                //理想は1テキスト内に出力し続ける
+                string path = CreatePhotoRefDir(Acce_PhotoRefCalcCount_);
+                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+                get_photoreflector((double)data1, pathptr);
             }
         }
 
@@ -1548,27 +1571,25 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : GraphUpdate_AccAndPhoto          			    			*/
-        /* 機能     : 加速度センサー・フォトセンサーのグラフを更新              */
+        /* 関数名   : GraphUpdate_Acce               			    			*/
+        /* 機能     : 加速度センサーのグラフを更新                              */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private void GraphUpdate_AccAndPhoto()
+        private void GraphUpdate_Acce()
         {
             int cnt = 0;
 
-            lock (lockData_AccAndPhoto)
+            lock (lockData_Acce)
             {
-                // 加速度センサー・フォトセンサーのグラフを更新
-                Series accelerometer_x = chartAccelerometerAndPhoto.Series["X軸"]; //■
-                Series accelerometer_y = chartAccelerometerAndPhoto.Series["Y軸"]; //■
-                Series accelerometer_z = chartAccelerometerAndPhoto.Series["Z軸"]; //■
-                Series photosensor     = chartAccelerometerAndPhoto.Series["フォトセンサー"]; //■
+                // 加速度センサーのグラフを更新
+                Series accelerometer_x = chartAccelerometer.Series["X軸"]; //■
+                Series accelerometer_y = chartAccelerometer.Series["Y軸"]; //■
+                Series accelerometer_z = chartAccelerometer.Series["Z軸"]; //■
 
                 accelerometer_x.Points.Clear();
                 accelerometer_y.Points.Clear();
                 accelerometer_z.Points.Clear();
-                photosensor.Points.Clear();
 
                 foreach (int data in AccelerometerXQueue)
                 {
@@ -1587,14 +1608,34 @@ namespace SleepCheckerApp
                     accelerometer_z.Points.AddXY(cnt, data);
                     cnt++;
                 }
-                cnt = 0;
-                foreach (double data in PhotoSensorQueue)
+            }
+            chartAccelerometer.Invalidate();
+        }
+
+        /************************************************************************/
+        /* 関数名   : GraphUpdate_PhotoRef          			    			*/
+        /* 機能     : フォトリフレクタのグラフを更新                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void GraphUpdate_PhotoRef()
+        {
+            int cnt = 0;
+
+            lock (lockData_PhotoRef)
+            {
+                // フォトリフレクタのグラフを更新
+                Series photoRef = chartPhotoReflector.Series["フォトリフレクタ"]; //■
+
+                photoRef.Points.Clear();
+
+                foreach (double data in PhotoRefQueue)
                 {
-                    photosensor.Points.AddXY(cnt, data);
+                    photoRef.Points.AddXY(cnt, data);
                     cnt++;
                 }
             }
-            chartAccelerometerAndPhoto.Invalidate();
+            chartPhotoReflector.Invalidate();
         }
 
         /************************************************************************/
@@ -1607,7 +1648,8 @@ namespace SleepCheckerApp
         {
             GraphUpdate_Apnea();
             //            GraphUpdate_SpO2();
-            GraphUpdate_AccAndPhoto();
+            GraphUpdate_Acce();
+            GraphUpdate_PhotoRef();
         }
 
         /************************************************************************/
