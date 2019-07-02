@@ -56,6 +56,9 @@ static void Judge(void);
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
 #define RIREKI			3
+#define MAX_THRESHOLD			1000
+#define MIN_THRESHOLD			100
+#define PREVIOUS_DATA_NUM		  3
 
 /************************************************************/
 /* 型定義													*/
@@ -121,6 +124,12 @@ DLLEXPORT void    __stdcall setThreshold(int SnoreParamThre, int SnoreParamNorma
 /************************************************************************/
 DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore)
 {
+	double  before_raw[PREVIOUS_DATA_NUM] = { -1, -1, -1 };
+	BOOL before_under = FALSE;
+	BOOL after_under = FALSE;
+	int i, j;
+	int pastDataNum = 0;
+
 	// ファイル出力パスを保存
 	int pos=0;
 	if(ppath){
@@ -131,12 +140,138 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 		path_[pos] = '\0';
 	}
 	
-	// 移動平均
+	// 型変換
 	for(int ii=0;ii<len;++ii){
 		dc_[ii] = (double)pdata[ii];
+		raw_[ii] = (double)psnore[ii];
 	}
-	
+	debug_out("raw", dc_, len, path_);
+	debug_out("rawsnore", raw_, len, path_);
+
 	static const int N = APNEA_PARAM_AVE_NUM;
+
+	// エッジ強調移動平均
+	for (int ii = 0; ii < len; ++ii) {
+		movave_[ii] = 0;
+
+		if ((ii - 2) >= 0)
+		{//要素2以上
+			if ((ii + 2) <= (len - 1))
+			{// 要素197まで
+				movave_[ii] += dc_[ii - 2] * 0.1;
+				movave_[ii] += dc_[ii - 1];
+				movave_[ii] += dc_[ii] * 20;
+				movave_[ii] += dc_[ii + 1];
+				movave_[ii] += dc_[ii + 2] * 0.1;
+				movave_[ii] /= (double)N;
+			}
+		}
+		else if (before_raw[ii] != -1)
+		{// 過去データがあるか
+			movave_[ii] += before_raw[ii + 1] * 0.1;
+			if (ii == 0)
+			{
+				movave_[ii] += before_raw[ii + 2];
+			}
+			else {
+				movave_[ii] += dc_[ii - 1];
+			}
+			movave_[ii] += dc_[ii] * 20;
+			movave_[ii] += dc_[ii + 1];
+			movave_[ii] += dc_[ii + 2] * 0.1;
+			movave_[ii] /= (double)N;
+		}
+	}
+	debug_out("edge_movave", movave_, len, path_);
+
+	// 心拍除去
+	for (i = 0; i < len; i++)
+	{
+		if (i <= len - 4)
+		{
+			if (movave_[i] >= MAX_THRESHOLD && raw_[i] <= MIN_THRESHOLD)
+			{// エッジ強調1000以上、いびき音100以下
+				if (i < 3)
+				{
+				// 0 ～ 2まで
+					// 前150ms確認
+					if (i == 0)
+					{// データ配列の先頭
+						if (before_raw[0] < MIN_THRESHOLD || before_raw[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
+						{
+							before_under = TRUE;
+							pastDataNum = 3;
+						}
+					}
+					else if (i == 1)
+					{// データ配列2番目
+						if (dc_[0] < MIN_THRESHOLD || before_raw[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
+						{
+							before_under = TRUE;
+							pastDataNum = 2;
+						}
+					}
+					else if (i == 2)
+					{// データ配列3番目
+						if (dc_[0] < MIN_THRESHOLD || dc_[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
+						{
+							before_under = TRUE;
+							pastDataNum = 1;
+						}
+					}
+					// 前に該当データがある場合は後150ms確認
+					if (before_under)
+					{
+						for (j = 1; j < 4; j++)
+						{
+							if (dc_[i + j] < MIN_THRESHOLD)
+							{
+								after_under = TRUE;
+							}
+						}
+					}
+				}
+				else {
+				// 3 ～ 196まで
+					// 前後150ms確認
+					for (j = 1; j < 4; j++)
+					{
+						// 前150ms確認
+						if (dc_[i - j] < MIN_THRESHOLD)
+						{
+							before_under = TRUE;
+						}
+						// 後150ms確認
+						if (dc_[i + j] < MIN_THRESHOLD)
+						{
+							after_under = TRUE;
+						}
+					}
+				}
+
+				if (before_under && after_under)
+				{// 前後に該当箇所がある場合
+					for (j = -3 + pastDataNum; j < 4; j++)
+					{// 前後150ms分0にする
+						dc_[i + j] = 0;
+					}
+				}
+				// フラグリセット
+				before_under = FALSE;
+				after_under = FALSE;
+				pastDataNum = 0;
+			}
+		}
+	}
+
+	// 過去データセット（要素197, 198, 199）
+	before_raw[0] = dc_[197];
+	before_raw[1] = dc_[198];
+	before_raw[2] = dc_[199];
+
+	debug_out("raw_heartBeatRemov", dc_, len, path_);
+
+	// 移動平均
 	for(int ii=0;ii<len;++ii){
 		movave_[ii]=0;
 		for(int jj=0;jj<N;++jj){
@@ -146,13 +281,11 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 		}
 		movave_[ii] /= (double)N;
 	}
-	for(int ii=0;ii<len;++ii){
-		raw_[ii] = (double)psnore[ii];
-	}
-	debug_out("rawsnore", raw_, len, path_);
-	debug_out("raw", dc_, len, path_);
+
 	debug_out("movave", movave_, len, path_);
 	double* ptest1= (double*)calloc(len, sizeof(double));
+
+	// 補正
 	for(int ii=0;ii<len;++ii){
 		ptest1[ii] = movave_[ii] / APNEA_PARAM_RAW;
 	}
