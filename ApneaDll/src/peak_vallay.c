@@ -23,7 +23,6 @@ void peak_vallay
 	const double	in[],		/* IN：入力信号の格納されたバッファ						*/
 	int		ot[],		/* OT：判定結果（0=NO、1=YES)							*/
 	int		size,		/* IN：入力信号・出力信号のバッファのサイズ				*/
-	int		width,		/* IN：検査幅、奇数、最小は３指定						*/
 	int		peak		/* IN：1=極大値抽出、else=極小処理抽出					*/
 )
 {

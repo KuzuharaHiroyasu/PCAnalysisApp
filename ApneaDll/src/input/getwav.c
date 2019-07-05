@@ -31,8 +31,8 @@ extern void peak_vallay	( const double in[] , int    ot[] , int size, int width 
 /* プロトタイプ宣言											*/
 /************************************************************/
 void getwav_pp(const double* pData, int DSize, double Param1);
-void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, double Param3, double Param4);
-void getwav_snore(const double* pData, int DSize, double Param);
+void getwav_apnea(const double* pData, int DSize, double Param3, double Param4);
+void getwav_snore(const double* pData);
 
 DLLEXPORT void __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
 DLLEXPORT void __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore);
@@ -89,7 +89,7 @@ double	interval_[DATA_SIZE];
 
 char path_[256];
 
-static B	SnoreTime_[RIREKI];
+static int	SnoreTime_[RIREKI];
 static UB	SnoreFlg_; // ONカウント中 or OFFカウント中
 static int	SnoreCnt_; // ON連続回数, OFF連続回数 兼用
 
@@ -125,7 +125,6 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	BOOL before_under = FALSE;
 	BOOL after_under = FALSE;
 	int i, j;
-	int pastDataNum = 0;
 
 	// ファイル出力パスを保存
 	int pos=0;
@@ -217,10 +216,10 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	debug_out("movave", movave_, len, path_);
 
 	// (35) - (47)
-	getwav_apnea(movave_, len, APNEA_PARAM_AVE_CNT, APNEA_PARAM_AVE_THRE, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
+	getwav_apnea(movave_, len, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
 	
 	// (48) - (56)
-	getwav_snore(raw_, len, APNEA_PARAM_SNORE);
+	getwav_snore(raw_);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
 }
@@ -337,12 +336,12 @@ void getwav_pp(const double* pData, int DSize, double Param1)
 		double* presult = (double*)calloc(size, sizeof(double));
 		int rpos = 0;
 		for(int ii=0;ii<ppcnt;++ii){
-			int loop2 = (int)(pp2[ii] + 0.5) -1;
+//			int loop2 = (int)(pp2[ii] + 0.5) -1;
 			for(int jj=rpos;jj<pp2[ii];++jj){
 				presult[rpos] = 0;
 				rpos+=1;
 			}
-			int loop5 = (int)(pp5[ii] + 0.5) - 1;
+//			int loop5 = (int)(pp5[ii] + 0.5) - 1;
 			for(int jj=rpos;jj<pp5[ii];++jj){
 				presult[rpos] = max;
 				rpos+=1;
@@ -381,52 +380,12 @@ void getwav_pp(const double* pData, int DSize, double Param1)
 /* 注意事項 :															*/
 /* なし																	*/
 /************************************************************************/
-void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, double Param3, double Param4)
+void getwav_apnea(const double* pData, int DSize, double Param3, double Param4)
 {
 	// (35) = Param1
 	// (36) = Param2
 	// (40) = Param3
 	
-	// (37)
-/* // 使用していないためコメントアウト
-	for(int ii=0;ii<DSize;++ii){
-		int min=0;
-		int loop=0;
-		if(ii <= DSize-1){
-			int tmp = DSize-1 - ii;
-			if(tmp > Param1){
-				min = Param1;
-			}else{
-				min = tmp;
-			}
-			loop = min * 2 + 1;
-			min = ii - min;
-			if(min < 0){
-				min = 0;
-			}
-		}else{
-			min = 0;
-			loop = ii * 2 + 1;
-		}
-		double ave = 0.0f;
-		for(int jj=0;jj<loop;++jj){
-			ave += pData[min+jj];
-		}
-		ave /= loop;
-		ave_[ii] = ave;
-	}
-	debug_out("ave", ave_, DSize, path_);
-	
-	// (38) - (39)
-	for(int ii=0;ii<DSize;++ii){
-		if(ave_[ii] >= Param2){
-			eval_[ii] = 1;
-		}else{
-			eval_[ii] = 0;
-		}
-	}
-	debug_out("eval2", eval_, DSize, path_);
-*/	
 	// (41) ... 使用していないため省略
 	// (42)
 	// (43) = prms
@@ -477,7 +436,8 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 		// 現状通らない
 		apnea_ = APNEA_NORMAL;
 	}
-/* //低呼吸も無呼吸と判定するため
+
+	//低呼吸も無呼吸と判定するため ※現状通らない
 	// 完全無呼吸の判定
 	if(apnea_ == APNEA_WARN){
 		apnea_ = APNEA_ERROR;
@@ -488,7 +448,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 			}
 		}
 	}
-*/	
+	
 	double tmpapnea = (double)apnea_;
 	debug_out("apnea", &tmpapnea, 1, path_);
 }
@@ -505,7 +465,7 @@ void getwav_apnea(const double* pData, int DSize, int Param1, double Param2, dou
 /* 注意事項 :															*/
 /* なし																	*/
 /************************************************************************/
-void getwav_snore(const double* pData, int DSize, double Param)
+void getwav_snore(const double* pData)
 {
 	int ii;
 	int jj;
