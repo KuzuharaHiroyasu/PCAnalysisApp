@@ -3,3 +3,5 @@ SleepCheckerApp/obj
 ApneaDll/x64
 PulseOximeterDll/x64
 .vs
+ApneaDll/Apnea.vcxproj.user
+PulseOximeterDll/PulseOximeter.vcxproj.user
