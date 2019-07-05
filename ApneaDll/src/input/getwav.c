@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "movave_param.h"
 
 extern void	debug_out( char *f , double d[] , int size , const char* ppath );
 extern int	peak_modify	( const double in_data[] , int in_res[] , double ot_data[] , double ot_hz[] , int size , double delta, double th);	/* ☆ */
@@ -56,9 +57,6 @@ static void Judge(void);
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
 #define RIREKI			3
-#define MAX_THRESHOLD			1000
-#define MIN_THRESHOLD			100
-#define PREVIOUS_DATA_NUM		  3
 
 /************************************************************/
 /* 型定義													*/
@@ -124,7 +122,6 @@ DLLEXPORT void    __stdcall setThreshold(int SnoreParamThre, int SnoreParamNorma
 /************************************************************************/
 DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore)
 {
-	double  before_raw[PREVIOUS_DATA_NUM] = { -1, -1, -1 };
 	BOOL before_under = FALSE;
 	BOOL after_under = FALSE;
 	int i, j;
@@ -149,36 +146,20 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	debug_out("rawsnore", raw_, len, path_);
 
 	static const int N = APNEA_PARAM_AVE_NUM;
+	static int N_half;
+	N_half = N / 2;
 
 	// エッジ強調移動平均
 	for (int ii = 0; ii < len; ++ii) {
 		movave_[ii] = 0;
 
-		if ((ii - 2) >= 0)
-		{//要素2以上
-			if ((ii + 2) <= (len - 1))
-			{// 要素197まで
-				movave_[ii] += dc_[ii - 2] * 0.1;
-				movave_[ii] += dc_[ii - 1];
-				movave_[ii] += dc_[ii] * 20;
-				movave_[ii] += dc_[ii + 1];
-				movave_[ii] += dc_[ii + 2] * 0.1;
-				movave_[ii] /= (double)N;
-			}
-		}
-		else if (before_raw[ii] != -1)
-		{// 過去データがあるか
-			movave_[ii] += before_raw[ii + 1] * 0.1;
-			if (ii == 0)
-			{
-				movave_[ii] += before_raw[ii + 2];
-			}
-			else {
-				movave_[ii] += dc_[ii - 1];
-			}
-			movave_[ii] += dc_[ii] * 20;
-			movave_[ii] += dc_[ii + 1];
-			movave_[ii] += dc_[ii + 2] * 0.1;
+		if (ii >= N_half && ii < (len - N_half))
+		{
+			movave_[ii] += dc_[ii - 2] * DIAMETER_END;
+			movave_[ii] += dc_[ii - 1] * DIAMETER_NEXT;
+			movave_[ii] += dc_[ii] * DIAMETER_CENTER;
+			movave_[ii] += dc_[ii + 1] * DIAMETER_NEXT;
+			movave_[ii] += dc_[ii + 2] * DIAMETER_END;
 			movave_[ii] /= (double)N;
 		}
 	}
@@ -187,124 +168,61 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	// 心拍除去
 	for (i = 0; i < len; i++)
 	{
-		if (i <= len - 4)
+		if (i >= PREVIOUS_DATA_NUM && i < (len - PREVIOUS_DATA_NUM))
 		{
-			if (movave_[i] >= MAX_THRESHOLD && raw_[i] <= MIN_THRESHOLD)
-			{// エッジ強調1000以上、いびき音100以下
-				if (i < 3)
+			if (movave_[i] >= MAX_EDGE_THRESHOLD && raw_[i] <= MIN_SNORE_THRESHOLD)
+			{
+				for (j = 1; j <= PREVIOUS_DATA_NUM; j++)
 				{
-				// 0 ～ 2まで
-					// 前150ms確認
-					if (i == 0)
-					{// データ配列の先頭
-						if (before_raw[0] < MIN_THRESHOLD || before_raw[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
-						{
-							before_under = TRUE;
-							pastDataNum = 3;
-						}
-					}
-					else if (i == 1)
-					{// データ配列2番目
-						if (dc_[0] < MIN_THRESHOLD || before_raw[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
-						{
-							before_under = TRUE;
-							pastDataNum = 2;
-						}
-					}
-					else if (i == 2)
-					{// データ配列3番目
-						if (dc_[0] < MIN_THRESHOLD || dc_[1] < MIN_THRESHOLD || before_raw[2] < MIN_THRESHOLD)
-						{
-							before_under = TRUE;
-							pastDataNum = 1;
-						}
-					}
-					// 前に該当データがある場合は後150ms確認
-					if (before_under)
+					if (raw_[i - j] < MIN_BREATH_THRESHOLD)
 					{
-						for (j = 1; j < 4; j++)
-						{
-							if (dc_[i + j] < MIN_THRESHOLD)
-							{
-								after_under = TRUE;
-							}
-						}
+						before_under = TRUE;
 					}
-				}
-				else {
-				// 3 ～ 196まで
-					// 前後150ms確認
-					for (j = 1; j < 4; j++)
+					if (raw_[i + j] < MIN_BREATH_THRESHOLD)
 					{
-						// 前150ms確認
-						if (dc_[i - j] < MIN_THRESHOLD)
-						{
-							before_under = TRUE;
-						}
-						// 後150ms確認
-						if (dc_[i + j] < MIN_THRESHOLD)
-						{
-							after_under = TRUE;
-						}
+						after_under = TRUE;
 					}
 				}
 
 				if (before_under && after_under)
-				{// 前後に該当箇所がある場合
-					for (j = -3 + pastDataNum; j < 4; j++)
-					{// 前後150ms分0にする
+				{
+					dc_[i] = 0;
+					for (j = 1; j <= PREVIOUS_DATA_NUM; j++)
+					{
+						dc_[i - j] = 0;
 						dc_[i + j] = 0;
 					}
 				}
-				// フラグリセット
 				before_under = FALSE;
 				after_under = FALSE;
-				pastDataNum = 0;
 			}
 		}
 	}
-
-	// 過去データセット（要素197, 198, 199）
-	before_raw[0] = dc_[197];
-	before_raw[1] = dc_[198];
-	before_raw[2] = dc_[199];
-
 	debug_out("raw_heartBeatRemov", dc_, len, path_);
 
-	// 移動平均
-	for(int ii=0;ii<len;++ii){
-		movave_[ii]=0;
-		for(int jj=0;jj<N;++jj){
-			if((ii-jj)>=0){
-				movave_[ii]+=dc_[ii-jj];
-			}
+	// 除去後の呼吸音の移動平均
+	for (int ii = 0; ii < len; ++ii) {
+		movave_[ii] = 0;
+		if (ii >= N_half && ii < (len - N_half))
+		{
+			movave_[ii] += dc_[ii - 2];
+			movave_[ii] += dc_[ii - 1];
+			movave_[ii] += dc_[ii];
+			movave_[ii] += dc_[ii + 1];
+			movave_[ii] += dc_[ii + 2];
+			movave_[ii] /= (double)N;
+			movave_[ii] /= APNEA_PARAM_RAW;	// 生データ補正
 		}
-		movave_[ii] /= (double)N;
 	}
-
 	debug_out("movave", movave_, len, path_);
-	double* ptest1= (double*)calloc(len, sizeof(double));
 
-	// 補正
-	for(int ii=0;ii<len;++ii){
-		ptest1[ii] = movave_[ii] / APNEA_PARAM_RAW;
-	}
-
-	// (21) - (34)
-//	getwav_pp(ptest1, len, APNEA_PARAM_PEAK_THRE);
-//	getwav_pp(testdata, 200, 0.003f);
-	
 	// (35) - (47)
-	getwav_apnea(ptest1, len, APNEA_PARAM_AVE_CNT, APNEA_PARAM_AVE_THRE, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
-//	getwav_apnea(testdata, 200, 450, 0.0015f, 0.002f);
+	getwav_apnea(movave_, len, APNEA_PARAM_AVE_CNT, APNEA_PARAM_AVE_THRE, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
 	
 	// (48) - (56)
 	getwav_snore(raw_, len, APNEA_PARAM_SNORE);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
-//	getwav_snore(testdata, 200, 0.0125f);
-	
-	// (57)
 }
 
 /************************************************************************/
