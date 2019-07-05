@@ -112,6 +112,8 @@ DLLEXPORT void __stdcall calculator_clr(int *pdata, int len, char* ppath)
 //		temp_dbl_buf2[i] = tmp;
 //	}
 //	proc_spo2(temp_dbl_buf2, DATA_SIZE_SPO2, snpk1_, &mx1_, &min1_, 1);
+
+	len = len;	// warning対策
 }
 
 DLLEXPORT void __stdcall calculator_inf(int *pdata, int len, char* ppath)
@@ -150,6 +152,10 @@ DLLEXPORT void __stdcall calculator_inf(int *pdata, int len, char* ppath)
 	if((0 > sp1_) || (sp1_ > 200)){
 		sp1_ = 0;
 	}
+
+	// warning対策
+	len = len;
+	ppath = ppath;	
 }
 
 /********************************************************************/
@@ -201,6 +207,10 @@ static void	proc_spo2(const double *pdata, int len, int snpk, double* pmk, doubl
 	double* p3 = &new_ifft_[0];
 	ifft(ar1, ai1, len, p3);
 	debug_out("new_ifft", p3, len, path_, no);
+
+	// warning対策
+	pmin = pmin;
+	pmk = pmk;
 }
 
 /********************************************************************/
@@ -237,13 +247,13 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	/*- DC成分除去 -----------------------------------------------------------------*/
 	ph11 = &temp_dbl_buf0[0];
 	double min = pdata[0];
-	for(int ii=1;ii<len;++ii){
+	for(ii=1;ii<len;++ii){
 		if(min > pdata[ii]){
 			min = pdata[ii];
 		}
 	}
 	*pmin = min;
-	for(int ii=0;ii<len;++ii){
+	for(ii=0;ii<len;++ii){
 		ph11[ii] = (pdata[ii] - min);			//DC抜きデータ
 		dc_[ii] = (int)(ph11[ii]);
 	}
@@ -254,7 +264,7 @@ static void	proc(const double *pdata, int len, int* psnpk, double* pmk, double* 
 	double	ar1[BUF_SIZE];		//実数部
 	double	ai1[BUF_SIZE];		//虚数部
 	
-	for(int ii=0;ii<len;++ii){
+	for(ii=0;ii<len;++ii){
 		ph11[ii] = pdata[ii] * hanning_window[ii];		//演算データ
 	}
 	fft(ph11, len, ar1, ai1, fft_);
@@ -344,7 +354,7 @@ static void acdc_average(const double* pdata, double* ar1, double* ai1, double* 
 	pos_center_down = (int)pos_center;
 	
 	// pos_center_downまでは 0
-	for (int ii = 0; ii<pos_center_down; ++ii) {
+	for (ii = 0; ii<pos_center_down; ++ii) {
 		ar1[ii] = 0;
 		ai1[ii] = 0;
 	}
