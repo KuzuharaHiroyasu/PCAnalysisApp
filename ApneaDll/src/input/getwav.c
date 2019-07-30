@@ -170,15 +170,15 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 		if (i >= PREVIOUS_DATA_NUM && i < (len - PREVIOUS_DATA_NUM))
 		{
 			if (movave_[i] >= MAX_EDGE_THRESHOLD && raw_[i] <= MIN_SNORE_THRESHOLD)
-			{
+			{// エッジ強調でAD値1000以上、いびき音のAD値100以下
 				for (j = 1; j <= PREVIOUS_DATA_NUM; j++)
 				{
-					if (raw_[i - j] < MIN_BREATH_THRESHOLD)
-					{
+					if (pdata[i - j] < MIN_BREATH_THRESHOLD)
+					{// 3個前(150ms)までに1つでも呼吸音のAD値が50未満
 						before_under = TRUE;
 					}
-					if (raw_[i + j] < MIN_BREATH_THRESHOLD)
-					{
+					if (pdata[i + j] < MIN_BREATH_THRESHOLD)
+					{// 3個後(150ms)までに1つでも呼吸音のAD値が50未満
 						after_under = TRUE;
 					}
 				}
