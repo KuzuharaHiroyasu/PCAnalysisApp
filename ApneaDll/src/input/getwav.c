@@ -103,7 +103,7 @@ extern	double	testdata[200];
 DLLEXPORT void    __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre)
 {
 	SnoreParamThre_ = SnoreParamThre;				// いびき閾値
-	SnoreParamNormalCnt_ = SnoreParamNormalCnt;		// 無呼吸の閾値
+	SnoreParamNormalCnt_ = SnoreParamNormalCnt;		// いびきOFFへのカウント
 	ApneaJudgeCnt_ = ApneaJudgeCnt;					// 無呼吸判定カウント
 	ApneaParamBinThre_ = ApneaParamBinThre;			// 2値化50%閾値
 }
