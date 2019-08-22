@@ -23,6 +23,8 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
         [DllImport("Apnea.dll")]
+        static extern void setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, int MinBreathThre, int DiameterCenter, int DiameterNext, double DiameterEnd);
+        [DllImport("Apnea.dll")]
         static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
         [DllImport("Apnea.dll")]
         static extern void getwav_dc(IntPtr data);
@@ -185,6 +187,12 @@ namespace SleepCheckerApp
         private int SnoreParamNormalCnt;    // いびき無しへのカウント
         private int ApneaJudgeCnt;          // 無呼吸判定カウント
         private double ApneaParamBinThre;   // 2値化50%閾値
+        private int MaxEdgeThre;            // エッジ強調移動平均値の判定上限
+        private int MinSnoreThre;           // いびき音の判定下限
+        private int MinBreathThre;          // 生の呼吸音の判定下限
+        private int DiameterCenter;         // エッジ強調移動平均の中心の倍率
+        private int DiameterNext;           // エッジ強調移動平均の隣の倍率
+        private double DiameterEnd;			// エッジ強調移動平均の端の倍率
 
         public int snore = 0;
         public int apnea = 0;
@@ -590,6 +598,70 @@ namespace SleepCheckerApp
 
             // iniファイルから取得した閾値をApneaにセットする
             setThreshold(SnoreParamThre, SnoreParamNormalCnt, ApneaJudgeCnt, ApneaParamBinThre);
+
+            // iniファイルからエッジ強調移動平均値の判定上限を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "MAX_EDGE_THRESHOLD",
+                "1000",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            MaxEdgeThre = int.Parse(sb.ToString());
+
+            // iniファイルからいびき音の判定下限を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "MIN_SNORE_THRESHOLD",
+                "100",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            MinSnoreThre = int.Parse(sb.ToString());
+
+            // iniファイルから生の呼吸音の判定下限を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "MIN_BREATH_THRESHOLD",
+                "50",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            MinBreathThre = int.Parse(sb.ToString());
+
+            // iniファイルからエッジ強調移動平均の中心の倍率を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "DIAMETER_CENTER",
+                "20",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            DiameterCenter = int.Parse(sb.ToString());
+
+            // iniファイルからエッジ強調移動平均の隣の倍率を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "DIAMETER_NEXT",
+                "10",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            DiameterNext = int.Parse(sb.ToString());
+
+            // iniファイルからエッジ強調移動平均の端の倍率を取得
+            GetPrivateProfileString(
+                "APNEA",
+                "DIAMETER_END",
+                "0.1",       // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            DiameterEnd = double.Parse(sb.ToString());
+
+            // iniファイルから取得したエッジ強調処理の閾値をApneaにセットする
+            setEdgeThreshold(MaxEdgeThre, MinSnoreThre, MinBreathThre, DiameterCenter, DiameterNext, DiameterEnd);
+
         }
 
         /************************************************************************/

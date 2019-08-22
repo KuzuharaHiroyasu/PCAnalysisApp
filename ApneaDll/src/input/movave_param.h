@@ -16,12 +16,10 @@
 #define MAX_EDGE_THRESHOLD			1000
 
 // いびき音の判定下限
-//#define MIN_SNORE_THRESHOLD			100
-#define MIN_SNORE_THRESHOLD			280
+#define MIN_SNORE_THRESHOLD			100
 
 // 生の呼吸音の判定下限
-//#define MIN_BREATH_THRESHOLD		50
-#define MIN_BREATH_THRESHOLD		105
+#define MIN_BREATH_THRESHOLD		50
 
 // 過去データ参照数
 #define PREVIOUS_DATA_NUM		  3

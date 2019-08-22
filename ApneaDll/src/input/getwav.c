@@ -35,6 +35,7 @@ void getwav_apnea(const double* pData, int DSize, double Param3, double Param4);
 void getwav_snore(const double* pData);
 
 DLLEXPORT void __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
+DLLEXPORT void __stdcall setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, int MinBreathThre, int DiameterCenter, int DiameterNext, double DiameterEnd);
 DLLEXPORT void __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore);
 DLLEXPORT int	__stdcall get_result_snore(double* data);
 DLLEXPORT int	__stdcall get_result_peak(double* data);
@@ -74,9 +75,15 @@ int		SnoreParamThre_;		// いびき閾値
 int		SnoreParamNormalCnt_;	// 無呼吸の閾値
 int		ApneaJudgeCnt_;			// 無呼吸判定カウント
 double	ApneaParamBinThre_;		// 2値化50%閾値
+int		MaxEdgeThre_;			// エッジ強調移動平均値の判定上限
+int		MinSnoreThre_;			// いびき音の判定下限
+int		MinBreathThre_;			// 生の呼吸音の判定下限
+int		DiameterCenter_;		// エッジ強調移動平均の中心の倍率
+int		DiameterNext_;			// エッジ強調移動平均の隣の倍率
+double	DiameterEnd_;			// エッジ強調移動平均の端の倍率
 
 // 演算途中データ
-double raw_[DATA_SIZE];
+double	raw_[DATA_SIZE];
 double	dc_[DATA_SIZE];
 double	movave_[DATA_SIZE];
 double	ave_[DATA_SIZE];
@@ -102,10 +109,20 @@ extern	double	testdata[200];
 
 DLLEXPORT void    __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre)
 {
-	SnoreParamThre_ = SnoreParamThre;				// いびき閾値
-	SnoreParamNormalCnt_ = SnoreParamNormalCnt;		// いびきOFFへのカウント
-	ApneaJudgeCnt_ = ApneaJudgeCnt;					// 無呼吸判定カウント
-	ApneaParamBinThre_ = ApneaParamBinThre;			// 2値化50%閾値
+	SnoreParamThre_			= SnoreParamThre;			// いびき閾値
+	SnoreParamNormalCnt_	= SnoreParamNormalCnt;		// いびきOFFへのカウント
+	ApneaJudgeCnt_			= ApneaJudgeCnt;			// 無呼吸判定カウント
+	ApneaParamBinThre_		= ApneaParamBinThre;		// 2値化50%閾値
+}
+
+DLLEXPORT void    __stdcall setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, int MinBreathThre, int DiameterCenter, int DiameterNext, double DiameterEnd)
+{
+	MaxEdgeThre_			= MaxEdgeThre;				// エッジ強調移動平均値の判定上限
+	MinSnoreThre_			= MinSnoreThre;				// いびき音の判定下限
+	MinBreathThre_			= MinBreathThre;			// 生の呼吸音の判定下限
+	DiameterCenter_			= DiameterCenter;			// エッジ強調移動平均の中心の倍率
+	DiameterNext_			= DiameterNext;				// エッジ強調移動平均の隣の倍率
+	DiameterEnd_			= DiameterEnd;				// エッジ強調移動平均の端の倍率
 }
 
 /************************************************************************/
@@ -154,11 +171,11 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 
 		if (ii >= N_half && ii < (len - N_half))
 		{
-			movave_[ii] += dc_[ii - 2] * DIAMETER_END;
-			movave_[ii] += dc_[ii - 1] * DIAMETER_NEXT;
-			movave_[ii] += dc_[ii] * DIAMETER_CENTER;
-			movave_[ii] += dc_[ii + 1] * DIAMETER_NEXT;
-			movave_[ii] += dc_[ii + 2] * DIAMETER_END;
+			movave_[ii] += dc_[ii - 2] * DiameterEnd_;
+			movave_[ii] += dc_[ii - 1] * DiameterNext_;
+			movave_[ii] += dc_[ii] * DiameterCenter_;
+			movave_[ii] += dc_[ii + 1] * DiameterNext_;
+			movave_[ii] += dc_[ii + 2] * DiameterEnd_;
 			movave_[ii] /= (double)N;
 		}
 	}
@@ -169,15 +186,15 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	{
 		if (i >= PREVIOUS_DATA_NUM && i < (len - PREVIOUS_DATA_NUM))
 		{
-			if (movave_[i] >= MAX_EDGE_THRESHOLD && raw_[i] <= MIN_SNORE_THRESHOLD)
+			if (movave_[i] >= MaxEdgeThre_ && raw_[i] <= MinSnoreThre_)
 			{// エッジ強調でAD値1000以上、いびき音のAD値100以下
 				for (j = 1; j <= PREVIOUS_DATA_NUM; j++)
 				{
-					if (pdata[i - j] < MIN_BREATH_THRESHOLD)
+					if (pdata[i - j] < MinBreathThre_)
 					{// 3個前(150ms)までに1つでも呼吸音のAD値が50未満
 						before_under = TRUE;
 					}
-					if (pdata[i + j] < MIN_BREATH_THRESHOLD)
+					if (pdata[i + j] < MinBreathThre_)
 					{// 3個後(150ms)までに1つでも呼吸音のAD値が50未満
 						after_under = TRUE;
 					}
