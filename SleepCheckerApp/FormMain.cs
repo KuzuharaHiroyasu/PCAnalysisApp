@@ -738,6 +738,8 @@ namespace SleepCheckerApp
             // 表示設定
             Series srs = chartRawData.Series["呼吸(移動平均)"];
             srs.Enabled = false;
+            srs = chartPhotoReflector.Series["フォトリフレクタ"];
+            srs.Enabled = false;
         }
 
         /************************************************************************/
@@ -1920,6 +1922,82 @@ namespace SleepCheckerApp
         {
             Series srs = chart1.Series["無呼吸(point)"];
             if (checkBox_apneapoint.Checked)
+            {
+                srs.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_acl_x_CheckedChanged     	        		    */
+        /* 機能     : X軸チェック時のイベント                                   */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_acl_x_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs = chartAccelerometer.Series["X軸"];
+            if (checkBox_acl_x.Checked)
+            {
+                srs.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_acl_y_CheckedChanged           	        		*/
+        /* 機能     : Y軸チェック時のイベント                                   */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_acl_y_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs = chartAccelerometer.Series["Y軸"];
+            if (checkBox_acl_y.Checked)
+            {
+                srs.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_acl_z_CheckedChanged         	        		*/
+        /* 機能     : Z軸チェック時のイベント                                   */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_acl_z_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs = chartAccelerometer.Series["Z軸"];
+            if (checkBox_acl_z.Checked)
+            {
+                srs.Enabled = true;
+            }
+            else
+            {
+                srs.Enabled = false;
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : checkBox_photo_CheckedChanged     	            		*/
+        /* 機能     : フォトリフレクタチェック時のイベント                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void checkBox_photo_CheckedChanged(object sender, EventArgs e)
+        {
+            Series srs = chartPhotoReflector.Series["フォトリフレクタ"];
+            if (checkBox_photo.Checked)
             {
                 srs.Enabled = true;
             }
