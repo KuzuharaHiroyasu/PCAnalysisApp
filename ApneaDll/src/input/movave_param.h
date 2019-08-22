@@ -17,7 +17,7 @@
 
 // ‚¢‚Ñ‚«‰¹‚Ì”»’è‰ºŒÀ
 //#define MIN_SNORE_THRESHOLD			100
-#define MIN_SNORE_THRESHOLD			210
+#define MIN_SNORE_THRESHOLD			280
 
 // ¶‚ÌŒÄ‹z‰¹‚Ì”»’è‰ºŒÀ
 //#define MIN_BREATH_THRESHOLD		50
