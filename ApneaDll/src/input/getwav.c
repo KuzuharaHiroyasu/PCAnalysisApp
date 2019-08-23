@@ -43,6 +43,7 @@ DLLEXPORT int	__stdcall get_result_apnea(double* data);
 DLLEXPORT int   __stdcall get_result_snore_count();
 DLLEXPORT void   __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath);
 DLLEXPORT void __stdcall get_photoreflector(double data, char* ppath);
+DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata);
 DLLEXPORT void __stdcall calc_snore_init(void);
 
 static int proc_on(int Pos);
@@ -765,6 +766,13 @@ DLLEXPORT void __stdcall get_photoreflector(double data, char* ppath)
 	debug_out("photoref", &data, 1, path_);
 }
 
+// 心拍除去データを取得する
+DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata)
+{
+	for (int ii = 0; ii < DATA_SIZE; ++ii) {
+		pdata[ii] = (double)dc_[ii];
+	}
+}
 /************************************************************/
 /* END OF TEXT												*/
 /************************************************************/
