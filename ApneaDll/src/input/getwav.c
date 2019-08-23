@@ -86,6 +86,7 @@ double	DiameterEnd_;			// エッジ強調移動平均の端の倍率
 // 演算途中データ
 double	raw_[DATA_SIZE];
 double	dc_[DATA_SIZE];
+double	dcHBR_[DATA_SIZE];
 double	movave_[DATA_SIZE];
 double	ave_[DATA_SIZE];
 double	eval_[DATA_SIZE];
@@ -162,6 +163,8 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	debug_out("raw", dc_, len, path_);
 	debug_out("rawsnore", raw_, len, path_);
 
+	memcpy_s(dcHBR_, sizeof(double) * DATA_SIZE, dc_, sizeof(double) * DATA_SIZE);
+
 	static const int N = APNEA_PARAM_AVE_NUM;
 	static int N_half;
 	N_half = N / 2;
@@ -203,11 +206,11 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 
 				if (before_under && after_under)
 				{
-					dc_[i] = 0;
+					dcHBR_[i] = 0;
 					for (j = 1; j <= PREVIOUS_DATA_NUM; j++)
 					{
-						dc_[i - j] = 0;
-						dc_[i + j] = 0;
+						dcHBR_[i - j] = 0;
+						dcHBR_[i + j] = 0;
 					}
 				}
 				before_under = FALSE;
@@ -215,18 +218,18 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			}
 		}
 	}
-	debug_out("raw_heartBeatRemov", dc_, len, path_);
+	debug_out("raw_heartBeatRemov", dcHBR_, len, path_);
 
 	// 除去後の呼吸音の移動平均
 	for (int ii = 0; ii < len; ++ii) {
 		movave_[ii] = 0;
 		if (ii >= N_half && ii < (len - N_half))
 		{
-			movave_[ii] += dc_[ii - 2];
-			movave_[ii] += dc_[ii - 1];
-			movave_[ii] += dc_[ii];
-			movave_[ii] += dc_[ii + 1];
-			movave_[ii] += dc_[ii + 2];
+			movave_[ii] += dcHBR_[ii - 2];
+			movave_[ii] += dcHBR_[ii - 1];
+			movave_[ii] += dcHBR_[ii];
+			movave_[ii] += dcHBR_[ii + 1];
+			movave_[ii] += dcHBR_[ii + 2];
 			movave_[ii] /= (double)N;
 			movave_[ii] /= APNEA_PARAM_RAW;	// 生データ補正
 		}
@@ -667,7 +670,7 @@ static void Reset(void)
 }
 
 // DC成分除去データを取得する
-DLLEXPORT void __stdcall getwav_dc(double* pdata)
+DLLEXPORT void __stdcall getwav_movave(double* pdata)
 {
 	for(int ii=0;ii<DATA_SIZE;++ii){
 		pdata[ii] = (double)movave_[ii];
@@ -768,6 +771,14 @@ DLLEXPORT void __stdcall get_photoreflector(double data, char* ppath)
 
 // 心拍除去データを取得する
 DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata)
+{
+	for (int ii = 0; ii < DATA_SIZE; ++ii) {
+		pdata[ii] = (double)dcHBR_[ii];
+	}
+}
+
+// 呼吸データを取得する
+DLLEXPORT void __stdcall getwav_dc(double* pdata)
 {
 	for (int ii = 0; ii < DATA_SIZE; ++ii) {
 		pdata[ii] = (double)dc_[ii];

@@ -27,7 +27,7 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
         [DllImport("Apnea.dll")]
-        static extern void getwav_dc(IntPtr data);
+        static extern void getwav_movave(IntPtr data);
         [DllImport("Apnea.dll")]
         static extern void get_apnea_ave(IntPtr data);
         [DllImport("Apnea.dll")]
@@ -48,6 +48,8 @@ namespace SleepCheckerApp
         static extern void get_photoreflector(double data, IntPtr ppath);
         [DllImport("Apnea.dll")]
         static extern void getwav_heartbeat_remov_dc(IntPtr data);
+        [DllImport("Apnea.dll")]
+        static extern void getwav_dc(IntPtr data);
         [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
 
@@ -97,7 +99,6 @@ namespace SleepCheckerApp
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
-        private const int CalcDataNumApneaHeartBeatRemov = CalcDataNumApnea;
 
         enum request
         {
@@ -134,8 +135,10 @@ namespace SleepCheckerApp
         Queue<double> ApneaPointQueue = new Queue<double>();
 
         // 心拍除去後の呼吸データ
-        private const int ApneaHeartBeatRemovGraphDataNum = CalcDataNumApneaHeartBeatRemov * 10 + 1;
         Queue<double> ApneaHeartBeatRemovQueue = new Queue<double>();
+
+        // 呼吸データ(プロット)
+        Queue<double> ApneaGraphPlotQueue = new Queue<double>();
 
         // 演算結果データ
         private const int BufNumApneaGraph = 11;            // 1分(10データ)分だけ表示する // 0点も打つので+1
@@ -721,17 +724,14 @@ namespace SleepCheckerApp
                 RawDataRespQueue.Enqueue(0);
                 RawDataSnoreQueue.Enqueue(0);
                 RawDataDcQueue.Enqueue(0);
+                ApneaHeartBeatRemovQueue.Enqueue(0);
+                ApneaGraphPlotQueue.Enqueue(0);
             }
 
             for (int i = 0; i < ApneaGraphCalculationDataNum; i++)
             {
                 ApneaRmsQueue.Enqueue(0);
                 ApneaPointQueue.Enqueue(0);
-            }
-
-            for (int i = 0; i < ApneaHeartBeatRemovGraphDataNum; i++)
-            {
-                ApneaHeartBeatRemovQueue.Enqueue(0);
             }
 
             for (int i = 0; i < BufNumApneaGraph; i++)
@@ -1418,7 +1418,7 @@ namespace SleepCheckerApp
                 lock (lockData)
                 {
                     // DC成分除去データをQueueに置く
-                    getwav_dc(pd);
+                    getwav_movave(pd);
                     Marshal.Copy(pd, arrayd, 0, num);
                     for (int ii = 0; ii < num; ++ii)
                     {
@@ -1444,10 +1444,19 @@ namespace SleepCheckerApp
                         ApneaPointQueue.Enqueue(arrayd[ii]);
                     }
 
+                    // 呼吸データをQueueに置く
+                    getwav_dc(pd);
+                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
+                    for (int ii = 0; ii < CalcDataNumApnea; ++ii)
+                    {
+                        ApneaGraphPlotQueue.Dequeue();
+                        ApneaGraphPlotQueue.Enqueue(arrayd[ii]);
+                    }
+
                     // 心拍除去後のデータをQueueに置く
                     getwav_heartbeat_remov_dc(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApneaHeartBeatRemov);
-                    for (int ii = 0; ii < CalcDataNumApneaHeartBeatRemov; ++ii)
+                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
+                    for (int ii = 0; ii < CalcDataNumApnea; ++ii)
                     {
                         ApneaHeartBeatRemovQueue.Dequeue();
                         ApneaHeartBeatRemovQueue.Enqueue(arrayd[ii]);
@@ -1660,6 +1669,16 @@ namespace SleepCheckerApp
                     cnt++;
                 }
 
+                // 呼吸データ(プロット)グラフを更新
+                Series srs_apnea_plot = chartApneaPlot.Series["呼吸生データ"];
+                srs_apnea_plot.Points.Clear();
+                cnt = 0;
+                foreach (double data in ApneaGraphPlotQueue)
+                {
+                    srs_apnea_plot.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+
                 // 心拍除去後の呼吸データグラフを更新
                 Series srs_apnea_heart_beat_remov = chartHeartBeatRemov.Series["心拍除去後呼吸"];
                 srs_apnea_heart_beat_remov.Points.Clear();
@@ -1675,6 +1694,7 @@ namespace SleepCheckerApp
             chartRawData.Invalidate();
             chart1.Invalidate();
             chartHeartBeatRemov.Invalidate();
+            chartApneaPlot.Invalidate();
         }
 
         /************************************************************************/

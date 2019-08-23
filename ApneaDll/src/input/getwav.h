@@ -58,7 +58,7 @@
 // 演算実行
 DLLEXPORT void __stdcall getwav_init(int* data, int len, char* ppath, int* psnore);
 // DC成分除去データ
-DLLEXPORT void __stdcall getwav_dc(double* pdata);
+DLLEXPORT void __stdcall getwav_movave(double* pdata);
 
 // 無呼吸演算
 DLLEXPORT void __stdcall get_apnea_ave(double* pdata);
@@ -72,6 +72,7 @@ DLLEXPORT void __stdcall get_snore_interval(double* pdata);
 DLLEXPORT int  __stdcall get_state(void);
 // 心拍除去後の呼吸データ
 DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata);
+DLLEXPORT void __stdcall getwav_dc(double* pdata);
 #endif
 
 /************************************************************/

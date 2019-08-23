@@ -58,6 +58,10 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.buttonStart = new System.Windows.Forms.Button();
             this.chartApnea = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartRawData = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -89,6 +93,7 @@
             this.button_vibstart = new System.Windows.Forms.Button();
             this.chartPhotoReflector = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartApneaPlot = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
@@ -100,6 +105,7 @@
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartPhotoReflector)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartApneaPlot)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -134,7 +140,7 @@
             legend1.Position.X = 80F;
             legend1.Position.Y = 12.98242F;
             this.chartApnea.Legends.Add(legend1);
-            this.chartApnea.Location = new System.Drawing.Point(12, 404);
+            this.chartApnea.Location = new System.Drawing.Point(676, 125);
             this.chartApnea.Name = "chartApnea";
             series1.BorderWidth = 3;
             series1.ChartArea = "ChartAreaTime";
@@ -147,7 +153,7 @@
             series2.Name = "いびき";
             this.chartApnea.Series.Add(series1);
             this.chartApnea.Series.Add(series2);
-            this.chartApnea.Size = new System.Drawing.Size(658, 193);
+            this.chartApnea.Size = new System.Drawing.Size(658, 187);
             this.chartApnea.TabIndex = 11;
             this.chartApnea.Text = "ステータス";
             title1.Name = "Title";
@@ -159,7 +165,6 @@
             chartArea2.AxisX.Interval = 200D;
             chartArea2.AxisX.Maximum = 2000D;
             chartArea2.AxisX.Minimum = 0D;
-            chartArea2.AxisX.Title = "データ数";
             chartArea2.AxisY.Maximum = 1024D;
             chartArea2.AxisY.Minimum = 0D;
             chartArea2.Name = "ChartAreaTime";
@@ -177,11 +182,9 @@
             this.chartRawData.Legends.Add(legend2);
             this.chartRawData.Location = new System.Drawing.Point(12, 6);
             this.chartRawData.Name = "chartRawData";
-            series3.BorderWidth = 2;
             series3.ChartArea = "ChartAreaTime";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series3.Legend = "Legend1";
-            series3.MarkerBorderWidth = 5;
             series3.Name = "呼吸(生データ)";
             series4.ChartArea = "ChartAreaTime";
             series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -194,7 +197,7 @@
             this.chartRawData.Series.Add(series3);
             this.chartRawData.Series.Add(series4);
             this.chartRawData.Series.Add(series5);
-            this.chartRawData.Size = new System.Drawing.Size(658, 193);
+            this.chartRawData.Size = new System.Drawing.Size(658, 187);
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "生データ(呼吸)";
             title2.Name = "Title";
@@ -206,7 +209,6 @@
             chartArea3.AxisX.Interval = 10D;
             chartArea3.AxisX.Maximum = 100D;
             chartArea3.AxisX.Minimum = 0D;
-            chartArea3.AxisX.Title = "データ数";
             chartArea3.AxisX2.Interval = 0.1D;
             chartArea3.AxisX2.Maximum = 0.5D;
             chartArea3.AxisX2.Minimum = 0D;
@@ -224,7 +226,7 @@
             legend3.Position.X = 80F;
             legend3.Position.Y = 12.98242F;
             this.chart1.Legends.Add(legend3);
-            this.chart1.Location = new System.Drawing.Point(676, 324);
+            this.chart1.Location = new System.Drawing.Point(12, 585);
             this.chart1.Name = "chart1";
             series6.ChartArea = "ChartAreaTime";
             series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -236,7 +238,7 @@
             series7.Name = "無呼吸(point)";
             this.chart1.Series.Add(series6);
             this.chart1.Series.Add(series7);
-            this.chart1.Size = new System.Drawing.Size(658, 193);
+            this.chart1.Size = new System.Drawing.Size(658, 187);
             this.chart1.TabIndex = 20;
             title3.Name = "Title";
             title3.Text = "演算途中データ";
@@ -247,7 +249,6 @@
             chartArea4.AxisX.Interval = 20D;
             chartArea4.AxisX.Maximum = 200D;
             chartArea4.AxisX.Minimum = 0D;
-            chartArea4.AxisX.Title = "データ数";
             chartArea4.AxisY.Maximum = 127D;
             chartArea4.AxisY.Minimum = -128D;
             chartArea4.Name = "ChartAreaTime";
@@ -264,7 +265,7 @@
             legend4.Position.X = 80F;
             legend4.Position.Y = 12.98242F;
             this.chartAccelerometer.Legends.Add(legend4);
-            this.chartAccelerometer.Location = new System.Drawing.Point(676, 125);
+            this.chartAccelerometer.Location = new System.Drawing.Point(676, 318);
             this.chartAccelerometer.Name = "chartAccelerometer";
             series8.BorderWidth = 2;
             series8.ChartArea = "ChartAreaTime";
@@ -287,7 +288,7 @@
             this.chartAccelerometer.Series.Add(series8);
             this.chartAccelerometer.Series.Add(series9);
             this.chartAccelerometer.Series.Add(series10);
-            this.chartAccelerometer.Size = new System.Drawing.Size(658, 193);
+            this.chartAccelerometer.Size = new System.Drawing.Size(658, 187);
             this.chartAccelerometer.TabIndex = 21;
             this.chartAccelerometer.Text = "加速度センサー";
             title4.Name = "Title";
@@ -579,7 +580,6 @@
             chartArea5.AxisX.Interval = 20D;
             chartArea5.AxisX.Maximum = 200D;
             chartArea5.AxisX.Minimum = 0D;
-            chartArea5.AxisX.Title = "データ数";
             chartArea5.AxisY.Maximum = 1024D;
             chartArea5.AxisY.Minimum = 0D;
             chartArea5.Name = "ChartAreaTime";
@@ -595,14 +595,14 @@
             legend5.Position.X = 80F;
             legend5.Position.Y = 12.98242F;
             this.chartPhotoReflector.Legends.Add(legend5);
-            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 523);
+            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 511);
             this.chartPhotoReflector.Name = "chartPhotoReflector";
             series11.ChartArea = "ChartAreaTime";
             series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series11.Legend = "Legend1";
             series11.Name = "フォトリフレクタ";
             this.chartPhotoReflector.Series.Add(series11);
-            this.chartPhotoReflector.Size = new System.Drawing.Size(658, 193);
+            this.chartPhotoReflector.Size = new System.Drawing.Size(658, 187);
             this.chartPhotoReflector.TabIndex = 27;
             this.chartPhotoReflector.Text = "フォトリフレクタ";
             title5.Name = "Title";
@@ -614,7 +614,6 @@
             chartArea6.AxisX.Interval = 200D;
             chartArea6.AxisX.Maximum = 2000D;
             chartArea6.AxisX.Minimum = 0D;
-            chartArea6.AxisX.Title = "データ数";
             chartArea6.AxisX2.Interval = 0.1D;
             chartArea6.AxisX2.Maximum = 0.5D;
             chartArea6.AxisX2.Minimum = 0D;
@@ -623,8 +622,7 @@
             chartArea6.Name = "ChartAreaTime";
             chartArea6.Position.Auto = false;
             chartArea6.Position.Height = 85F;
-            chartArea6.Position.Width = 79F;
-            chartArea6.Position.X = 0.7F;
+            chartArea6.Position.Width = 80F;
             chartArea6.Position.Y = 13F;
             this.chartHeartBeatRemov.ChartAreas.Add(chartArea6);
             legend6.Name = "Legend1";
@@ -634,25 +632,62 @@
             legend6.Position.X = 80F;
             legend6.Position.Y = 12.98242F;
             this.chartHeartBeatRemov.Legends.Add(legend6);
-            this.chartHeartBeatRemov.Location = new System.Drawing.Point(12, 205);
+            this.chartHeartBeatRemov.Location = new System.Drawing.Point(12, 392);
             this.chartHeartBeatRemov.Name = "chartHeartBeatRemov";
             series12.ChartArea = "ChartAreaTime";
             series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series12.Legend = "Legend1";
             series12.Name = "心拍除去後呼吸";
             this.chartHeartBeatRemov.Series.Add(series12);
-            this.chartHeartBeatRemov.Size = new System.Drawing.Size(658, 193);
+            this.chartHeartBeatRemov.Size = new System.Drawing.Size(658, 187);
             this.chartHeartBeatRemov.TabIndex = 28;
             title6.Name = "Title";
             title6.Text = "心拍除去後の呼吸波形";
             this.chartHeartBeatRemov.Titles.Add(title6);
+            // 
+            // chartApneaPlot
+            // 
+            chartArea7.AxisX.Interval = 200D;
+            chartArea7.AxisX.Maximum = 2000D;
+            chartArea7.AxisX.Minimum = 0D;
+            chartArea7.AxisX2.Interval = 0.1D;
+            chartArea7.AxisX2.Maximum = 0.5D;
+            chartArea7.AxisX2.Minimum = 0D;
+            chartArea7.AxisY.Maximum = 1024D;
+            chartArea7.AxisY.Minimum = 0D;
+            chartArea7.Name = "ChartAreaTime";
+            chartArea7.Position.Auto = false;
+            chartArea7.Position.Height = 85F;
+            chartArea7.Position.Width = 80F;
+            chartArea7.Position.Y = 13F;
+            this.chartApneaPlot.ChartAreas.Add(chartArea7);
+            legend7.Name = "Legend1";
+            legend7.Position.Auto = false;
+            legend7.Position.Height = 19.79167F;
+            legend7.Position.Width = 18.11263F;
+            legend7.Position.X = 80F;
+            legend7.Position.Y = 12.98242F;
+            this.chartApneaPlot.Legends.Add(legend7);
+            this.chartApneaPlot.Location = new System.Drawing.Point(12, 199);
+            this.chartApneaPlot.Name = "chartApneaPlot";
+            series13.ChartArea = "ChartAreaTime";
+            series13.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series13.Legend = "Legend1";
+            series13.Name = "呼吸生データ";
+            this.chartApneaPlot.Series.Add(series13);
+            this.chartApneaPlot.Size = new System.Drawing.Size(658, 187);
+            this.chartApneaPlot.TabIndex = 29;
+            title7.Name = "Title";
+            title7.Text = "呼吸生データプロット";
+            this.chartApneaPlot.Titles.Add(title7);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1340, 722);
+            this.ClientSize = new System.Drawing.Size(1345, 779);
+            this.Controls.Add(this.chartApneaPlot);
             this.Controls.Add(this.chartHeartBeatRemov);
             this.Controls.Add(this.chartPhotoReflector);
             this.Controls.Add(this.groupBox5);
@@ -683,6 +718,7 @@
             this.groupBox5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartPhotoReflector)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartApneaPlot)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -720,6 +756,7 @@
         private System.Windows.Forms.CheckBox checkBox_acl_z;
         private System.Windows.Forms.CheckBox checkBox_acl_y;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartHeartBeatRemov;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartApneaPlot;
     }
 }
 
