@@ -1838,7 +1838,7 @@ namespace SleepCheckerApp
             if (buttonStart.Text == "開始")
             {
                 com.PortName = comboBoxComport.Text;
-                com.BaudRate = 76800;
+                com.BaudRate = 19200;
                 com.Parity = Parity.Even;
                 com.DataBits = 8;
                 com.StopBits = StopBits.One;
