@@ -784,6 +784,15 @@ DLLEXPORT void __stdcall getwav_dc(double* pdata)
 		pdata[ii] = (double)dc_[ii];
 	}
 }
+
+DLLEXPORT void __stdcall set_g1d_judge_ret(int snore_g1d, int apnea_g1d)
+{
+	double snore_g1d_ = (double)snore_g1d;
+	double apnea_g1d_ = (double)apnea_g1d;
+
+	debug_out("snore_g1d", &snore_g1d_, 1, path_);
+	debug_out("apnea_g1d", &apnea_g1d_, 1, path_);
+}
 /************************************************************/
 /* END OF TEXT												*/
 /************************************************************/

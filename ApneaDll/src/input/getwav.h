@@ -73,6 +73,7 @@ DLLEXPORT int  __stdcall get_state(void);
 // 心拍除去後の呼吸データ
 DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata);
 DLLEXPORT void __stdcall getwav_dc(double* pdata);
+DLLEXPORT void __stdcall set_g1d_judge_ret(int snore_g1d, int apnea_g1d);
 #endif
 
 /************************************************************/

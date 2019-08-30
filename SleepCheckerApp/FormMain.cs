@@ -51,6 +51,8 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void getwav_dc(IntPtr data);
         [DllImport("Apnea.dll")]
+        static extern void set_g1d_judge_ret(int snore_g1d, int apnea_g1d);
+        [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
 
         // For PulseOximeter
@@ -145,9 +147,14 @@ namespace SleepCheckerApp
         Queue<double> ApneaQueue = new Queue<double>();
         Queue<double> ResultIbikiQueue = new Queue<double>();
 
+        // G1Dでの判定結果データ
+        Queue<double> ResultG1DApneaQueue = new Queue<double>();
+        Queue<double> ResultG1DSnoreQueue = new Queue<double>();
+
         object lockData = new object();
         object lockData_Acce = new object();
         object lockData_PhotoRef = new object();
+        object lockData_g1d = new object();
 
         // For PulseOximeter
         private List<int> SpO2_CalcDataList1 = new List<int>();
@@ -206,6 +213,9 @@ namespace SleepCheckerApp
 
         public int snore = 0;
         public int apnea = 0;
+
+        public int g1d_snore = 0;
+        public int g1d_apnea = 0;
 
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
@@ -570,7 +580,7 @@ namespace SleepCheckerApp
             GetPrivateProfileString(
                 "SNORE",
                 "THRESHOLD",
-                "350",            // 値が取得できなかった場合に返される初期値
+                "245",            // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
                 filePath);
@@ -590,7 +600,7 @@ namespace SleepCheckerApp
             GetPrivateProfileString(
                 "APNEA",
                 "APNEA_JUDGE_CNT",
-                "2",            // 値が取得できなかった場合に返される初期値
+                "1",            // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
                 filePath);
@@ -718,6 +728,8 @@ namespace SleepCheckerApp
             PhotoRefQueue.Clear();
             ApneaQueue.Clear();
             ResultIbikiQueue.Clear();
+            ResultG1DApneaQueue.Clear();
+            ResultG1DSnoreQueue.Clear();
 
             for (int i = 0; i < ApneaGraphDataNum; i++)
             {
@@ -738,6 +750,8 @@ namespace SleepCheckerApp
             {
                 ApneaQueue.Enqueue(0);
                 ResultIbikiQueue.Enqueue(0);
+                ResultG1DApneaQueue.Enqueue(0);
+                ResultG1DSnoreQueue.Enqueue(0);
             }
 
             for (int i = 0; i < AcceAndPhotoRef_RawDataRirekiNum; i++)
@@ -927,7 +941,7 @@ namespace SleepCheckerApp
 
                     //異常値チェック
                     string[] datas = lines[i].Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 6)
+                    if (datas.Length == 4)
                     {
                         //測定データ表示
                         //SetTextInput(lines[i] + "\r\n");
@@ -935,31 +949,25 @@ namespace SleepCheckerApp
                         int result;
                         if (!int.TryParse(datas[0], out result)) continue;      // マイク(呼吸)
                         if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
-                        if (!int.TryParse(datas[2], out result)) continue;      // 加速度センサ(X)
-                        if (!int.TryParse(datas[3], out result)) continue;      // 加速度センサ(Y)
-                        if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(Z)
-                        if (!int.TryParse(datas[5], out result)) continue;      // フォトセンサ
+                        if (!int.TryParse(datas[2], out result)) continue;      // いびき判定結果
+                        if (!int.TryParse(datas[3], out result)) continue;      // 無呼吸判定結果
 
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
-                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99 && Convert.ToInt32(datas[5]) == 0)
+                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99)
                         {
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
                             //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
-                        } else
+                        }
+                        else
                         {
-                            // For 加速度
-                            SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
-                            //Console.WriteLine("[DataReceived] X軸:" + Convert.ToInt32(datas[2]) + " Y軸:" + Convert.ToInt32(datas[3]) + " Z軸:" + Convert.ToInt32(datas[4]));
-                            // For フォトリフレクタ
-                            SetCalcData_PhotoRef(Convert.ToInt32(datas[5]));
-                            //Console.WriteLine("[DataReceived] フォトリフレクタ:" + Convert.ToInt32(datas[5]));
-                            Acce_PhotoRefCalcCount_++;
+                            SetJudgeResult(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
                         }
                     }
                     else
                     {
+                        log_output("受信異常データ演算破棄(" + lines[i] + " i: " + i + " / " + lines.Length + ")");
                         Console.WriteLine("受信異常データ演算破棄(" + lines[i] + " i:" + i + "/" + lines.Length + ")");
                     }
                 }
@@ -1392,6 +1400,32 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
+        /* 関数名   : SetJudgeResult               			                   	*/
+        /* 機能     : 判定結果のデータをセット                                  */
+        /* 引数     : [int] data1 - いびきの判定結果                            */
+        /*          : [int] data2 - 無呼吸の判定結果                            */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void SetJudgeResult(int data1, int data2)
+        {
+            lock (lockData_g1d)
+            {
+                if (ResultG1DSnoreQueue.Count >= BufNumApneaGraph)
+                {
+                    ResultG1DSnoreQueue.Dequeue();
+                }
+                ResultG1DSnoreQueue.Enqueue(data1);
+                if (ResultG1DApneaQueue.Count >= BufNumApneaGraph)
+                {
+                    ResultG1DApneaQueue.Dequeue();
+                }
+                ResultG1DApneaQueue.Enqueue(data2);
+                g1d_snore = data1;
+                g1d_apnea = data2;
+            }
+        }
+
+        /************************************************************************/
         /* 関数名   : Calc_Apnea                    			    			*/
         /* 機能     : 呼吸データの演算                                          */
         /* 引数     : なし                                                      */
@@ -1476,6 +1510,7 @@ namespace SleepCheckerApp
                         ApneaQueue.Dequeue();
                     }
                     ApneaQueue.Enqueue(apnea);
+                    set_g1d_judge_ret(g1d_snore, g1d_apnea);
 
                     // アラーム鳴動
                     alarm.confirmAlarm();
@@ -1688,6 +1723,25 @@ namespace SleepCheckerApp
                     srs_apnea_heart_beat_remov.Points.AddXY(cnt, data);
                     cnt++;
                 }
+
+                // G1D判定結果グラフの更新
+                //chartG1DJudgeResult
+                Series srs_g1d_apnea_judge_result = chartG1DJudgeResult.Series["呼吸状態"];
+                Series srs_g1d_snore_judge_result = chartG1DJudgeResult.Series["いびき"];
+                srs_g1d_apnea_judge_result.Points.Clear();
+                srs_g1d_snore_judge_result.Points.Clear();
+                cnt = 0;
+                foreach (double data in ResultG1DSnoreQueue)
+                {
+                    srs_g1d_snore_judge_result.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in ResultG1DApneaQueue)
+                {
+                    srs_g1d_apnea_judge_result.Points.AddXY(cnt, data);
+                    cnt++;
+                }
             }
             // 更新実行
             chartApnea.Invalidate();
@@ -1695,6 +1749,7 @@ namespace SleepCheckerApp
             chart1.Invalidate();
             chartHeartBeatRemov.Invalidate();
             chartApneaPlot.Invalidate();
+            chartG1DJudgeResult.Invalidate();
         }
 
         /************************************************************************/

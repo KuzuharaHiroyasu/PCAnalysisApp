@@ -62,6 +62,11 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series14 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.buttonStart = new System.Windows.Forms.Button();
             this.chartApnea = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartRawData = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -94,6 +99,7 @@
             this.chartPhotoReflector = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartApneaPlot = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartG1DJudgeResult = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
@@ -106,6 +112,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.chartPhotoReflector)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApneaPlot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartG1DJudgeResult)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -265,7 +272,7 @@
             legend4.Position.X = 80F;
             legend4.Position.Y = 12.98242F;
             this.chartAccelerometer.Legends.Add(legend4);
-            this.chartAccelerometer.Location = new System.Drawing.Point(676, 318);
+            this.chartAccelerometer.Location = new System.Drawing.Point(676, 511);
             this.chartAccelerometer.Name = "chartAccelerometer";
             series8.BorderWidth = 2;
             series8.ChartArea = "ChartAreaTime";
@@ -595,7 +602,7 @@
             legend5.Position.X = 80F;
             legend5.Position.Y = 12.98242F;
             this.chartPhotoReflector.Legends.Add(legend5);
-            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 511);
+            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 704);
             this.chartPhotoReflector.Name = "chartPhotoReflector";
             series11.ChartArea = "ChartAreaTime";
             series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -681,12 +688,55 @@
             title7.Text = "呼吸生データプロット";
             this.chartApneaPlot.Titles.Add(title7);
             // 
+            // chartG1DJudgeResult
+            // 
+            chartArea8.AxisX.Interval = 1D;
+            chartArea8.AxisX.Maximum = 10D;
+            chartArea8.AxisX.Minimum = 0D;
+            chartArea8.AxisY.Interval = 1D;
+            chartArea8.AxisY.Maximum = 3D;
+            chartArea8.AxisY.Minimum = 0D;
+            chartArea8.Name = "ChartAreaTime";
+            chartArea8.Position.Auto = false;
+            chartArea8.Position.Height = 85F;
+            chartArea8.Position.Width = 75F;
+            chartArea8.Position.X = 4F;
+            chartArea8.Position.Y = 13F;
+            this.chartG1DJudgeResult.ChartAreas.Add(chartArea8);
+            legend8.Name = "Legend1";
+            legend8.Position.Auto = false;
+            legend8.Position.Height = 19.79167F;
+            legend8.Position.Width = 15.06849F;
+            legend8.Position.X = 80F;
+            legend8.Position.Y = 12.98242F;
+            this.chartG1DJudgeResult.Legends.Add(legend8);
+            this.chartG1DJudgeResult.Location = new System.Drawing.Point(676, 318);
+            this.chartG1DJudgeResult.Name = "chartG1DJudgeResult";
+            series14.BorderWidth = 3;
+            series14.ChartArea = "ChartAreaTime";
+            series14.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series14.Legend = "Legend1";
+            series14.Name = "呼吸状態";
+            series15.ChartArea = "ChartAreaTime";
+            series15.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series15.Legend = "Legend1";
+            series15.Name = "いびき";
+            this.chartG1DJudgeResult.Series.Add(series14);
+            this.chartG1DJudgeResult.Series.Add(series15);
+            this.chartG1DJudgeResult.Size = new System.Drawing.Size(658, 187);
+            this.chartG1DJudgeResult.TabIndex = 30;
+            this.chartG1DJudgeResult.Text = "ステータス";
+            title8.Name = "Title";
+            title8.Text = "G1D判定結果";
+            this.chartG1DJudgeResult.Titles.Add(title8);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1345, 779);
+            this.ClientSize = new System.Drawing.Size(1342, 901);
+            this.Controls.Add(this.chartG1DJudgeResult);
             this.Controls.Add(this.chartApneaPlot);
             this.Controls.Add(this.chartHeartBeatRemov);
             this.Controls.Add(this.chartPhotoReflector);
@@ -719,6 +769,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.chartPhotoReflector)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartApneaPlot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartG1DJudgeResult)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -757,6 +808,7 @@
         private System.Windows.Forms.CheckBox checkBox_acl_y;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartHeartBeatRemov;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartApneaPlot;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartG1DJudgeResult;
     }
 }
 
