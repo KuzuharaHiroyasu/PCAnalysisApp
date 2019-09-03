@@ -936,6 +936,7 @@ namespace SleepCheckerApp
                     //空行チェック
                     if (lines[i].Length == 0)
                     {
+                        log_output("受信異常データ 空行");
                         continue;
                     }
 
@@ -975,6 +976,7 @@ namespace SleepCheckerApp
             }
             catch (Exception ex)
             {
+                log_output("[例外] " + ex.Message + " text:" + text);
                 //■例外多発
                 //MessageBox.Show(ex.Message, "内部エラー(ComPort_DataReceived)");
                 Console.WriteLine(ex.Message + "text:" + text);
