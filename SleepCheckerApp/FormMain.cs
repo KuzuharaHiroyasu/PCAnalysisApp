@@ -922,17 +922,14 @@ namespace SleepCheckerApp
         {
             string text = "";
 
-            //Console.WriteLine("ComPort_DataReceived");
             try
             {
                 text = amari + Encoding.ASCII.GetString(buffer);
                 amari = "";
-                //string[] lines = text.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 string[] lines = text.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                //for (int i = 0; i < lines.Length; i++)
-//                Console.WriteLine("[Data]:" + text);
                 for (int i = 0; i < lines.Length - 1; i++)  // 最後のデータは切れている可能性があるので、次のデータと結合して処理する
                 {
+//                    log_output("受信データ(" + lines[i] + " i: " + i + " / " + lines.Length + ")");
                     //空行チェック
                     if (lines[i].Length == 0)
                     {
@@ -945,7 +942,6 @@ namespace SleepCheckerApp
                     if (datas.Length == 4)
                     {
                         //測定データ表示
-                        //SetTextInput(lines[i] + "\r\n");
                         //演算
                         int result;
                         if (!int.TryParse(datas[0], out result)) continue;      // マイク(呼吸)
