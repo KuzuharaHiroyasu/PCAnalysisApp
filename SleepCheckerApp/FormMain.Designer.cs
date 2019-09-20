@@ -272,7 +272,7 @@
             legend4.Position.X = 80F;
             legend4.Position.Y = 12.98242F;
             this.chartAccelerometer.Legends.Add(legend4);
-            this.chartAccelerometer.Location = new System.Drawing.Point(676, 511);
+            this.chartAccelerometer.Location = new System.Drawing.Point(676, 704);
             this.chartAccelerometer.Name = "chartAccelerometer";
             series8.BorderWidth = 2;
             series8.ChartArea = "ChartAreaTime";
@@ -323,6 +323,8 @@
             // checkBox_photo
             // 
             this.checkBox_photo.AutoSize = true;
+            this.checkBox_photo.Checked = true;
+            this.checkBox_photo.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_photo.Location = new System.Drawing.Point(215, 41);
             this.checkBox_photo.Name = "checkBox_photo";
             this.checkBox_photo.Size = new System.Drawing.Size(88, 16);
@@ -334,8 +336,6 @@
             // checkBox_acl_z
             // 
             this.checkBox_acl_z.AutoSize = true;
-            this.checkBox_acl_z.Checked = true;
-            this.checkBox_acl_z.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_acl_z.Location = new System.Drawing.Point(215, 66);
             this.checkBox_acl_z.Name = "checkBox_acl_z";
             this.checkBox_acl_z.Size = new System.Drawing.Size(43, 16);
@@ -347,8 +347,6 @@
             // checkBox_acl_y
             // 
             this.checkBox_acl_y.AutoSize = true;
-            this.checkBox_acl_y.Checked = true;
-            this.checkBox_acl_y.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_acl_y.Location = new System.Drawing.Point(108, 66);
             this.checkBox_acl_y.Name = "checkBox_acl_y";
             this.checkBox_acl_y.Size = new System.Drawing.Size(43, 16);
@@ -360,8 +358,6 @@
             // checkBox_acl_x
             // 
             this.checkBox_acl_x.AutoSize = true;
-            this.checkBox_acl_x.Checked = true;
-            this.checkBox_acl_x.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_acl_x.Location = new System.Drawing.Point(6, 66);
             this.checkBox_acl_x.Name = "checkBox_acl_x";
             this.checkBox_acl_x.Size = new System.Drawing.Size(43, 16);
@@ -602,7 +598,7 @@
             legend5.Position.X = 80F;
             legend5.Position.Y = 12.98242F;
             this.chartPhotoReflector.Legends.Add(legend5);
-            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 704);
+            this.chartPhotoReflector.Location = new System.Drawing.Point(676, 511);
             this.chartPhotoReflector.Name = "chartPhotoReflector";
             series11.ChartArea = "ChartAreaTime";
             series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;

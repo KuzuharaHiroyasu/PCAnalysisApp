@@ -765,8 +765,6 @@ namespace SleepCheckerApp
             // 表示設定
             Series srs = chartRawData.Series["呼吸(移動平均)"];
             srs.Enabled = false;
-            srs = chartPhotoReflector.Series["フォトリフレクタ"];
-            srs.Enabled = false;
         }
 
         /************************************************************************/
@@ -939,7 +937,7 @@ namespace SleepCheckerApp
 
                     //異常値チェック
                     string[] datas = lines[i].Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 4)
+                    if (datas.Length == 5)
                     {
                         //測定データ表示
                         //演算
@@ -948,8 +946,10 @@ namespace SleepCheckerApp
                         if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
                         if (!int.TryParse(datas[2], out result)) continue;      // いびき判定結果
                         if (!int.TryParse(datas[3], out result)) continue;      // 無呼吸判定結果
+                        if (!int.TryParse(datas[4], out result)) continue;      // フォトリフレクタ
 
                         // For Apnea
+                        Console.WriteLine("呼吸：" + Convert.ToInt32(datas[0]) + " いびき：" + Convert.ToInt32(datas[1]));
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
                         if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99)
@@ -960,6 +960,11 @@ namespace SleepCheckerApp
                         else
                         {
                             SetJudgeResult(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
+                        }
+
+                        if (Convert.ToInt32(datas[4]) != 65535)
+                        {
+                            SetCalcData_PhotoRef(Convert.ToInt32(datas[4]));
                         }
                     }
                     else
