@@ -964,6 +964,7 @@ namespace SleepCheckerApp
                         if (Convert.ToInt32(datas[4]) != 2000)
                         {
                             SetCalcData_PhotoRef(Convert.ToInt32(datas[4]));
+                            Acce_PhotoRefCalcCount_++;
                         }
                     }
                     else
