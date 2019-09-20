@@ -949,7 +949,6 @@ namespace SleepCheckerApp
                         if (!int.TryParse(datas[4], out result)) continue;      // フォトリフレクタ
 
                         // For Apnea
-                        Console.WriteLine("呼吸：" + Convert.ToInt32(datas[0]) + " いびき：" + Convert.ToInt32(datas[1]));
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
                         if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99)
@@ -962,7 +961,7 @@ namespace SleepCheckerApp
                             SetJudgeResult(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
                         }
 
-                        if (Convert.ToInt32(datas[4]) != 65535)
+                        if (Convert.ToInt32(datas[4]) != 2000)
                         {
                             SetCalcData_PhotoRef(Convert.ToInt32(datas[4]));
                         }
