@@ -32,6 +32,8 @@
 #define APNEA_ERROR		2	// 完全無呼吸
 #define APNEA_NONE		3	// 判定エラー
 
+#define APNEA_CONT_POINT	10	// APNEA_PARAM_BIN_THREを超えていない連続データ数
+
 // いびき判定結果
 #define SNORE_OFF		0	// いびきなし
 #define SNORE_ON		1	// いびきあり
@@ -46,7 +48,7 @@
 // 許容誤差 0.4s
 #define SNORE_PARAM_GOSA				(8)
 // 無呼吸判定カウント
-#define APNEA_JUDGE_CNT					(2)
+#define APNEA_JUDGE_CNT					(0)
 
 /************************************************************/
 /* 型定義													*/
