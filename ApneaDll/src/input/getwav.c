@@ -104,6 +104,8 @@ static int	SnoreCnt_; // ON˜A‘±‰ñ”, OFF˜A‘±‰ñ” Œ“—p
 
 int temp_int_buf0[BUF_SIZE];
 
+int cont_apnea_point = 0;
+
 /************************************************************/
 /* ‚q‚n‚l’è‹`												*/
 /************************************************************/
@@ -411,6 +413,9 @@ void getwav_apnea(const double* pData, int DSize, double Param3, double Param4)
 	// (42)
 	// (43) = prms
 	int datasize = DSize / 20;
+
+	apnea_ = APNEA_NORMAL;
+
 	memset(rms_, 0x00, DSize);
 	for(int ii=0;ii<datasize;++ii){
 		rms_[ii] = 0.0f;
@@ -429,35 +434,47 @@ void getwav_apnea(const double* pData, int DSize, double Param3, double Param4)
 	for(int ii=0;ii<datasize;++ii){
 		if(rms_[ii] >= Param3){
 			point_[ii] = 1;
+			cont_apnea_point = 0;
 		}else{
 			point_[ii] = 0;
+			cont_apnea_point++;
+			if (cont_apnea_point >= APNEA_CONT_POINT)
+			{
+				apnea_ = APNEA_ERROR;
+				cont_apnea_point = 0;
+			}
 		}
 	}
 	debug_out("point", point_, datasize, path_);
 	
 	// (46)
-	if(datasize == 0){
-		// Œ»ó’Ê‚ç‚È‚¢
-		apnea_ = APNEA_NORMAL;
-	}
-	else if(datasize > 9){
-		apnea_ = APNEA_ERROR;
-		int loop = datasize - 9;
-		for(int ii=0;ii<loop;++ii){
-			double apnea = 0;
-			for (int jj = 0; jj < datasize; ++jj) {
-				apnea += point_[ii + jj];
-				if (ApneaJudgeCnt_ < apnea) {
-					apnea_ = APNEA_NORMAL;
-					break;
+	if (apnea_ != APNEA_ERROR)
+	{
+		if (datasize == 0) {
+			// Œ»ó’Ê‚ç‚È‚¢
+			apnea_ = APNEA_NORMAL;
+		}
+		else if (datasize > 9) {
+			apnea_ = APNEA_ERROR;
+			int loop = datasize - 9;
+			for (int ii = 0; ii < loop; ++ii) {
+				double apnea = 0;
+				for (int jj = 0; jj < datasize; ++jj) {
+					apnea += point_[ii + jj];
+					if (ApneaJudgeCnt_ < apnea) {
+						apnea_ = APNEA_NORMAL;
+						break;
+					}
 				}
 			}
 		}
-	}else{
-		// Œ»ó’Ê‚ç‚È‚¢
-		apnea_ = APNEA_NORMAL;
+		else {
+			// Œ»ó’Ê‚ç‚È‚¢
+			apnea_ = APNEA_NORMAL;
+		}
 	}
 
+/*
 	//’áŒÄ‹z‚à–³ŒÄ‹z‚Æ”»’è‚·‚é‚½‚ß ¦Œ»ó’Ê‚ç‚È‚¢
 	// Š®‘S–³ŒÄ‹z‚Ì”»’è
 	if(apnea_ == APNEA_WARN){
@@ -469,7 +486,7 @@ void getwav_apnea(const double* pData, int DSize, double Param3, double Param4)
 			}
 		}
 	}
-	
+*/	
 	double tmpapnea = (double)apnea_;
 	debug_out("apnea", &tmpapnea, 1, path_);
 }
