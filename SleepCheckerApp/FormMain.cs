@@ -600,7 +600,7 @@ namespace SleepCheckerApp
             GetPrivateProfileString(
                 "APNEA",
                 "APNEA_JUDGE_CNT",
-                "1",            // 値が取得できなかった場合に返される初期値
+                "0",            // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
                 filePath);
