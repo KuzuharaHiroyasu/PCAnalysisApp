@@ -570,7 +570,7 @@ namespace SleepCheckerApp
             GetPrivateProfileString(
                 "SNORE",
                 "THRESHOLD",
-                "350",            // 値が取得できなかった場合に返される初期値
+                "245",            // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
                 filePath);
@@ -590,7 +590,7 @@ namespace SleepCheckerApp
             GetPrivateProfileString(
                 "APNEA",
                 "APNEA_JUDGE_CNT",
-                "2",            // 値が取得できなかった場合に返される初期値
+                "0",            // 値が取得できなかった場合に返される初期値
                 sb,
                 Convert.ToUInt32(sb.Capacity),
                 filePath);
