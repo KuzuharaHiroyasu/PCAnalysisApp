@@ -94,6 +94,7 @@
             this.chartPhotoReflector = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartApneaPlot = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.button_send = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
@@ -535,6 +536,7 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.button_send);
             this.groupBox5.Controls.Add(this.checkBox_vib_apnea);
             this.groupBox5.Controls.Add(this.checkBox_vib_snore);
             this.groupBox5.Controls.Add(this.button_vibstart);
@@ -681,6 +683,16 @@
             title7.Text = "呼吸生データプロット";
             this.chartApneaPlot.Titles.Add(title7);
             // 
+            // button_send
+            // 
+            this.button_send.Location = new System.Drawing.Point(17, 87);
+            this.button_send.Name = "button_send";
+            this.button_send.Size = new System.Drawing.Size(90, 20);
+            this.button_send.TabIndex = 5;
+            this.button_send.Text = "コマンド送信";
+            this.button_send.UseVisualStyleBackColor = true;
+            this.button_send.Click += new System.EventHandler(this.button_send_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -757,6 +769,7 @@
         private System.Windows.Forms.CheckBox checkBox_acl_y;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartHeartBeatRemov;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartApneaPlot;
+        private System.Windows.Forms.Button button_send;
     }
 }
 

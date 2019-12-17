@@ -2116,5 +2116,21 @@ namespace SleepCheckerApp
         {
             panda.requestLattepanda((byte)request.VIBRATION);
         }
+
+        /************************************************************************/
+        /* 関数名   : button_send_Click              		    		        */
+        /* 機能     : こまんど送信ボタンクリック時のイベント                    */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void button_send_Click(object sender, EventArgs e)
+        {
+            byte[] param = new byte[1];
+            byte pattern = 4;
+
+            param[0] = pattern;
+
+            com.WriteData(param);
+        }
     }
 }
