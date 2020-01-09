@@ -92,7 +92,6 @@ namespace SleepCheckerApp
 
         private ComPort com = null;
         private SoundRecord record = null;
-        private SoundAlarm alarm = null;
         private LattePanda panda = null;
         private Vibration vib = null;
 
@@ -254,9 +253,6 @@ namespace SleepCheckerApp
             // グラフ初期設定
             initGraphShow();
 
-            // アラーム音初期設定
-            initAlarm();
-
             // COMポート取得
             string[] ports = com.GetPortNames();
             foreach (string port in ports)
@@ -360,12 +356,10 @@ namespace SleepCheckerApp
         {
             com = new ComPort();
             record = new SoundRecord();
-            alarm = new SoundAlarm();
             panda = new LattePanda();
             vib = new Vibration();
 
             record.form = this;
-            alarm.form = this;
             vib.form = this;
             vib.panda = panda;
         }
@@ -499,40 +493,6 @@ namespace SleepCheckerApp
             else
             {
                 checkBox_vib_apnea.Checked = false;
-            }
-
-            // iniファイルからいびきのアラーム設定を取得
-            GetPrivateProfileString(
-                "ALARM",
-                "SNORE",
-                "OFF",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                checkBox_alarm_snore.Checked = true;
-            }
-            else
-            {
-                checkBox_alarm_snore.Checked = false;
-            }
-
-            // iniファイルから無呼吸のアラーム設定を取得
-            GetPrivateProfileString(
-                "ALARM",
-                "APNEA",
-                "OFF",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                checkBox_alarm_apnea.Checked = true;
-            }
-            else
-            {
-                checkBox_alarm_apnea.Checked = false;
             }
 
             // iniファイルから画面表示設定を取得
@@ -749,44 +709,8 @@ namespace SleepCheckerApp
             }
 
             // 表示設定
-            Series srs = chartRawData.Series["呼吸(移動平均)"];
+            Series srs = chartPhotoReflector.Series["フォトリフレクタ"];
             srs.Enabled = false;
-            srs = chartPhotoReflector.Series["フォトリフレクタ"];
-            srs.Enabled = false;
-        }
-
-        /************************************************************************/
-        /* 関数名   : initAlarm                       			    			*/
-        /* 機能     : アラーム設定の初期処理       	                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void initAlarm()
-        {
-            // アラーム音取得
-            StringBuilder sb = new StringBuilder(1024);
-            string[] alarmFilesPath = System.IO.Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.wav", System.IO.SearchOption.TopDirectoryOnly);
-            string filePath = AppDomain.CurrentDomain.BaseDirectory + iniFileName;
-            string alarmFile;
-
-            foreach (string alarmFilePath in alarmFilesPath)
-            {
-                alarmFile = Path.GetFileName(alarmFilePath);
-                comboBoxAlarm.Items.Add(alarmFile);
-            }
-            // iniファイルからいびきの閾値を取得
-            GetPrivateProfileString(
-                "ALARM",
-                "FILE_NAME",
-                alarmFilesPath[0],   // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            alarmFile = Path.GetFileName(sb.ToString());
-
-            alarm.setInitAlarm(alarmFile);
-            comboBoxAlarm.SelectedItem = alarm.getAlarmFile();
-            log_output("AlarmFile:" + alarm.getAlarmFile());
         }
 
         /************************************************************************/
@@ -1477,9 +1401,6 @@ namespace SleepCheckerApp
                     }
                     ApneaQueue.Enqueue(apnea);
 
-                    // アラーム鳴動
-                    alarm.confirmAlarm();
-
                     // バイブレーション
                     vib.confirmVib((byte)request.VIBRATION);
                 }
@@ -1609,7 +1530,7 @@ namespace SleepCheckerApp
             lock (lockData)
             {
                 // いびき、呼吸状態グラフを更新
-                Series srs_apnea = chartApnea.Series["呼吸状態"]; //■
+                Series srs_apnea = chartApnea.Series["無呼吸"]; //■
                 Series srs_snore = chartApnea.Series["いびき"]; //■
                 srs_apnea.Points.Clear();
                 srs_snore.Points.Clear();
@@ -1626,12 +1547,10 @@ namespace SleepCheckerApp
                 }
 
                 // 生データグラフを更新
-                Series srs_rawresp = chartRawData.Series["呼吸(生データ)"]; //■
-                Series srs_rawsnore = chartRawData.Series["いびき(生データ)"]; //■
-                Series srs_dcresp = chartRawData.Series["呼吸(移動平均)"]; //■
+                Series srs_rawresp = chartRawData.Series["呼吸音"]; //■
+                Series srs_rawsnore = chartRawData.Series["いびき音"]; //■
                 srs_rawresp.Points.Clear();
                 srs_rawsnore.Points.Clear();
-                srs_dcresp.Points.Clear();
                 cnt = 0;
                 foreach (double data in RawDataRespQueue)
                 {
@@ -1642,12 +1561,6 @@ namespace SleepCheckerApp
                 foreach (double data in RawDataSnoreQueue)
                 {
                     srs_rawsnore.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in RawDataDcQueue)
-                {
-                    srs_dcresp.Points.AddXY(cnt, data);
                     cnt++;
                 }
                 
@@ -2060,51 +1973,6 @@ namespace SleepCheckerApp
             }
         }
 
-/* アラーム */
-        /************************************************************************/
-        /* 関数名   : checkBox_snore_CheckedChanged          		    		*/
-        /* 機能     : いびきチェック時のイベント                                */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_snore_CheckedChanged(object sender, EventArgs e)
-        {
-            alarm.snoreCheckedChanged();
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_Apnea_CheckedChanged          		    		*/
-        /* 機能     : 無呼吸チェック時のイベント                                */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_Apnea_CheckedChanged(object sender, EventArgs e)
-        {
-            alarm.apneaCheckedChanged();
-        }
-
-        /************************************************************************/
-        /* 関数名   : comboBoxAlarm_SelectedIndexChanged      		    		*/
-        /* 機能     : アラーム音変更時のイベント                                */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void comboBoxAlarm_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            alarm.changeAlarmContents();
-        }
-
-        /************************************************************************/
-        /* 関数名   : button_alarmplay_Click          		    		        */
-        /* 機能     : アラーム再生ボタンクリック時のイベント                    */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void button_alarmplay_Click(object sender, EventArgs e)
-        {
-            alarm.playAlarm();
-        }
-
 /* バイブレーション */
         /************************************************************************/
         /* 関数名   : button_vibstart_Click          		    		        */
@@ -2119,18 +1987,24 @@ namespace SleepCheckerApp
 
         /************************************************************************/
         /* 関数名   : button_send_Click              		    		        */
-        /* 機能     : こまんど送信ボタンクリック時のイベント                    */
+        /* 機能     : コマンド送信ボタンクリック時のイベント                    */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
         private void button_send_Click(object sender, EventArgs e)
         {
             byte[] param = new byte[1];
-            byte pattern = 4;
+            byte pattern = 30;
 
             param[0] = pattern;
 
-            com.WriteData(param);
+            if (com.myPort != null)
+            {
+                if (com.myPort.IsOpen)
+                {
+                    com.WriteData(param);
+                }
+            }
         }
     }
 }

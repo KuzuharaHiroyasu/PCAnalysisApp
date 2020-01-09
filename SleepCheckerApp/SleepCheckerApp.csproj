@@ -103,7 +103,6 @@
     <Compile Include="LattePanda.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SoundAlarm.cs" />
     <Compile Include="SoundRecord.cs" />
     <Compile Include="Vibration.cs" />
     <EmbeddedResource Include="FormMain.resx">
