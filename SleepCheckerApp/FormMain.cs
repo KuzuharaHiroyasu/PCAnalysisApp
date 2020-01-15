@@ -53,59 +53,14 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
 
-        // For PulseOximeter
-        [DllImport("PulseOximeter.dll")]
-        static extern void calculator_clr(IntPtr data, int len, IntPtr path);
-        [DllImport("PulseOximeter.dll")]
-        static extern void calculator_inf(IntPtr data, int len, IntPtr path);
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_dc(IntPtr data);
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_fft(IntPtr data);
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_ifft(IntPtr data);
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_new_ifft(IntPtr data);
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_sinpak_clr();
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_sinpak_inf();
-        [DllImport("PulseOximeter.dll")]
-        static extern int get_spo2();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_acdc();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_acavg_clr();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_acavg_inf();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_dcavg_clr();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_dcavg_inf();
-        [DllImport("PulseOximeter.dll")]
-        static extern double get_acavg_ratio();
-
         private Boolean USB_OUTPUT = true;
         private Boolean C_DRIVE = true;
         private Boolean AUTO_ANALYSIS = true;
-        private Boolean SOUND_RECORD = true;
 
         private ComPort com = null;
-        private SoundRecord record = null;
-        private LattePanda panda = null;
-        private Vibration vib = null;
 
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
-        private const int CalcDataNumSpO2 = 128;            // 4秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
-
-        enum request
-        {
-            LED_OFF = 0,    //解析スタート
-            LED_ERROR,      //エラー
-            SET_CLOCK,      //時刻設定
-            VIBRATION,      //バイブレーション
-        }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
         private List<int> CalcDataList1 = new List<int>();
@@ -125,9 +80,6 @@ namespace SleepCheckerApp
         Queue<double> AccelerometerYQueue = new Queue<double>();
         Queue<double> AccelerometerZQueue = new Queue<double>();
 
-        // フォトリフレクタ
-        Queue<double> PhotoRefQueue = new Queue<double>();
-
         // 演算途中データ
         private const int ApneaGraphCalculationDataNum = CalcDataNumCalculationApnea * 10 + 1;
         Queue<double> ApneaRmsQueue = new Queue<double>();
@@ -146,50 +98,16 @@ namespace SleepCheckerApp
 
         object lockData = new object();
         object lockData_Acce = new object();
-        object lockData_PhotoRef = new object();
-
-        // For PulseOximeter
-        private List<int> SpO2_CalcDataList1 = new List<int>();
-        private List<int> SpO2_CalcDataList2 = new List<int>();
         
         // グラフ用
         private const int SpO2_RawDataRirekiNum = 128;              // 生データ履歴数
         
-        // 生データ
-        Queue<int> RawDataSekisyokuQueue = new Queue<int>();
-        Queue<int> RawDataSekigaiQueue = new Queue<int>();
-        Queue<int> DcSekisyokuDataQueue = new Queue<int>();
-        Queue<int> DcSekigaiDataQueue = new Queue<int>();
-        
-        // 演算途中データ
-        Queue<double> FftSekisyokuDataQueue = new Queue<double>();
-        Queue<double> FftSekigaiDataQueue = new Queue<double>();
-        Queue<double> IfftSekisyokuDataQueue = new Queue<double>();
-        Queue<double> IfftSekigaiDataQueue = new Queue<double>();
-        Queue<double> NewIfftSekisyokuDataQueue = new Queue<double>();
-        Queue<double> NewIfftSekigaiDataQueue = new Queue<double>();
-        
-        // 演算結果データ
-        private const int BufNumSpO2Graph = 31;             // 1分(15データ)分だけ表示する // 0点も打つので+1
-        private const int ShipakuDataRirekiNum = BufNumSpO2Graph;    // 心拍数データ履歴数
-        private const int SpDataRirekiNum = BufNumSpO2Graph;         // SpO2データ履歴数
-        Queue<double> ShinpakuSekisyokuDataQueue = new Queue<double>();
-        Queue<double> ShinpakuSekigaiDataQueue = new Queue<double>();
-        Queue<double> SpNormalDataQueue = new Queue<double>();
-        Queue<double> SpAcdcDataQueue = new Queue<double>();
-        object lockData_SpO2 = new object();
-        
         // 演算結果保存向けデータ-------
         // 保存rootパス
         private string ApneaRootPath_;
-        private string PulseRootPath_ = null;
         private string AcceRootPath_;
-        private string PhotoRefRootPath_;
-        private string RecordRootPath_;
-        private string recordFilePath;
 
         private int ApneaCalcCount_;
-        private int PulseCalcCount_;
         private int Acce_PhotoRefCalcCount_;
 
         private int SnoreParamThre;         // いびき閾値
@@ -220,9 +138,6 @@ namespace SleepCheckerApp
 
             if(File.Exists(icon))
                 this.Icon = new System.Drawing.Icon(icon);
-
-            //CalcDataList1 = new List<int>(CalcData1);
-            //CalcDataList2 = new List<int>(CalcData2);
         }
 
         /************************************************************************/
@@ -263,13 +178,11 @@ namespace SleepCheckerApp
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
-            PulseCalcCount_ = 0;
             Acce_PhotoRefCalcCount_ = 0;
 
             // グラフ更新
             GraphUpdate_Apnea();
             GraphUpdate_Acce();
-            GraphUpdate_PhotoRef();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -290,44 +203,24 @@ namespace SleepCheckerApp
         {
             Boolean ret = true;
 
-            panda.setComPort_Lattepanda();
-
             // ログ出力フォルダ作成
-            CreateRootDir();
-
-            // 解析スタートでLATTEPANDAのLEDを消灯。
-            panda.requestLattepanda((byte)request.LED_OFF);
+//            CreateRootDir();
 
             if (AUTO_ANALYSIS)
             {
-                if(SOUND_RECORD)
-                {
-                    // 録音開始
-                    ret = record.startRecordApnea();
-                }
-
+                // 解析
+                ret = startAnalysis();
                 if (ret)
                 {
-                    // 解析
-                    ret = startAnalysis();
-                    if (ret)
-                    {
-                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中";
-                        buttonStart.Enabled = false;
-                        log_output("[START]Analysis_Auto");
-                    }
-                    else
-                    {
-                        record.stopRecordApnea();
-                    }
+                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    buttonStart.Text = "測定中";
+                    buttonStart.Enabled = false;
+                    log_output("[START]Analysis_Auto");
                 }
             }
 
             if (!ret)
             { //エラー処理
-                panda.requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
-                panda.closeComPort_Lattepanda();
                 log_output("[ERROR]");
                 Application.Exit();
             }
@@ -341,8 +234,6 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            record.stopRecordApnea();
-            panda.closeComPort_Lattepanda();
             com.Close();
         }
 
@@ -355,13 +246,6 @@ namespace SleepCheckerApp
         private void initInstance()
         {
             com = new ComPort();
-            record = new SoundRecord();
-            panda = new LattePanda();
-            vib = new Vibration();
-
-            record.form = this;
-            vib.form = this;
-            vib.panda = panda;
         }
 
         /************************************************************************/
@@ -425,74 +309,6 @@ namespace SleepCheckerApp
             else
             {
                 AUTO_ANALYSIS = false;
-            }
-
-            // iniファイルから音声録音設定を取得
-            GetPrivateProfileString(
-                "FUNCTION",
-                "SOUND_RECORD",
-                "ON",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                SOUND_RECORD = true;
-            }
-            else
-            {
-                SOUND_RECORD = false;
-            }
-
-            // iniファイルからラテパンダコマンド送信設定を取得
-            GetPrivateProfileString(
-                "FUNCTION",
-                "LATTEPANDA",
-                "ON",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                panda.setLattepandaFuncSetting(true);
-            }
-            else
-            {
-                panda.setLattepandaFuncSetting(false);
-            }
-
-            // iniファイルからいびきのバイブ設定を取得
-            GetPrivateProfileString(
-                "VIBRATION",
-                "SNORE",
-                "OFF",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                checkBox_vib_snore.Checked = true;
-            }
-            else
-            {
-                checkBox_vib_snore.Checked = false;
-            }
-
-            // iniファイルから無呼吸のバイブ設定を取得
-            GetPrivateProfileString(
-                "VIBRATION",
-                "APNEA",
-                "OFF",            // 値が取得できなかった場合に返される初期値
-                sb,
-                Convert.ToUInt32(sb.Capacity),
-                filePath);
-            if (Path.GetFileName(sb.ToString()) == "ON")
-            {
-                checkBox_vib_apnea.Checked = true;
-            }
-            else
-            {
-                checkBox_vib_apnea.Checked = false;
             }
 
             // iniファイルから画面表示設定を取得
@@ -631,7 +447,6 @@ namespace SleepCheckerApp
 
             // iniファイルから取得したエッジ強調処理の閾値をApneaにセットする
             setEdgeThreshold(MaxEdgeThre, MinSnoreThre, MinBreathThre, DiameterCenter, DiameterNext, DiameterEnd);
-
         }
 
         /************************************************************************/
@@ -662,7 +477,7 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Blue,
             };
-            chart1.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+            chartCalculation.ChartAreas[0].AxisY.StripLines.Add(stripLine);
 
             // グラフ表示初期化
             // For Apnea
@@ -675,7 +490,6 @@ namespace SleepCheckerApp
             AccelerometerXQueue.Clear();
             AccelerometerYQueue.Clear();
             AccelerometerZQueue.Clear();
-            PhotoRefQueue.Clear();
             ApneaQueue.Clear();
             ResultIbikiQueue.Clear();
 
@@ -705,12 +519,7 @@ namespace SleepCheckerApp
                 AccelerometerXQueue.Enqueue(0);
                 AccelerometerYQueue.Enqueue(0);
                 AccelerometerZQueue.Enqueue(0);
-                PhotoRefQueue.Enqueue(0);
             }
-
-            // 表示設定
-            Series srs = chartPhotoReflector.Series["フォトリフレクタ"];
-            srs.Enabled = false;
         }
 
         /************************************************************************/
@@ -781,17 +590,6 @@ namespace SleepCheckerApp
             log_output("USBConnectConf:" + ret);
 
             return ret;
-        }
-
-        /************************************************************************/
-        /* 関数名   : getRecordFilePath    		                          		*/
-        /* 機能     : 録音ファイルのファイルパスを返す                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : [string] recordFilePath - ファイルパス         			*/
-        /************************************************************************/
-        public string getRecordFilePath()
-        {
-            return recordFilePath;
         }
 
         /************************************************************************/
@@ -876,10 +674,6 @@ namespace SleepCheckerApp
                             // For 加速度
                             SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
                             //Console.WriteLine("[DataReceived] X軸:" + Convert.ToInt32(datas[2]) + " Y軸:" + Convert.ToInt32(datas[3]) + " Z軸:" + Convert.ToInt32(datas[4]));
-                            // For フォトリフレクタ
-                            SetCalcData_PhotoRef(Convert.ToInt32(datas[5]));
-                            //Console.WriteLine("[DataReceived] フォトリフレクタ:" + Convert.ToInt32(datas[5]));
-                            Acce_PhotoRefCalcCount_++;
                         }
                     }
                     else
@@ -975,24 +769,7 @@ namespace SleepCheckerApp
                     break;
                 }
             }
-            /*
-                        // rootパス
-                        PulseRootPath_ = drivePath + "\\ax\\pulse\\" + datestr + "\\";
-                        temp = PulseRootPath_;
-                        for (i = 1; i < 20; i++)
-                        {
-                            if (Directory.Exists(temp))
-                            {
-                                temp = PulseRootPath_ + "(" + i + ")";
-                            }
-                            else
-                            {
-                                temp = temp + "\\";
-                                Directory.CreateDirectory(temp);
-                                break;
-                            }
-                        }
-            */
+
             // rootパス
             AcceRootPath_ = drivePath + "\\ax\\acce\\" + datestr + "\\";
             temp = AcceRootPath_;
@@ -1008,47 +785,6 @@ namespace SleepCheckerApp
                     Directory.CreateDirectory(temp);
                     break;
                 }
-            }
-
-            PhotoRefRootPath_ = drivePath + "\\ax\\photoref\\" + datestr + "\\";
-            temp = PhotoRefRootPath_;
-            for (i = 1; i < 20; i++)
-            {
-                if (Directory.Exists(temp))
-                {
-                    temp = PhotoRefRootPath_ + "(" + i + ")";
-                }
-                else
-                {
-                    temp = temp + "\\";
-                    Directory.CreateDirectory(temp);
-                    break;
-                }
-            }
-
-            if (SOUND_RECORD)
-            {
-                // rootパス
-                RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
-                temp = RecordRootPath_;
-                for (i = 1; i < 20; i++)
-                {
-                    if (Directory.Exists(temp))
-                    {
-                        temp = RecordRootPath_ + "(" + i + ")";
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(temp);
-                        recordFilePath = temp;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                RecordRootPath_ = null;
-                recordFilePath = RecordRootPath_;
             }
         }
 
@@ -1073,26 +809,6 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : CreatePulseDir                     		    			*/
-        /* 機能     : SpO2演算結果保存用パスの作成                              */
-        /* 引数     : [int] Count - データ数                                    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private string CreatePulseDir(int Count)
-        {
-            string path = PulseRootPath_ + Count.ToString("D");
-            if (Directory.Exists(path))
-            {
-            }
-            else
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            return path;
-        }
-
-        /************************************************************************/
         /* 関数名   : CreateAcceDir                     		    			*/
         /* 機能     : 加速度センサー結果保存用パスの作成                        */
         /* 引数     : [int] Count - データ数                                    */
@@ -1102,26 +818,6 @@ namespace SleepCheckerApp
         {
 
             string path = AcceRootPath_ + Count.ToString("D");
-            if (Directory.Exists(path))
-            {
-            }
-            else
-            {
-                Directory.CreateDirectory(path);
-            }
-            return path;
-        }
-
-        /************************************************************************/
-        /* 関数名   : CreatePhotoRefDir                		    			    */
-        /* 機能     : フォトリフレクタ結果保存用パスの作成                      */
-        /* 引数     : [int] Count - データ数                                    */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private string CreatePhotoRefDir(int Count)
-        {
-
-            string path = PhotoRefRootPath_ + Count.ToString("D");
             if (Directory.Exists(path))
             {
             }
@@ -1177,77 +873,6 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : SetCalcData_SpO2               			    			*/
-        /* 機能     : 赤色・赤外のデータをセット                                */
-        /* 引数     : [int] data1 - 赤色の生データ                              */
-        /*          : [int] data2 - 赤外の生データ                              */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void SetCalcData_SpO2(int data1, int data2)
-        {
-
-            //計算用データ
-            SpO2_CalcDataList1.Add(data1);
-            SpO2_CalcDataList2.Add(data2);
-            lock (lockData_SpO2)
-            {
-                //グラフ用データ追加
-                if (RawDataSekisyokuQueue.Count >= SpO2_RawDataRirekiNum)
-                {
-                    RawDataSekisyokuQueue.Dequeue();
-                }
-                RawDataSekisyokuQueue.Enqueue(data1);
-                if (RawDataSekigaiQueue.Count >= SpO2_RawDataRirekiNum)
-                {
-                    RawDataSekigaiQueue.Dequeue();
-                }
-                RawDataSekigaiQueue.Enqueue(data2);
-            }
-
-            if (SpO2_CalcDataList1.Count >= CalcDataNumSpO2)     // 1と2は同じ個数が入る前提
-            {
-                //演算
-                Calc_SpO2();
-                //結果表示
-                double shinpaku_sekisyoku = get_sinpak_clr();
-                double shinpaku_sekigai   = get_sinpak_inf();
-                double sp_normal = get_spo2();
-                double sp_acdc = get_acavg_ratio();
-
-                //グラフ用データ追加
-                lock (lockData_SpO2)
-                {
-                    if (ShinpakuSekisyokuDataQueue.Count >= ShipakuDataRirekiNum)
-                    {
-                        ShinpakuSekisyokuDataQueue.Dequeue();
-                    }
-                    ShinpakuSekisyokuDataQueue.Enqueue(shinpaku_sekisyoku);
-
-                    if (ShinpakuSekigaiDataQueue.Count >= ShipakuDataRirekiNum)
-                    {
-                        ShinpakuSekigaiDataQueue.Dequeue();
-                    }
-                    ShinpakuSekigaiDataQueue.Enqueue(shinpaku_sekigai);
-
-                    if (SpNormalDataQueue.Count >= SpDataRirekiNum)
-                    {
-                        SpNormalDataQueue.Dequeue();
-                    }
-                    SpNormalDataQueue.Enqueue(sp_normal);
-
-                    if (SpAcdcDataQueue.Count >= SpDataRirekiNum)
-                    {
-                        SpAcdcDataQueue.Dequeue();
-                    }
-                    SpAcdcDataQueue.Enqueue(sp_acdc);
-                }
-                //データクリア
-                SpO2_CalcDataList1.Clear();
-                SpO2_CalcDataList2.Clear();
-            }
-        }
-
-        /************************************************************************/
         /* 関数名   : SetCalcData_Acce                        			    	*/
         /* 機能     : 加速度センサーのデータをセット                            */
         /* 引数     : [int] data1 - X軸                                         */
@@ -1282,36 +907,9 @@ namespace SleepCheckerApp
                 //10回に1回テキスト出力する(500ms毎)（暫定）
                 //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
                 //理想は1テキスト内に出力し続ける
-                string path = CreateAcceDir(Acce_PhotoRefCalcCount_);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : SetCalcData_PhotoRef               			          	*/
-        /* 機能     : フォトリフレクタのデータをセット                          */
-        /* 引数     : [int] data1 - フォトリフレクタ値                          */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void SetCalcData_PhotoRef(int data1)
-        {
-            lock (lockData_PhotoRef)
-            {
-                //グラフ用データ追加
-                // フォトリフレクタ
-                if (PhotoRefQueue.Count >= AcceAndPhotoRef_RawDataRirekiNum)
-                {
-                    PhotoRefQueue.Dequeue();
-                }
-                PhotoRefQueue.Enqueue(data1);
-
-                //10回に1回テキスト出力する(500ms毎)（暫定）
-                //50msごとに出力すると約1時間で１フォルダ内のフォルダ数の限界がくるため
-                //理想は1テキスト内に出力し続ける
-                string path = CreatePhotoRefDir(Acce_PhotoRefCalcCount_);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                get_photoreflector((double)data1, pathptr);
+//                string path = CreateAcceDir(Acce_PhotoRefCalcCount_);
+//                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+//                get_accelerometer((double)data1, (double)data2, (double)data3, pathptr);
             }
         }
 
@@ -1325,7 +923,7 @@ namespace SleepCheckerApp
         {
             try
             {
-                string path = CreateApneaDir(ApneaCalcCount_);
+//                string path = CreateApneaDir(ApneaCalcCount_);
                 ApneaCalcCount_ += 1;
 
                 int num = CalcDataNumApnea;
@@ -1337,8 +935,8 @@ namespace SleepCheckerApp
                 double[] arrayd = new double[num];
                 Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
                 Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                getwav_init(ptr, num, pathptr, ptr2);
+//                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+//                getwav_init(ptr, num, pathptr, ptr2);
                 lock (lockData)
                 {
                     // DC成分除去データをQueueに置く
@@ -1400,115 +998,12 @@ namespace SleepCheckerApp
                         ApneaQueue.Dequeue();
                     }
                     ApneaQueue.Enqueue(apnea);
-
-                    // バイブレーション
-                    vib.confirmVib((byte)request.VIBRATION);
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
                 Marshal.FreeCoTaskMem(pi);
                 Marshal.FreeCoTaskMem(pd);
-                Marshal.FreeHGlobal(pathptr);
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show(ex.Message, "内部エラー(Calc)");
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : Calc_SpO2                     			    			*/
-        /* 機能     : SpO2データの演算                                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void Calc_SpO2()
-        {
-            try
-            {
-                string path = CreatePulseDir(PulseCalcCount_);
-                PulseCalcCount_+=1;
-                
-                int num = SpO2_CalcDataList1.Count;
-                IntPtr ptr1 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
-                int[] arrayi = new int[num];
-                double[] arrayd = new double[num];
-                Marshal.Copy(SpO2_CalcDataList1.ToArray(), 0, ptr1, num);
-                Marshal.Copy(SpO2_CalcDataList2.ToArray(), 0, ptr2, num);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-                calculator_clr(ptr1, num, pathptr);
-                lock (lockData_SpO2)
-                {
-                    // DC成分除去データをQueueに置く
-                    get_dc(pi);
-                    Marshal.Copy(pi, arrayi, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        DcSekisyokuDataQueue.Dequeue();
-                        DcSekisyokuDataQueue.Enqueue(arrayi[ii]);
-                    }
-                    // FFTデータをQueueに置く
-                    get_fft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        FftSekisyokuDataQueue.Dequeue();
-                        FftSekisyokuDataQueue.Enqueue(arrayd[ii]);
-                    }
-                    // iFFTデータをQueueに置く
-                    get_ifft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        IfftSekisyokuDataQueue.Dequeue();
-                        IfftSekisyokuDataQueue.Enqueue(arrayd[ii]);
-                    }
-                    // new_iFFTデータをQueueに置く
-                    get_new_ifft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        NewIfftSekisyokuDataQueue.Dequeue();
-                        NewIfftSekisyokuDataQueue.Enqueue(arrayd[ii]);
-                    }
-                }
-                calculator_inf(ptr2, num, pathptr);
-                lock (lockData_SpO2)
-                {
-                    // DC成分除去データをQueueに置く
-                    get_dc(pi);
-                    Marshal.Copy(pi, arrayi, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        DcSekigaiDataQueue.Dequeue();
-                        DcSekigaiDataQueue.Enqueue(arrayi[ii]);
-                    }
-                    // FFTデータをQueueに置く
-                    get_fft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        FftSekigaiDataQueue.Dequeue();
-                        FftSekigaiDataQueue.Enqueue(arrayd[ii]);
-                    }
-                    // iFFTデータをQueueに置く
-                    get_ifft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        IfftSekigaiDataQueue.Dequeue();
-                        IfftSekigaiDataQueue.Enqueue(arrayd[ii]);
-                    }
-                    // new_iFFTデータをQueueに置く
-                    get_new_ifft(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for(int ii=0;ii<num;++ii){
-                        NewIfftSekigaiDataQueue.Dequeue();
-                        NewIfftSekigaiDataQueue.Enqueue(arrayd[ii]);
-                    }
-                }
-                Marshal.FreeCoTaskMem(ptr1);
-                Marshal.FreeCoTaskMem(ptr2);
-                Marshal.FreeCoTaskMem(pi);
-                Marshal.FreeCoTaskMem(pd);
-                Marshal.FreeHGlobal(pathptr);
+//                Marshal.FreeHGlobal(pathptr);
             }
             catch (Exception ex)
             {
@@ -1565,8 +1060,8 @@ namespace SleepCheckerApp
                 }
                 
                 // 演算途中データグラフを更新
-                Series srs_apnea_rms = chart1.Series["無呼吸(rms)"];
-                Series srs_apnea_point = chart1.Series["無呼吸(point)"];
+                Series srs_apnea_rms = chartCalculation.Series["無呼吸(rms)"];
+                Series srs_apnea_point = chartCalculation.Series["無呼吸(point)"];
                 srs_apnea_rms.Points.Clear();
                 srs_apnea_point.Points.Clear();
                 cnt = 0;
@@ -1579,16 +1074,6 @@ namespace SleepCheckerApp
                 foreach (double data in ApneaPointQueue)
                 {
                     srs_apnea_point.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
-                // 呼吸データ(プロット)グラフを更新
-                Series srs_apnea_plot = chartApneaPlot.Series["呼吸生データ"];
-                srs_apnea_plot.Points.Clear();
-                cnt = 0;
-                foreach (double data in ApneaGraphPlotQueue)
-                {
-                    srs_apnea_plot.Points.AddXY(cnt, data);
                     cnt++;
                 }
 
@@ -1605,9 +1090,8 @@ namespace SleepCheckerApp
             // 更新実行
             chartApnea.Invalidate();
             chartRawData.Invalidate();
-            chart1.Invalidate();
+            chartCalculation.Invalidate();
             chartHeartBeatRemov.Invalidate();
-            chartApneaPlot.Invalidate();
         }
 
         /************************************************************************/
@@ -1653,32 +1137,6 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : GraphUpdate_PhotoRef          			    			*/
-        /* 機能     : フォトリフレクタのグラフを更新                            */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void GraphUpdate_PhotoRef()
-        {
-            int cnt = 0;
-
-            lock (lockData_PhotoRef)
-            {
-                // フォトリフレクタのグラフを更新
-                Series photoRef = chartPhotoReflector.Series["フォトリフレクタ"]; //■
-
-                photoRef.Points.Clear();
-
-                foreach (double data in PhotoRefQueue)
-                {
-                    photoRef.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-            }
-            chartPhotoReflector.Invalidate();
-        }
-
-        /************************************************************************/
         /* 関数名   : Interval                      			    			*/
         /* 機能     : グラフ更新イベント                                        */
         /* 引数     : なし                                                      */
@@ -1687,56 +1145,7 @@ namespace SleepCheckerApp
         public void Interval(object sender, EventArgs e)
         {
             GraphUpdate_Apnea();
-            //            GraphUpdate_SpO2();
             GraphUpdate_Acce();
-            GraphUpdate_PhotoRef();
-        }
-
-        /************************************************************************/
-        /* 関数名   : CalculateAll                   			    			*/
-        /* 機能     : CSVファイル読み込み                                       */
-        /* 引数     : [string] FolderPath - フォルダパス                        */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void CalculateAll(String FolderPath)
-        {
-        	string[] files = System.IO.Directory.GetFiles(FolderPath, "*.csv", System.IO.SearchOption.AllDirectories);
-        	foreach(string filename in files){
-        		Calculate(filename);
-        	}
-        }
-
-        /************************************************************************/
-        /* 関数名   : Calculate                     			    			*/
-        /* 機能     : CSVファイルに書き出し                                     */
-        /* 引数     : [string] FolderPath - ファイルパス                        */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void Calculate(String FilePath)
-        {
-    		using(StreamReader r = new StreamReader(FilePath))
-    		{
-    			string strline;
-  				while( (strline = r.ReadLine()) != null){
-                    string[] datas = strline.Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 4)
-                    {
-                        //測定データ表示
-                        //SetTextInput(lines[i] + "\r\n");
-                        //演算
-                        int result;
-                        if (!int.TryParse(datas[0], out result)) continue;      // 赤色AD値
-                        if (!int.TryParse(datas[1], out result)) continue;      // 赤外AD値
-                        if (!int.TryParse(datas[2], out result)) continue;      // マイク(呼吸)
-                        if (!int.TryParse(datas[3], out result)) continue;      // マイク(いびき)
-
-                        // For Apnea
-                        SetCalcData_Apnea(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
-                        // For PulseOximeter
-                        SetCalcData_SpO2(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-                    }
-  				}
-  			}
         }
 
 /* ボタンクリックイベント */
@@ -1748,7 +1157,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void buttonStart_Click(object sender, EventArgs e)
         {
-            if (buttonStart.Text == "開始")
+            if (buttonStart.Text == "測定開始")
             {
                 com.PortName = comboBoxComport.Text;
                 com.BaudRate = 19200;
@@ -1761,7 +1170,7 @@ namespace SleepCheckerApp
                     if (ret)
                     {
                         com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "データ取得中";
+                        buttonStart.Text = "測定中";
                         buttonStart.Enabled = false;
                         log_output("[START]Analysis(button)");
                     }
@@ -1769,96 +1178,8 @@ namespace SleepCheckerApp
             }
         }
 
-        /************************************************************************/
-        /* 関数名   : button_recordstart_Click          				   		*/
-        /* 機能     : 録音開始ボタンクリック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void button_recordstart_Click(object sender, EventArgs e)
-        {
-            if (SOUND_RECORD)
-            {
-                log_output("[BUTTON]Record Start");
-
-                record.startRecordApnea();
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : button_recordstop_Click          		    		   		*/
-        /* 機能     : 録音停止ボタンクリック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void button_recordstop_Click(object sender, EventArgs e)
-        {
-            if (SOUND_RECORD)
-            {
-                log_output("[BUTTON]Record Stop");
-                record.stopRecordApnea();
-            }
-        }
-
 /* チェックボックスイベント */
 /* 呼吸切替 */
-        /************************************************************************/
-        /* 関数名   : checkBox_rawresp_CheckedChanged				    		*/
-        /* 機能     : 呼吸(生データ)チェック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_rawresp_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartRawData.Series["呼吸(生データ)"];
-            if (checkBox_rawresp.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_rawsnore_CheckedChanged     			    		*/
-        /* 機能     : いびき(生データ)チェック時のイベント                      */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_rawsnore_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartRawData.Series["いびき(生データ)"];
-            if (checkBox_rawsnore.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_dcresp_CheckedChanged     			    		*/
-        /* 機能     : 呼吸(移動平均)チェック時のイベント                        */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_dcresp_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartRawData.Series["呼吸(移動平均)"];
-            if (checkBox_dcresp.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
         /************************************************************************/
         /* 関数名   : checkBox_apnearms_CheckedChanged        		    		*/
         /* 機能     : 無呼吸(rms)チェック時のイベント                           */
@@ -1867,7 +1188,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void checkBox_apnearms_CheckedChanged(object sender, EventArgs e)
         {
-            Series srs = chart1.Series["無呼吸(rms)"];
+            Series srs = chartCalculation.Series["無呼吸(rms)"];
             if (checkBox_apnearms.Checked)
             {
                 srs.Enabled = true;
@@ -1886,7 +1207,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void checkBox_apneapoint_CheckedChanged(object sender, EventArgs e)
         {
-            Series srs = chart1.Series["無呼吸(point)"];
+            Series srs = chartCalculation.Series["無呼吸(point)"];
             if (checkBox_apneapoint.Checked)
             {
                 srs.Enabled = true;
@@ -1954,37 +1275,7 @@ namespace SleepCheckerApp
             }
         }
 
-        /************************************************************************/
-        /* 関数名   : checkBox_photo_CheckedChanged     	            		*/
-        /* 機能     : フォトリフレクタチェック時のイベント                      */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_photo_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartPhotoReflector.Series["フォトリフレクタ"];
-            if (checkBox_photo.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-/* バイブレーション */
-        /************************************************************************/
-        /* 関数名   : button_vibstart_Click          		    		        */
-        /* 機能     : バイブボタンクリック時のイベント                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void button_vibstart_Click(object sender, EventArgs e)
-        {
-            panda.requestLattepanda((byte)request.VIBRATION);
-        }
-
+/* コマンド送信 */
         /************************************************************************/
         /* 関数名   : button_send_Click              		    		        */
         /* 機能     : コマンド送信ボタンクリック時のイベント                    */
