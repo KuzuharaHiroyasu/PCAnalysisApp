@@ -69,6 +69,7 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.button_send = new System.Windows.Forms.Button();
             this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.buttonSetting = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartCalculation)).BeginInit();
@@ -81,7 +82,7 @@
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(36, 41);
+            this.buttonStart.Location = new System.Drawing.Point(120, 12);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(108, 30);
             this.buttonStart.TabIndex = 2;
@@ -326,11 +327,12 @@
             // 
             // groupBoxCom
             // 
+            this.groupBoxCom.Controls.Add(this.buttonSetting);
             this.groupBoxCom.Controls.Add(this.comboBoxComport);
             this.groupBoxCom.Controls.Add(this.buttonStart);
             this.groupBoxCom.Location = new System.Drawing.Point(13, 6);
             this.groupBoxCom.Name = "groupBoxCom";
-            this.groupBoxCom.Size = new System.Drawing.Size(181, 82);
+            this.groupBoxCom.Size = new System.Drawing.Size(338, 47);
             this.groupBoxCom.TabIndex = 8;
             this.groupBoxCom.TabStop = false;
             this.groupBoxCom.Text = "ポート設定";
@@ -339,7 +341,7 @@
             // 
             this.comboBoxComport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxComport.FormattingEnabled = true;
-            this.comboBoxComport.Location = new System.Drawing.Point(36, 14);
+            this.comboBoxComport.Location = new System.Drawing.Point(6, 18);
             this.comboBoxComport.Name = "comboBoxComport";
             this.comboBoxComport.Size = new System.Drawing.Size(108, 20);
             this.comboBoxComport.TabIndex = 15;
@@ -347,9 +349,9 @@
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.button_send);
-            this.groupBox5.Location = new System.Drawing.Point(213, 12);
+            this.groupBox5.Location = new System.Drawing.Point(566, 6);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(147, 52);
+            this.groupBox5.Size = new System.Drawing.Size(290, 47);
             this.groupBox5.TabIndex = 26;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "バイブレーション";
@@ -401,6 +403,16 @@
             this.chartHeartBeatRemov.Titles.Add(title5);
             this.chartHeartBeatRemov.Visible = false;
             // 
+            // buttonSetting
+            // 
+            this.buttonSetting.Location = new System.Drawing.Point(234, 12);
+            this.buttonSetting.Name = "buttonSetting";
+            this.buttonSetting.Size = new System.Drawing.Size(98, 29);
+            this.buttonSetting.TabIndex = 16;
+            this.buttonSetting.Text = "設定";
+            this.buttonSetting.UseVisualStyleBackColor = true;
+            this.buttonSetting.Click += new System.EventHandler(this.buttonSetting_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -451,6 +463,7 @@
         private System.Windows.Forms.CheckBox checkBox_acl_y;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartHeartBeatRemov;
         private System.Windows.Forms.Button button_send;
+        private System.Windows.Forms.Button buttonSetting;
     }
 }
 

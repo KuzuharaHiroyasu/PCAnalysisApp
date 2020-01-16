@@ -58,6 +58,7 @@ namespace SleepCheckerApp
         private Boolean AUTO_ANALYSIS = true;
 
         private ComPort com = null;
+        private FormSetting formset = null;
 
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
@@ -108,7 +109,7 @@ namespace SleepCheckerApp
         private string AcceRootPath_;
 
         private int ApneaCalcCount_;
-        private int Acce_PhotoRefCalcCount_;
+//        private int Acce_PhotoRefCalcCount_;
 
         private int SnoreParamThre;         // いびき閾値
         private int SnoreParamNormalCnt;    // いびき無しへのカウント
@@ -178,7 +179,7 @@ namespace SleepCheckerApp
             // 演算データ保存向け初期化処理
             //CreateRootDir(); //(移動)USB検索後にルート設定
             ApneaCalcCount_ = 0;
-            Acce_PhotoRefCalcCount_ = 0;
+//            Acce_PhotoRefCalcCount_ = 0;
 
             // グラフ更新
             GraphUpdate_Apnea();
@@ -246,6 +247,9 @@ namespace SleepCheckerApp
         private void initInstance()
         {
             com = new ComPort();
+            formset = new FormSetting();
+
+            formset.form = this;
         }
 
         /************************************************************************/
@@ -1296,6 +1300,45 @@ namespace SleepCheckerApp
                     com.WriteData(param);
                 }
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : buttonSetting_Click              		    		        */
+        /* 機能     : 設定ボタンクリック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void buttonSetting_Click(object sender, EventArgs e)
+        {
+            if (com.myPort != null)
+            {
+                if (com.myPort.IsOpen)
+                {
+                    formset.Show();
+                }
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : writeData                      		    		        */
+        /* 機能     : コマンド書き込み                                          */
+        /* 引数     : [byte[]] buffer - 書き込むデータ                          */
+        /* 戻り値   : true  - 成功　　　　　　 　　　　　　　　　　　　　　　　 */
+        /*            false - 失敗                                            　*/
+        /************************************************************************/
+        public bool writeData(byte[] buffer)
+        {
+            bool ret = false;
+
+            if (com.myPort != null)
+            {
+                if (com.myPort.IsOpen)
+                {
+                    com.WriteData(buffer);
+                    ret = true;
+                }
+            }
+            return ret;
         }
     }
 }
