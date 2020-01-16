@@ -64,8 +64,9 @@ namespace SleepCheckerApp
             {
                 myPort.Close();
                 //receiveThread.Join();     // これだけだとブロックし続けて終わらない
-                receiveThread.Join(1000);   // 1秒終了を待機して
+                //receiveThread.Join(1000);   // 1秒終了を待機して
                 receiveThread.Abort();      // スレッドを強制終了
+                receiveThread = null;
             }
         }
 

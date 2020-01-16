@@ -55,7 +55,7 @@ namespace SleepCheckerApp
 
         private Boolean USB_OUTPUT = true;
         private Boolean C_DRIVE = true;
-        private Boolean AUTO_ANALYSIS = true;
+//        private Boolean AUTO_ANALYSIS = true;
 
         private ComPort com = null;
         private FormSetting formset = null;
@@ -207,18 +207,8 @@ namespace SleepCheckerApp
             // ログ出力フォルダ作成
 //            CreateRootDir();
 
-            if (AUTO_ANALYSIS)
-            {
-                // 解析
-                ret = startAnalysis();
-                if (ret)
-                {
-                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                    buttonStart.Text = "測定中";
-                    buttonStart.Enabled = false;
-                    log_output("[START]Analysis_Auto");
-                }
-            }
+            // 解析
+            ret = startAnalysis();
 
             if (!ret)
             { //エラー処理
@@ -308,11 +298,11 @@ namespace SleepCheckerApp
                 filePath);
             if (Path.GetFileName(sb.ToString()) == "ON")
             {
-                AUTO_ANALYSIS = true;
+//                AUTO_ANALYSIS = true;
             }
             else
             {
-                AUTO_ANALYSIS = false;
+//                AUTO_ANALYSIS = false;
             }
 
             // iniファイルから画面表示設定を取得
@@ -535,7 +525,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private Boolean startAnalysis()
         {
-            Boolean ret = false;
+            Boolean ret = true;
             com.BaudRate = 19200;
             com.Parity = Parity.Even;
             com.DataBits = 8;
@@ -549,7 +539,7 @@ namespace SleepCheckerApp
                     comboBoxComport.SelectedIndex = i;
                     if (String.IsNullOrWhiteSpace(com.PortName) == false)
                     {
-                        ret = com.Start();
+//                        ret = com.Start();
                         break;
                     }
                 }
@@ -927,7 +917,7 @@ namespace SleepCheckerApp
         {
             try
             {
-//                string path = CreateApneaDir(ApneaCalcCount_);
+                string path = CreateApneaDir(ApneaCalcCount_);
                 ApneaCalcCount_ += 1;
 
                 int num = CalcDataNumApnea;
@@ -939,8 +929,8 @@ namespace SleepCheckerApp
                 double[] arrayd = new double[num];
                 Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
                 Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
-//                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
-//                getwav_init(ptr, num, pathptr, ptr2);
+                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
+                getwav_init(ptr, num, pathptr, ptr2);
                 lock (lockData)
                 {
                     // DC成分除去データをQueueに置く
@@ -1163,21 +1153,14 @@ namespace SleepCheckerApp
         {
             if (buttonStart.Text == "測定開始")
             {
-                com.PortName = comboBoxComport.Text;
-                com.BaudRate = 19200;
-                com.Parity = Parity.Even;
-                com.DataBits = 8;
-                com.StopBits = StopBits.One;
-                if (String.IsNullOrWhiteSpace(com.PortName) == false)
+                Boolean ret = com.Start();
+                if (ret)
                 {
-                    Boolean ret = com.Start();
-                    if (ret)
-                    {
-                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
-                        buttonStart.Text = "測定中";
-                        buttonStart.Enabled = false;
-                        log_output("[START]Analysis(button)");
-                    }
+                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    buttonStart.Enabled = false;
+                    buttonStop.Enabled = true;
+                    labelState.Text = "測定中";
+                    log_output("[START]Analysis(button)");
                 }
             }
         }
@@ -1350,6 +1333,37 @@ namespace SleepCheckerApp
             {
                 System.Windows.Forms.MessageBox.Show("エラー");
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : buttonStop_Click                         	    	        */
+        /* 機能     : 停止ボタンクリック時のイベント                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void buttonStop_Click(object sender, EventArgs e)
+        {
+            //            chartRawData.Series.Clear();
+            com.Close();
+
+            //グラフ初期化
+            initGraphShow();
+
+            //データクリア
+            CalcDataList1.Clear();
+            CalcDataList2.Clear();
+
+            ApneaCalcCount_ = 0;
+
+            // グラフ更新
+            GraphUpdate_Apnea();
+            GraphUpdate_Acce();
+
+            calc_snore_init();
+
+            labelState.Text = "待機中";
+            buttonStop.Enabled = false;
+            buttonStart.Enabled = true;
         }
     }
 }
