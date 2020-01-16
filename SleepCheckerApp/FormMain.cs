@@ -1281,28 +1281,6 @@ namespace SleepCheckerApp
 
 /* コマンド送信 */
         /************************************************************************/
-        /* 関数名   : button_send_Click              		    		        */
-        /* 機能     : コマンド送信ボタンクリック時のイベント                    */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void button_send_Click(object sender, EventArgs e)
-        {
-            byte[] param = new byte[1];
-            byte pattern = 30;
-
-            param[0] = pattern;
-
-            if (com.myPort != null)
-            {
-                if (com.myPort.IsOpen)
-                {
-                    com.WriteData(param);
-                }
-            }
-        }
-
-        /************************************************************************/
         /* 関数名   : buttonSetting_Click              		    		        */
         /* 機能     : 設定ボタンクリック時のイベント                            */
         /* 引数     : なし                                                      */
@@ -1339,6 +1317,39 @@ namespace SleepCheckerApp
                 }
             }
             return ret;
+        }
+
+        /************************************************************************/
+        /* 関数名   : buttonVibConf_Click                         		        */
+        /* 機能     : バイブ確認ボタンクリック時のイベント                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void buttonVibConf_Click(object sender, EventArgs e)
+        {
+            byte[] param = new byte[1];
+
+            if (radioButtonVibConfWeak.Checked == true)
+            {
+                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_WEAK_CONF;
+            }
+            else if (radioButtonVibConfMed.Checked == true)
+            {
+                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED_CONF;
+            }
+            else if (radioButtonVibConfStrong.Checked == true)
+            {
+                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_STRONG_CONF;
+            }
+            else if (radioButtonVibConfGrad.Checked == true)
+            {
+                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD_CONF;
+            }
+
+            if (!writeData(param))
+            {
+                System.Windows.Forms.MessageBox.Show("エラー");
+            }
         }
     }
 }
