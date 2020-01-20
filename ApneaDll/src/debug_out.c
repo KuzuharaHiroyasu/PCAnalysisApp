@@ -8,6 +8,7 @@
 /*==============================================================================*/
 void	debug_out( char *f , double d[] , int size , const char* ppath)
 {
+/*
 	FILE		*fp;
 	char		b[1024];
 	errno_t error;
@@ -26,6 +27,7 @@ void	debug_out( char *f , double d[] , int size , const char* ppath)
 		fprintf( fp , "%lf\n" , d[i] );
 	}
 	fclose( fp );
+*/
 }
 /*==============================================================================*/
 /* EOF */

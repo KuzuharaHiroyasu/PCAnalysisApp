@@ -35,8 +35,12 @@ namespace SleepCheckerApp
         /************************************************************************/
         public Boolean Start()
         {
-            myPort = new SerialPort(
-                 PortName, BaudRate, Parity, DataBits, StopBits);
+            if(PortName != "")
+            {
+                myPort = new SerialPort(
+                     PortName, BaudRate, Parity, DataBits, StopBits);
+            }
+
             try
             {
                 myPort.Open();

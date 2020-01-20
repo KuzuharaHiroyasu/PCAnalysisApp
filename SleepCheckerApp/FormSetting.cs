@@ -175,6 +175,7 @@ namespace SleepCheckerApp
             if (form.writeData(param))
             {
                 snoreSens = param[0];
+                form.setSnoreThreUpdate(snoreSens);
             }
 
             // バイブレーションの強さ

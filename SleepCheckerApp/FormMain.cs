@@ -124,6 +124,8 @@ namespace SleepCheckerApp
 
         private int snoreDataText;          // 呼吸データ表示用
 
+        private StripLine stripLineSnore;
+
         public int snore = 0;
         public int apnea = 0;
 
@@ -457,7 +459,7 @@ namespace SleepCheckerApp
         private void initGraphShow()
         {
             // いびきの閾値表示
-            StripLine stripLine = new StripLine
+            stripLineSnore = new StripLine
             {
                 Interval = 0,
                 IntervalOffset = SnoreParamThre,    // いびきの閾値(SNORE_PARAM_THRE)
@@ -465,10 +467,10 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Yellow,
             };
-            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLine);
-            
+            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+
             // 無呼吸の閾値表示
-            stripLine = new StripLine
+            StripLine stripLineApnea = new StripLine
             {
                 Interval = 0,
                 IntervalOffset = ApneaParamBinThre,    // 無呼吸の閾値(APNEA_PARAM_BIN_THRE)
@@ -476,7 +478,7 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Blue,
             };
-            chartCalculation.ChartAreas[0].AxisY.StripLines.Add(stripLine);
+            chartCalculation.ChartAreas[0].AxisY.StripLines.Add(stripLineApnea);
 
             // グラフ表示初期化
             // For Apnea
@@ -801,7 +803,7 @@ namespace SleepCheckerApp
             }
             else
             {
-                Directory.CreateDirectory(path);
+//                Directory.CreateDirectory(path);
             }
 
             return path;
@@ -822,7 +824,8 @@ namespace SleepCheckerApp
             }
             else
             {
-                Directory.CreateDirectory(path);
+//                Directory.CreateDirectory(path);
+//                Directory.CreateDirectory(path);
             }
             return path;
         }
@@ -1389,6 +1392,34 @@ namespace SleepCheckerApp
             labelState.Text = "待機中";
             buttonStop.Enabled = false;
             buttonStart.Enabled = true;
+        }
+
+        /************************************************************************/
+        /* 関数名   : setSnoreThreUpdate                      	    	        */
+        /* 機能     : いびき閾値ライン更新                                      */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        public void setSnoreThreUpdate(int snoreSens)
+        {
+            if ((int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_WEAK == snoreSens)
+            {
+                SnoreParamThre = 300;
+            }
+            else if ((int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED == snoreSens)
+            {
+                SnoreParamThre = 245;
+            }
+            else if ((int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_STRONG == snoreSens)
+            {
+                SnoreParamThre = 200;
+            }
+            setThreshold(SnoreParamThre, SnoreParamNormalCnt, ApneaJudgeCnt, ApneaParamBinThre);
+
+            // いびきの閾値表示
+            chartRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
+            stripLineSnore.IntervalOffset = SnoreParamThre;
+            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
         }
     }
 }
