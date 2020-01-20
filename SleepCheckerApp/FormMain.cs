@@ -218,6 +218,8 @@ namespace SleepCheckerApp
                 log_output("[ERROR]");
                 Application.Exit();
             }
+
+            buttonSetting.Enabled = false;
         }
 
         /************************************************************************/
@@ -1181,6 +1183,7 @@ namespace SleepCheckerApp
                     com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
                     buttonStart.Enabled = false;
                     buttonStop.Enabled = true;
+                    buttonSetting.Enabled = true;
                     labelState.Text = "測定中";
                     log_output("[START]Analysis(button)");
                 }

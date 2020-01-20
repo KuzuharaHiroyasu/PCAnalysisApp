@@ -42,6 +42,7 @@
             this.radioButtonVibStrong = new System.Windows.Forms.RadioButton();
             this.radioButtonVibMed = new System.Windows.Forms.RadioButton();
             this.radioButtonVibWeak = new System.Windows.Forms.RadioButton();
+            this.buttonClose = new System.Windows.Forms.Button();
             this.groupBox_mode.SuspendLayout();
             this.groupBox_snore_sens.SuspendLayout();
             this.groupBox_vib.SuspendLayout();
@@ -55,7 +56,7 @@
             this.groupBox_mode.Controls.Add(this.radioButtonMonitor);
             this.groupBox_mode.Location = new System.Drawing.Point(12, 12);
             this.groupBox_mode.Name = "groupBox_mode";
-            this.groupBox_mode.Size = new System.Drawing.Size(119, 130);
+            this.groupBox_mode.Size = new System.Drawing.Size(119, 115);
             this.groupBox_mode.TabIndex = 0;
             this.groupBox_mode.TabStop = false;
             this.groupBox_mode.Text = "モード";
@@ -113,7 +114,7 @@
             this.groupBox_snore_sens.Controls.Add(this.radioButtonSnoreDetectWeak);
             this.groupBox_snore_sens.Location = new System.Drawing.Point(137, 12);
             this.groupBox_snore_sens.Name = "groupBox_snore_sens";
-            this.groupBox_snore_sens.Size = new System.Drawing.Size(96, 130);
+            this.groupBox_snore_sens.Size = new System.Drawing.Size(96, 115);
             this.groupBox_snore_sens.TabIndex = 1;
             this.groupBox_snore_sens.TabStop = false;
             this.groupBox_snore_sens.Text = "いびき検出感度";
@@ -161,7 +162,7 @@
             this.groupBox_vib.Controls.Add(this.radioButtonVibWeak);
             this.groupBox_vib.Location = new System.Drawing.Point(239, 12);
             this.groupBox_vib.Name = "groupBox_vib";
-            this.groupBox_vib.Size = new System.Drawing.Size(114, 130);
+            this.groupBox_vib.Size = new System.Drawing.Size(114, 115);
             this.groupBox_vib.TabIndex = 2;
             this.groupBox_vib.TabStop = false;
             this.groupBox_vib.Text = "バイブレーション";
@@ -212,15 +213,26 @@
             this.radioButtonVibWeak.UseVisualStyleBackColor = true;
             this.radioButtonVibWeak.CheckedChanged += new System.EventHandler(this.radioButtonVib_CheckedChanged);
             // 
+            // buttonClose
+            // 
+            this.buttonClose.Location = new System.Drawing.Point(111, 144);
+            this.buttonClose.Name = "buttonClose";
+            this.buttonClose.Size = new System.Drawing.Size(138, 31);
+            this.buttonClose.TabIndex = 3;
+            this.buttonClose.Text = "閉じる";
+            this.buttonClose.UseVisualStyleBackColor = true;
+            this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
+            // 
             // FormSetting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(369, 157);
+            this.ClientSize = new System.Drawing.Size(367, 187);
+            this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.groupBox_vib);
             this.Controls.Add(this.groupBox_snore_sens);
             this.Controls.Add(this.groupBox_mode);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormSetting";
             this.Text = "設定";
             this.groupBox_mode.ResumeLayout(false);
@@ -249,5 +261,6 @@
         private System.Windows.Forms.RadioButton radioButtonVibStrong;
         private System.Windows.Forms.RadioButton radioButtonVibMed;
         private System.Windows.Forms.RadioButton radioButtonVibWeak;
+        private System.Windows.Forms.Button buttonClose;
     }
 }
