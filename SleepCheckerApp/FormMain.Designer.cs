@@ -64,10 +64,10 @@
             this.checkBox_acl_x = new System.Windows.Forms.CheckBox();
             this.checkBox_apneapoint = new System.Windows.Forms.CheckBox();
             this.checkBox_apnearms = new System.Windows.Forms.CheckBox();
-            this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupBoxCom = new System.Windows.Forms.GroupBox();
-            this.buttonSetting = new System.Windows.Forms.Button();
             this.comboBoxComport = new System.Windows.Forms.ComboBox();
+            this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.buttonSetting = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.radioButtonVibConfGrad = new System.Windows.Forms.RadioButton();
             this.radioButtonVibConfStrong = new System.Windows.Forms.RadioButton();
@@ -76,19 +76,22 @@
             this.buttonVibConf = new System.Windows.Forms.Button();
             this.labelState = new System.Windows.Forms.Label();
             this.buttonStop = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.labelSnoreData = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartCalculation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartAccelerometer)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).BeginInit();
-            this.groupBoxCom.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(12, 15);
+            this.buttonStart.Location = new System.Drawing.Point(109, 17);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(108, 30);
             this.buttonStart.TabIndex = 2;
@@ -101,26 +104,38 @@
             this.chartApnea.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.chartApnea.BackColor = System.Drawing.Color.Black;
             chartArea11.AxisX.Interval = 1D;
+            chartArea11.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea11.AxisX.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisX.MajorGrid.Enabled = false;
+            chartArea11.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
             chartArea11.AxisX.Maximum = 10D;
             chartArea11.AxisX.Minimum = 0D;
             chartArea11.AxisY.Interval = 1D;
+            chartArea11.AxisY.LabelStyle.Enabled = false;
+            chartArea11.AxisY.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisY.MajorGrid.Enabled = false;
+            chartArea11.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
             chartArea11.AxisY.Maximum = 3D;
             chartArea11.AxisY.Minimum = 0D;
+            chartArea11.BackColor = System.Drawing.Color.Black;
             chartArea11.Name = "ChartAreaTime";
             this.chartApnea.ChartAreas.Add(chartArea11);
             legend11.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend11.Enabled = false;
             legend11.Name = "Legend1";
             this.chartApnea.Legends.Add(legend11);
             this.chartApnea.Location = new System.Drawing.Point(6, 366);
             this.chartApnea.Name = "chartApnea";
             series21.BorderWidth = 3;
             series21.ChartArea = "ChartAreaTime";
-            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
             series21.Legend = "Legend1";
             series21.Name = "無呼吸";
+            series22.BorderWidth = 3;
             series22.ChartArea = "ChartAreaTime";
-            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
             series22.Legend = "Legend1";
             series22.Name = "いびき";
             this.chartApnea.Series.Add(series21);
@@ -129,6 +144,7 @@
             this.chartApnea.TabIndex = 11;
             this.chartApnea.Text = "ステータス";
             title11.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            title11.ForeColor = System.Drawing.Color.White;
             title11.Name = "Title";
             title11.Text = "いびき/無呼吸判定";
             this.chartApnea.Titles.Add(title11);
@@ -138,24 +154,53 @@
             this.chartRawData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.chartRawData.BackColor = System.Drawing.Color.Black;
+            chartArea12.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.True;
             chartArea12.AxisX.Interval = 200D;
+            chartArea12.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea12.AxisX.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MajorGrid.Enabled = false;
+            chartArea12.AxisX.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
             chartArea12.AxisX.Maximum = 2000D;
             chartArea12.AxisX.Minimum = 0D;
-            chartArea12.AxisY.Maximum = 1024D;
+            chartArea12.AxisX.MinorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MinorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.TitleForeColor = System.Drawing.Color.White;
+            chartArea12.AxisY.LabelStyle.Enabled = false;
+            chartArea12.AxisY.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea12.AxisY.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MajorGrid.Enabled = false;
+            chartArea12.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MajorTickMark.Enabled = false;
+            chartArea12.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.Maximum = 600D;
             chartArea12.AxisY.Minimum = 0D;
+            chartArea12.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.TitleForeColor = System.Drawing.Color.White;
+            chartArea12.BackColor = System.Drawing.Color.Black;
+            chartArea12.CursorX.LineColor = System.Drawing.Color.Lime;
             chartArea12.Name = "ChartAreaTime";
             this.chartRawData.ChartAreas.Add(chartArea12);
             legend12.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend12.Enabled = false;
             legend12.Name = "Legend1";
             this.chartRawData.Legends.Add(legend12);
             this.chartRawData.Location = new System.Drawing.Point(6, 59);
             this.chartRawData.Name = "chartRawData";
             series23.ChartArea = "ChartAreaTime";
-            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series23.EmptyPointStyle.Color = System.Drawing.Color.White;
+            series23.Enabled = false;
             series23.Legend = "Legend1";
             series23.Name = "呼吸音";
             series24.ChartArea = "ChartAreaTime";
-            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series24.EmptyPointStyle.BorderColor = System.Drawing.Color.Fuchsia;
+            series24.EmptyPointStyle.Color = System.Drawing.Color.Red;
             series24.Legend = "Legend1";
             series24.Name = "いびき音";
             this.chartRawData.Series.Add(series23);
@@ -164,6 +209,7 @@
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "呼吸音";
             title12.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            title12.ForeColor = System.Drawing.Color.White;
             title12.Name = "Title";
             title12.Text = "呼吸音";
             this.chartRawData.Titles.Add(title12);
@@ -271,7 +317,7 @@
             this.groupBox2.Controls.Add(this.groupBoxCom);
             this.groupBox2.Controls.Add(this.chartCalculation);
             this.groupBox2.Controls.Add(this.chartHeartBeatRemov);
-            this.groupBox2.Location = new System.Drawing.Point(1029, 6);
+            this.groupBox2.Location = new System.Drawing.Point(1137, 7);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(203, 68);
             this.groupBox2.TabIndex = 19;
@@ -315,7 +361,7 @@
             // checkBox_apneapoint
             // 
             this.checkBox_apneapoint.AutoSize = true;
-            this.checkBox_apneapoint.Location = new System.Drawing.Point(108, 17);
+            this.checkBox_apneapoint.Location = new System.Drawing.Point(104, 17);
             this.checkBox_apneapoint.Name = "checkBox_apneapoint";
             this.checkBox_apneapoint.Size = new System.Drawing.Size(93, 16);
             this.checkBox_apneapoint.TabIndex = 7;
@@ -333,6 +379,25 @@
             this.checkBox_apnearms.Text = "無呼吸(rms)";
             this.checkBox_apnearms.UseVisualStyleBackColor = true;
             this.checkBox_apnearms.CheckedChanged += new System.EventHandler(this.checkBox_apnearms_CheckedChanged);
+            // 
+            // groupBoxCom
+            // 
+            this.groupBoxCom.Location = new System.Drawing.Point(189, 0);
+            this.groupBoxCom.Name = "groupBoxCom";
+            this.groupBoxCom.Size = new System.Drawing.Size(122, 47);
+            this.groupBoxCom.TabIndex = 8;
+            this.groupBoxCom.TabStop = false;
+            this.groupBoxCom.Text = "ポート設定";
+            this.groupBoxCom.Visible = false;
+            // 
+            // comboBoxComport
+            // 
+            this.comboBoxComport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxComport.FormattingEnabled = true;
+            this.comboBoxComport.Location = new System.Drawing.Point(12, 18);
+            this.comboBoxComport.Name = "comboBoxComport";
+            this.comboBoxComport.Size = new System.Drawing.Size(81, 20);
+            this.comboBoxComport.TabIndex = 15;
             // 
             // chartHeartBeatRemov
             // 
@@ -371,35 +436,15 @@
             this.chartHeartBeatRemov.Titles.Add(title15);
             this.chartHeartBeatRemov.Visible = false;
             // 
-            // groupBoxCom
-            // 
-            this.groupBoxCom.Controls.Add(this.comboBoxComport);
-            this.groupBoxCom.Location = new System.Drawing.Point(189, 0);
-            this.groupBoxCom.Name = "groupBoxCom";
-            this.groupBoxCom.Size = new System.Drawing.Size(122, 47);
-            this.groupBoxCom.TabIndex = 8;
-            this.groupBoxCom.TabStop = false;
-            this.groupBoxCom.Text = "ポート設定";
-            this.groupBoxCom.Visible = false;
-            // 
             // buttonSetting
             // 
-            this.buttonSetting.Location = new System.Drawing.Point(455, 15);
+            this.buttonSetting.Location = new System.Drawing.Point(236, 18);
             this.buttonSetting.Name = "buttonSetting";
-            this.buttonSetting.Size = new System.Drawing.Size(98, 29);
+            this.buttonSetting.Size = new System.Drawing.Size(98, 30);
             this.buttonSetting.TabIndex = 16;
             this.buttonSetting.Text = "設定";
             this.buttonSetting.UseVisualStyleBackColor = true;
             this.buttonSetting.Click += new System.EventHandler(this.buttonSetting_Click);
-            // 
-            // comboBoxComport
-            // 
-            this.comboBoxComport.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxComport.FormattingEnabled = true;
-            this.comboBoxComport.Location = new System.Drawing.Point(6, 18);
-            this.comboBoxComport.Name = "comboBoxComport";
-            this.comboBoxComport.Size = new System.Drawing.Size(108, 20);
-            this.comboBoxComport.TabIndex = 15;
             // 
             // groupBox5
             // 
@@ -408,7 +453,8 @@
             this.groupBox5.Controls.Add(this.radioButtonVibConfMed);
             this.groupBox5.Controls.Add(this.radioButtonVibConfWeak);
             this.groupBox5.Controls.Add(this.buttonVibConf);
-            this.groupBox5.Location = new System.Drawing.Point(579, 6);
+            this.groupBox5.ForeColor = System.Drawing.Color.White;
+            this.groupBox5.Location = new System.Drawing.Point(349, 8);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(385, 47);
             this.groupBox5.TabIndex = 26;
@@ -418,6 +464,7 @@
             // radioButtonVibConfGrad
             // 
             this.radioButtonVibConfGrad.AutoSize = true;
+            this.radioButtonVibConfGrad.ForeColor = System.Drawing.Color.White;
             this.radioButtonVibConfGrad.Location = new System.Drawing.Point(305, 20);
             this.radioButtonVibConfGrad.Name = "radioButtonVibConfGrad";
             this.radioButtonVibConfGrad.Size = new System.Drawing.Size(74, 16);
@@ -428,6 +475,7 @@
             // radioButtonVibConfStrong
             // 
             this.radioButtonVibConfStrong.AutoSize = true;
+            this.radioButtonVibConfStrong.ForeColor = System.Drawing.Color.White;
             this.radioButtonVibConfStrong.Location = new System.Drawing.Point(254, 20);
             this.radioButtonVibConfStrong.Name = "radioButtonVibConfStrong";
             this.radioButtonVibConfStrong.Size = new System.Drawing.Size(35, 16);
@@ -439,6 +487,7 @@
             // 
             this.radioButtonVibConfMed.AutoSize = true;
             this.radioButtonVibConfMed.Checked = true;
+            this.radioButtonVibConfMed.ForeColor = System.Drawing.Color.White;
             this.radioButtonVibConfMed.Location = new System.Drawing.Point(203, 20);
             this.radioButtonVibConfMed.Name = "radioButtonVibConfMed";
             this.radioButtonVibConfMed.Size = new System.Drawing.Size(35, 16);
@@ -450,6 +499,7 @@
             // radioButtonVibConfWeak
             // 
             this.radioButtonVibConfWeak.AutoSize = true;
+            this.radioButtonVibConfWeak.ForeColor = System.Drawing.Color.White;
             this.radioButtonVibConfWeak.Location = new System.Drawing.Point(152, 20);
             this.radioButtonVibConfWeak.Name = "radioButtonVibConfWeak";
             this.radioButtonVibConfWeak.Size = new System.Drawing.Size(35, 16);
@@ -459,6 +509,7 @@
             // 
             // buttonVibConf
             // 
+            this.buttonVibConf.ForeColor = System.Drawing.Color.Black;
             this.buttonVibConf.Location = new System.Drawing.Point(17, 18);
             this.buttonVibConf.Name = "buttonVibConf";
             this.buttonVibConf.Size = new System.Drawing.Size(115, 20);
@@ -472,7 +523,7 @@
             this.labelState.AutoSize = true;
             this.labelState.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.labelState.ForeColor = System.Drawing.Color.Red;
-            this.labelState.Location = new System.Drawing.Point(269, 15);
+            this.labelState.Location = new System.Drawing.Point(780, 19);
             this.labelState.Name = "labelState";
             this.labelState.Size = new System.Drawing.Size(93, 27);
             this.labelState.TabIndex = 27;
@@ -481,20 +532,75 @@
             // buttonStop
             // 
             this.buttonStop.Enabled = false;
-            this.buttonStop.Location = new System.Drawing.Point(137, 15);
+            this.buttonStop.Location = new System.Drawing.Point(1054, 21);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(108, 30);
             this.buttonStop.TabIndex = 28;
             this.buttonStop.Text = "停止";
             this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.Visible = false;
             this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Black;
+            this.label1.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label1.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.label1.Location = new System.Drawing.Point(12, 467);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(93, 27);
+            this.label1.TabIndex = 29;
+            this.label1.Text = "無呼吸";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.Black;
+            this.label2.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label2.ForeColor = System.Drawing.Color.Yellow;
+            this.label2.Location = new System.Drawing.Point(29, 538);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(76, 27);
+            this.label2.TabIndex = 30;
+            this.label2.Text = "いびき";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.Black;
+            this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label3.ForeColor = System.Drawing.Color.Yellow;
+            this.label3.Location = new System.Drawing.Point(12, 221);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(135, 27);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "いびきライン";
+            // 
+            // labelSnoreData
+            // 
+            this.labelSnoreData.AutoSize = true;
+            this.labelSnoreData.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.labelSnoreData.Font = new System.Drawing.Font("MS UI Gothic", 70F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.labelSnoreData.ForeColor = System.Drawing.Color.Lime;
+            this.labelSnoreData.Location = new System.Drawing.Point(984, 7);
+            this.labelSnoreData.Name = "labelSnoreData";
+            this.labelSnoreData.Size = new System.Drawing.Size(234, 96);
+            this.labelSnoreData.TabIndex = 32;
+            this.labelSnoreData.Text = "１００";
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(1347, 660);
+            this.Controls.Add(this.comboBoxComport);
+            this.Controls.Add(this.labelSnoreData);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.labelState);
             this.Controls.Add(this.chartRawData);
@@ -516,7 +622,6 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartHeartBeatRemov)).EndInit();
-            this.groupBoxCom.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
@@ -549,6 +654,10 @@
         private System.Windows.Forms.RadioButton radioButtonVibConfWeak;
         private System.Windows.Forms.Label labelState;
         private System.Windows.Forms.Button buttonStop;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label labelSnoreData;
     }
 }
 

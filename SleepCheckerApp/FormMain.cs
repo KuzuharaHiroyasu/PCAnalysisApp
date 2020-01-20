@@ -122,12 +122,15 @@ namespace SleepCheckerApp
         private int DiameterNext;           // エッジ強調移動平均の隣の倍率
         private double DiameterEnd;			// エッジ強調移動平均の端の倍率
 
+        private int snoreDataText;          // 呼吸データ表示用
+
         public int snore = 0;
         public int apnea = 0;
 
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
-
+        public delegate void DelegateUpdateText();
+        
         // ログ出力パス
         string logPath = "C:\\log";
         string iniFileName = "setting.ini";
@@ -458,7 +461,7 @@ namespace SleepCheckerApp
                 IntervalOffset = SnoreParamThre,    // いびきの閾値(SNORE_PARAM_THRE)
                 BorderWidth = 1,
                 BorderDashStyle = ChartDashStyle.Solid,
-                BorderColor = Color.Green,
+                BorderColor = Color.Yellow,
             };
             chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLine);
             
@@ -530,7 +533,7 @@ namespace SleepCheckerApp
             com.Parity = Parity.Even;
             com.DataBits = 8;
             com.StopBits = StopBits.One;
-
+/*
             for (int i = 0; i < comboBoxComport.Items.Count; i++)
             {
                 com.PortName = comboBoxComport.Items[i].ToString();
@@ -545,7 +548,7 @@ namespace SleepCheckerApp
                 }
             }
             log_output("startAnalysis:" + ret);
-
+*/
             return ret;
         }
 
@@ -855,6 +858,12 @@ namespace SleepCheckerApp
                 RawDataSnoreQueue.Enqueue(data2);
             }
 
+            if((CalcDataList1.Count % 20) == 0)
+            {//１秒毎に表示更新
+                snoreDataText = data2;
+                Invoke(new DelegateUpdateText(snoreDataUpdate));
+            }
+
             if (CalcDataList1.Count >= CalcDataNumApnea)
             {
                 //演算
@@ -864,6 +873,17 @@ namespace SleepCheckerApp
                 CalcDataList1.Clear();
                 CalcDataList2.Clear();
             }
+        }
+
+        /************************************************************************/
+        /* 関数名   : snoreDataUpdate                 			    			*/
+        /* 機能     : 呼吸データの表示                                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void snoreDataUpdate()
+        {
+            labelSnoreData.Text = snoreDataText.ToString();
         }
 
         /************************************************************************/
@@ -1040,6 +1060,7 @@ namespace SleepCheckerApp
                 Series srs_rawsnore = chartRawData.Series["いびき音"]; //■
                 srs_rawresp.Points.Clear();
                 srs_rawsnore.Points.Clear();
+                srs_rawsnore.Color = Color.GreenYellow;
                 cnt = 0;
                 foreach (double data in RawDataRespQueue)
                 {
@@ -1153,6 +1174,7 @@ namespace SleepCheckerApp
         {
             if (buttonStart.Text == "測定開始")
             {
+                com.PortName = comboBoxComport.Text;
                 Boolean ret = com.Start();
                 if (ret)
                 {
