@@ -28,31 +28,31 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea36 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend36 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series71 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series72 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title36 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea37 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend37 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series73 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series74 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title37 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea38 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend38 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series75 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series76 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title38 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea39 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend39 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series77 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series78 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series79 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title39 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea40 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend40 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series80 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title40 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea11 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend11 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title11 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title12 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea13 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend13 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series25 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series26 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title13 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea14 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend14 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series27 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series28 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series29 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title14 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea15 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend15 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series30 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title15 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.buttonStart = new System.Windows.Forms.Button();
             this.chartApnea = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartRawData = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -65,8 +65,8 @@
             this.checkBox_apneapoint = new System.Windows.Forms.CheckBox();
             this.checkBox_apnearms = new System.Windows.Forms.CheckBox();
             this.groupBoxCom = new System.Windows.Forms.GroupBox();
-            this.comboBoxComport = new System.Windows.Forms.ComboBox();
             this.chartHeartBeatRemov = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.comboBoxComport = new System.Windows.Forms.ComboBox();
             this.buttonSetting = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.radioButtonVibConfGrad = new System.Windows.Forms.RadioButton();
@@ -106,53 +106,52 @@
             // 
             // chartApnea
             // 
-            this.chartApnea.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.chartApnea.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartApnea.BackColor = System.Drawing.Color.Black;
-            chartArea36.AxisX.Interval = 1D;
-            chartArea36.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
-            chartArea36.AxisX.LineColor = System.Drawing.Color.White;
-            chartArea36.AxisX.MajorGrid.Enabled = false;
-            chartArea36.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea36.AxisX.Maximum = 10D;
-            chartArea36.AxisX.Minimum = 0D;
-            chartArea36.AxisY.Interval = 1D;
-            chartArea36.AxisY.LabelStyle.Enabled = false;
-            chartArea36.AxisY.LineColor = System.Drawing.Color.White;
-            chartArea36.AxisY.MajorGrid.Enabled = false;
-            chartArea36.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
-            chartArea36.AxisY.Maximum = 3D;
-            chartArea36.AxisY.Minimum = 0D;
-            chartArea36.BackColor = System.Drawing.Color.Black;
-            chartArea36.Name = "ChartAreaTime";
-            this.chartApnea.ChartAreas.Add(chartArea36);
-            legend36.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend36.Enabled = false;
-            legend36.Name = "Legend1";
-            this.chartApnea.Legends.Add(legend36);
+            chartArea11.AxisX.Interval = 1D;
+            chartArea11.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea11.AxisX.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisX.MajorGrid.Enabled = false;
+            chartArea11.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisX.Maximum = 10D;
+            chartArea11.AxisX.Minimum = 0D;
+            chartArea11.AxisY.Interval = 1D;
+            chartArea11.AxisY.LabelStyle.Enabled = false;
+            chartArea11.AxisY.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisY.MajorGrid.Enabled = false;
+            chartArea11.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea11.AxisY.Maximum = 3D;
+            chartArea11.AxisY.Minimum = 0D;
+            chartArea11.BackColor = System.Drawing.Color.Black;
+            chartArea11.Name = "ChartAreaTime";
+            this.chartApnea.ChartAreas.Add(chartArea11);
+            legend11.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend11.Enabled = false;
+            legend11.Name = "Legend1";
+            this.chartApnea.Legends.Add(legend11);
             this.chartApnea.Location = new System.Drawing.Point(6, 366);
             this.chartApnea.Name = "chartApnea";
-            series71.BorderWidth = 3;
-            series71.ChartArea = "ChartAreaTime";
-            series71.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series71.Legend = "Legend1";
-            series71.Name = "無呼吸";
-            series72.BorderWidth = 3;
-            series72.ChartArea = "ChartAreaTime";
-            series72.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
-            series72.Legend = "Legend1";
-            series72.Name = "いびき";
-            this.chartApnea.Series.Add(series71);
-            this.chartApnea.Series.Add(series72);
+            series21.BorderWidth = 3;
+            series21.ChartArea = "ChartAreaTime";
+            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series21.Legend = "Legend1";
+            series21.Name = "無呼吸";
+            series22.BorderWidth = 3;
+            series22.ChartArea = "ChartAreaTime";
+            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series22.Legend = "Legend1";
+            series22.Name = "いびき";
+            this.chartApnea.Series.Add(series21);
+            this.chartApnea.Series.Add(series22);
             this.chartApnea.Size = new System.Drawing.Size(1334, 290);
             this.chartApnea.TabIndex = 11;
-            this.chartApnea.Text = "ステータス";
-            title36.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            title36.ForeColor = System.Drawing.Color.White;
-            title36.Name = "Title";
-            title36.Text = "いびき/無呼吸判定";
-            this.chartApnea.Titles.Add(title36);
+            this.chartApnea.Text = "いびき/無呼吸判定";
+            title11.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            title11.ForeColor = System.Drawing.Color.White;
+            title11.Name = "Title";
+            title11.Text = "いびき/無呼吸判定";
+            this.chartApnea.Titles.Add(title11);
             // 
             // chartRawData
             // 
@@ -160,156 +159,156 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartRawData.BackColor = System.Drawing.Color.Black;
-            chartArea37.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.True;
-            chartArea37.AxisX.Interval = 200D;
-            chartArea37.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
-            chartArea37.AxisX.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.MajorGrid.Enabled = false;
-            chartArea37.AxisX.MajorGrid.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.Maximum = 2000D;
-            chartArea37.AxisX.Minimum = 0D;
-            chartArea37.AxisX.MinorGrid.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.MinorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisX.TitleForeColor = System.Drawing.Color.White;
-            chartArea37.AxisY.LabelStyle.Enabled = false;
-            chartArea37.AxisY.LabelStyle.ForeColor = System.Drawing.Color.White;
-            chartArea37.AxisY.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.MajorGrid.Enabled = false;
-            chartArea37.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.MajorTickMark.Enabled = false;
-            chartArea37.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.Maximum = 600D;
-            chartArea37.AxisY.Minimum = 0D;
-            chartArea37.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
-            chartArea37.AxisY.TitleForeColor = System.Drawing.Color.White;
-            chartArea37.BackColor = System.Drawing.Color.Black;
-            chartArea37.CursorX.LineColor = System.Drawing.Color.Lime;
-            chartArea37.Name = "ChartAreaTime";
-            this.chartRawData.ChartAreas.Add(chartArea37);
-            legend37.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend37.Enabled = false;
-            legend37.Name = "Legend1";
-            this.chartRawData.Legends.Add(legend37);
+            chartArea12.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.True;
+            chartArea12.AxisX.Interval = 200D;
+            chartArea12.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea12.AxisX.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MajorGrid.Enabled = false;
+            chartArea12.AxisX.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.Maximum = 2000D;
+            chartArea12.AxisX.Minimum = 0D;
+            chartArea12.AxisX.MinorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.MinorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisX.TitleForeColor = System.Drawing.Color.White;
+            chartArea12.AxisY.LabelStyle.Enabled = false;
+            chartArea12.AxisY.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea12.AxisY.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MajorGrid.Enabled = false;
+            chartArea12.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MajorTickMark.Enabled = false;
+            chartArea12.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.Maximum = 600D;
+            chartArea12.AxisY.Minimum = 0D;
+            chartArea12.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.ScaleBreakStyle.LineColor = System.Drawing.Color.White;
+            chartArea12.AxisY.TitleForeColor = System.Drawing.Color.White;
+            chartArea12.BackColor = System.Drawing.Color.Black;
+            chartArea12.CursorX.LineColor = System.Drawing.Color.Lime;
+            chartArea12.Name = "ChartAreaTime";
+            this.chartRawData.ChartAreas.Add(chartArea12);
+            legend12.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend12.Enabled = false;
+            legend12.Name = "Legend1";
+            this.chartRawData.Legends.Add(legend12);
             this.chartRawData.Location = new System.Drawing.Point(6, 59);
             this.chartRawData.Name = "chartRawData";
-            series73.ChartArea = "ChartAreaTime";
-            series73.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series73.EmptyPointStyle.Color = System.Drawing.Color.White;
-            series73.Enabled = false;
-            series73.Legend = "Legend1";
-            series73.Name = "呼吸音";
-            series74.ChartArea = "ChartAreaTime";
-            series74.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series74.EmptyPointStyle.BorderColor = System.Drawing.Color.Fuchsia;
-            series74.EmptyPointStyle.Color = System.Drawing.Color.Red;
-            series74.Legend = "Legend1";
-            series74.Name = "いびき音";
-            this.chartRawData.Series.Add(series73);
-            this.chartRawData.Series.Add(series74);
+            series23.ChartArea = "ChartAreaTime";
+            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series23.EmptyPointStyle.Color = System.Drawing.Color.White;
+            series23.Enabled = false;
+            series23.Legend = "Legend1";
+            series23.Name = "呼吸音";
+            series24.ChartArea = "ChartAreaTime";
+            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series24.EmptyPointStyle.BorderColor = System.Drawing.Color.Fuchsia;
+            series24.EmptyPointStyle.Color = System.Drawing.Color.Red;
+            series24.Legend = "Legend1";
+            series24.Name = "いびき音";
+            this.chartRawData.Series.Add(series23);
+            this.chartRawData.Series.Add(series24);
             this.chartRawData.Size = new System.Drawing.Size(1334, 301);
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "呼吸音";
-            title37.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
-            title37.ForeColor = System.Drawing.Color.White;
-            title37.Name = "Title";
-            title37.Text = "呼吸音";
-            this.chartRawData.Titles.Add(title37);
+            title12.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
+            title12.ForeColor = System.Drawing.Color.White;
+            title12.Name = "Title";
+            title12.Text = "呼吸音";
+            this.chartRawData.Titles.Add(title12);
             // 
             // chartCalculation
             // 
-            chartArea38.AxisX.Interval = 10D;
-            chartArea38.AxisX.Maximum = 100D;
-            chartArea38.AxisX.Minimum = 0D;
-            chartArea38.AxisX2.Interval = 0.1D;
-            chartArea38.AxisX2.Maximum = 0.5D;
-            chartArea38.AxisX2.Minimum = 0D;
-            chartArea38.Name = "ChartAreaTime";
-            chartArea38.Position.Auto = false;
-            chartArea38.Position.Height = 85F;
-            chartArea38.Position.Width = 79F;
-            chartArea38.Position.X = 0.7F;
-            chartArea38.Position.Y = 13F;
-            this.chartCalculation.ChartAreas.Add(chartArea38);
-            legend38.Name = "Legend1";
-            legend38.Position.Auto = false;
-            legend38.Position.Height = 19.79167F;
-            legend38.Position.Width = 18.11263F;
-            legend38.Position.X = 80F;
-            legend38.Position.Y = 12.98242F;
-            this.chartCalculation.Legends.Add(legend38);
+            chartArea13.AxisX.Interval = 10D;
+            chartArea13.AxisX.Maximum = 100D;
+            chartArea13.AxisX.Minimum = 0D;
+            chartArea13.AxisX2.Interval = 0.1D;
+            chartArea13.AxisX2.Maximum = 0.5D;
+            chartArea13.AxisX2.Minimum = 0D;
+            chartArea13.Name = "ChartAreaTime";
+            chartArea13.Position.Auto = false;
+            chartArea13.Position.Height = 85F;
+            chartArea13.Position.Width = 79F;
+            chartArea13.Position.X = 0.7F;
+            chartArea13.Position.Y = 13F;
+            this.chartCalculation.ChartAreas.Add(chartArea13);
+            legend13.Name = "Legend1";
+            legend13.Position.Auto = false;
+            legend13.Position.Height = 19.79167F;
+            legend13.Position.Width = 18.11263F;
+            legend13.Position.X = 80F;
+            legend13.Position.Y = 12.98242F;
+            this.chartCalculation.Legends.Add(legend13);
             this.chartCalculation.Location = new System.Drawing.Point(57, 1);
             this.chartCalculation.Name = "chartCalculation";
-            series75.ChartArea = "ChartAreaTime";
-            series75.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series75.Legend = "Legend1";
-            series75.Name = "無呼吸(rms)";
-            series76.ChartArea = "ChartAreaTime";
-            series76.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series76.Legend = "Legend1";
-            series76.Name = "無呼吸(point)";
-            this.chartCalculation.Series.Add(series75);
-            this.chartCalculation.Series.Add(series76);
+            series25.ChartArea = "ChartAreaTime";
+            series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series25.Legend = "Legend1";
+            series25.Name = "無呼吸(rms)";
+            series26.ChartArea = "ChartAreaTime";
+            series26.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series26.Legend = "Legend1";
+            series26.Name = "無呼吸(point)";
+            this.chartCalculation.Series.Add(series25);
+            this.chartCalculation.Series.Add(series26);
             this.chartCalculation.Size = new System.Drawing.Size(45, 38);
             this.chartCalculation.TabIndex = 20;
-            title38.Name = "Title";
-            title38.Text = "演算途中データ";
-            this.chartCalculation.Titles.Add(title38);
+            title13.Name = "Title";
+            title13.Text = "演算途中データ";
+            this.chartCalculation.Titles.Add(title13);
             this.chartCalculation.Visible = false;
             // 
             // chartAccelerometer
             // 
-            chartArea39.AxisX.Interval = 20D;
-            chartArea39.AxisX.Maximum = 200D;
-            chartArea39.AxisX.Minimum = 0D;
-            chartArea39.AxisY.Maximum = 127D;
-            chartArea39.AxisY.Minimum = -128D;
-            chartArea39.Name = "ChartAreaTime";
-            chartArea39.Position.Auto = false;
-            chartArea39.Position.Height = 85F;
-            chartArea39.Position.Width = 79F;
-            chartArea39.Position.X = 1F;
-            chartArea39.Position.Y = 13F;
-            this.chartAccelerometer.ChartAreas.Add(chartArea39);
-            legend39.Name = "Legend1";
-            legend39.Position.Auto = false;
-            legend39.Position.Height = 27.08333F;
-            legend39.Position.Width = 10.8067F;
-            legend39.Position.X = 80F;
-            legend39.Position.Y = 12.98242F;
-            this.chartAccelerometer.Legends.Add(legend39);
+            chartArea14.AxisX.Interval = 20D;
+            chartArea14.AxisX.Maximum = 200D;
+            chartArea14.AxisX.Minimum = 0D;
+            chartArea14.AxisY.Maximum = 127D;
+            chartArea14.AxisY.Minimum = -128D;
+            chartArea14.Name = "ChartAreaTime";
+            chartArea14.Position.Auto = false;
+            chartArea14.Position.Height = 85F;
+            chartArea14.Position.Width = 79F;
+            chartArea14.Position.X = 1F;
+            chartArea14.Position.Y = 13F;
+            this.chartAccelerometer.ChartAreas.Add(chartArea14);
+            legend14.Name = "Legend1";
+            legend14.Position.Auto = false;
+            legend14.Position.Height = 27.08333F;
+            legend14.Position.Width = 10.8067F;
+            legend14.Position.X = 80F;
+            legend14.Position.Y = 12.98242F;
+            this.chartAccelerometer.Legends.Add(legend14);
             this.chartAccelerometer.Location = new System.Drawing.Point(984, 7);
             this.chartAccelerometer.Name = "chartAccelerometer";
-            series77.BorderWidth = 2;
-            series77.ChartArea = "ChartAreaTime";
-            series77.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series77.Legend = "Legend1";
-            series77.MarkerBorderWidth = 5;
-            series77.Name = "X軸";
-            series78.BorderWidth = 2;
-            series78.ChartArea = "ChartAreaTime";
-            series78.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series78.Legend = "Legend1";
-            series78.MarkerBorderWidth = 5;
-            series78.Name = "Y軸";
-            series79.BorderWidth = 2;
-            series79.ChartArea = "ChartAreaTime";
-            series79.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series79.Legend = "Legend1";
-            series79.MarkerBorderWidth = 5;
-            series79.Name = "Z軸";
-            this.chartAccelerometer.Series.Add(series77);
-            this.chartAccelerometer.Series.Add(series78);
-            this.chartAccelerometer.Series.Add(series79);
+            series27.BorderWidth = 2;
+            series27.ChartArea = "ChartAreaTime";
+            series27.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series27.Legend = "Legend1";
+            series27.MarkerBorderWidth = 5;
+            series27.Name = "X軸";
+            series28.BorderWidth = 2;
+            series28.ChartArea = "ChartAreaTime";
+            series28.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series28.Legend = "Legend1";
+            series28.MarkerBorderWidth = 5;
+            series28.Name = "Y軸";
+            series29.BorderWidth = 2;
+            series29.ChartArea = "ChartAreaTime";
+            series29.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series29.Legend = "Legend1";
+            series29.MarkerBorderWidth = 5;
+            series29.Name = "Z軸";
+            this.chartAccelerometer.Series.Add(series27);
+            this.chartAccelerometer.Series.Add(series28);
+            this.chartAccelerometer.Series.Add(series29);
             this.chartAccelerometer.Size = new System.Drawing.Size(45, 41);
             this.chartAccelerometer.TabIndex = 21;
             this.chartAccelerometer.Text = "加速度センサー";
-            title39.Name = "Title";
-            title39.Text = "加速度センサー";
-            this.chartAccelerometer.Titles.Add(title39);
+            title14.Name = "Title";
+            title14.Text = "加速度センサー";
+            this.chartAccelerometer.Titles.Add(title14);
             this.chartAccelerometer.Visible = false;
             // 
             // groupBox2
@@ -395,6 +394,43 @@
             this.groupBoxCom.Text = "ポート設定";
             this.groupBoxCom.Visible = false;
             // 
+            // chartHeartBeatRemov
+            // 
+            chartArea15.AxisX.Interval = 200D;
+            chartArea15.AxisX.Maximum = 2000D;
+            chartArea15.AxisX.Minimum = 0D;
+            chartArea15.AxisX2.Interval = 0.1D;
+            chartArea15.AxisX2.Maximum = 0.5D;
+            chartArea15.AxisX2.Minimum = 0D;
+            chartArea15.AxisY.Maximum = 1024D;
+            chartArea15.AxisY.Minimum = 0D;
+            chartArea15.Name = "ChartAreaTime";
+            chartArea15.Position.Auto = false;
+            chartArea15.Position.Height = 85F;
+            chartArea15.Position.Width = 80F;
+            chartArea15.Position.Y = 13F;
+            this.chartHeartBeatRemov.ChartAreas.Add(chartArea15);
+            legend15.Name = "Legend1";
+            legend15.Position.Auto = false;
+            legend15.Position.Height = 19.79167F;
+            legend15.Position.Width = 18.11263F;
+            legend15.Position.X = 80F;
+            legend15.Position.Y = 12.98242F;
+            this.chartHeartBeatRemov.Legends.Add(legend15);
+            this.chartHeartBeatRemov.Location = new System.Drawing.Point(6, 1);
+            this.chartHeartBeatRemov.Name = "chartHeartBeatRemov";
+            series30.ChartArea = "ChartAreaTime";
+            series30.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series30.Legend = "Legend1";
+            series30.Name = "心拍除去後呼吸";
+            this.chartHeartBeatRemov.Series.Add(series30);
+            this.chartHeartBeatRemov.Size = new System.Drawing.Size(45, 38);
+            this.chartHeartBeatRemov.TabIndex = 28;
+            title15.Name = "Title";
+            title15.Text = "心拍除去後の呼吸波形";
+            this.chartHeartBeatRemov.Titles.Add(title15);
+            this.chartHeartBeatRemov.Visible = false;
+            // 
             // comboBoxComport
             // 
             this.comboBoxComport.BackColor = System.Drawing.Color.White;
@@ -404,43 +440,6 @@
             this.comboBoxComport.Name = "comboBoxComport";
             this.comboBoxComport.Size = new System.Drawing.Size(81, 20);
             this.comboBoxComport.TabIndex = 15;
-            // 
-            // chartHeartBeatRemov
-            // 
-            chartArea40.AxisX.Interval = 200D;
-            chartArea40.AxisX.Maximum = 2000D;
-            chartArea40.AxisX.Minimum = 0D;
-            chartArea40.AxisX2.Interval = 0.1D;
-            chartArea40.AxisX2.Maximum = 0.5D;
-            chartArea40.AxisX2.Minimum = 0D;
-            chartArea40.AxisY.Maximum = 1024D;
-            chartArea40.AxisY.Minimum = 0D;
-            chartArea40.Name = "ChartAreaTime";
-            chartArea40.Position.Auto = false;
-            chartArea40.Position.Height = 85F;
-            chartArea40.Position.Width = 80F;
-            chartArea40.Position.Y = 13F;
-            this.chartHeartBeatRemov.ChartAreas.Add(chartArea40);
-            legend40.Name = "Legend1";
-            legend40.Position.Auto = false;
-            legend40.Position.Height = 19.79167F;
-            legend40.Position.Width = 18.11263F;
-            legend40.Position.X = 80F;
-            legend40.Position.Y = 12.98242F;
-            this.chartHeartBeatRemov.Legends.Add(legend40);
-            this.chartHeartBeatRemov.Location = new System.Drawing.Point(6, 1);
-            this.chartHeartBeatRemov.Name = "chartHeartBeatRemov";
-            series80.ChartArea = "ChartAreaTime";
-            series80.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series80.Legend = "Legend1";
-            series80.Name = "心拍除去後呼吸";
-            this.chartHeartBeatRemov.Series.Add(series80);
-            this.chartHeartBeatRemov.Size = new System.Drawing.Size(45, 38);
-            this.chartHeartBeatRemov.TabIndex = 28;
-            title40.Name = "Title";
-            title40.Text = "心拍除去後の呼吸波形";
-            this.chartHeartBeatRemov.Titles.Add(title40);
-            this.chartHeartBeatRemov.Visible = false;
             // 
             // buttonSetting
             // 
@@ -551,6 +550,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Black;
             this.label1.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -563,6 +563,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Black;
             this.label2.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -575,6 +576,7 @@
             // 
             // label3
             // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Black;
             this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
@@ -587,6 +589,8 @@
             // 
             // labelSnoreData
             // 
+            this.labelSnoreData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelSnoreData.AutoSize = true;
             this.labelSnoreData.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.labelSnoreData.Font = new System.Drawing.Font("MS UI Gothic", 70F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
