@@ -55,7 +55,7 @@ static void Judge(void);
 /************************************************************/
 /* マクロ													*/
 /************************************************************/
-#define DATA_SIZE		(200)	// 10秒間、50msに1回データ取得した数
+#define DATA_SIZE		(100)	// 10秒間、50msに1回データ取得した数
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
 #define RIREKI			3
@@ -242,7 +242,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	getwav_apnea(movave_, len, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
 	
 	// (48) - (56)
-	getwav_snore(raw_);
+//	getwav_snore(raw_);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
 }
@@ -454,9 +454,9 @@ void getwav_apnea(const double* pData, int DSize, double Param3, double Param4)
 			// 現状通らない
 			apnea_ = APNEA_NORMAL;
 		}
-		else if (datasize > 9) {
+		else if (datasize > (datasize - 1)) {
 			apnea_ = APNEA_ERROR;
-			int loop = datasize - 9;
+			int loop = datasize - (datasize - 1);
 			for (int ii = 0; ii < loop; ++ii) {
 				double apnea = 0;
 				for (int jj = 0; jj < datasize; ++jj) {

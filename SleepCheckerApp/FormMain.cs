@@ -93,7 +93,7 @@ namespace SleepCheckerApp
         Queue<double> ApneaGraphPlotQueue = new Queue<double>();
 
         // 演算結果データ
-        private const int BufNumApneaGraph = 11;            // 1分(10データ)分だけ表示する // 0点も打つので+1
+        private const int BufNumApneaGraph = 21;            // 1分(10データ)分だけ表示する // 0点も打つので+1
         Queue<double> ApneaQueue = new Queue<double>();
         Queue<double> ResultIbikiQueue = new Queue<double>();
 
@@ -869,10 +869,11 @@ namespace SleepCheckerApp
                 Invoke(new DelegateUpdateText(snoreDataUpdate));
             }
 
-            if (CalcDataList1.Count >= CalcDataNumApnea)
+            //            if (CalcDataList1.Count >= CalcDataNumApnea)
+            if (CalcDataList1.Count >= 100)
             {
                 //演算
-                Calc_Apnea();
+                Calc_Apnea(CalcDataList1.Count);
 
                 //データクリア
                 CalcDataList1.Clear();
@@ -938,23 +939,24 @@ namespace SleepCheckerApp
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private void Calc_Apnea()
+        private void Calc_Apnea(int listCnt)
         {
             try
             {
                 string path = CreateApneaDir(ApneaCalcCount_);
                 ApneaCalcCount_ += 1;
 
-                int num = CalcDataNumApnea;
+                //                int num = CalcDataNumApnea;
+                int num = listCnt;
                 IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
                 IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
                 int[] arrayi = new int[num];
                 double[] arrayd = new double[num];
                 Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
                 Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
-                IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
                 getwav_init(ptr, num, pathptr, ptr2);
                 lock (lockData)
                 {
@@ -987,8 +989,8 @@ namespace SleepCheckerApp
 
                     // 呼吸データをQueueに置く
                     getwav_dc(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
-                    for (int ii = 0; ii < CalcDataNumApnea; ++ii)
+                    Marshal.Copy(pd, arrayd, 0, 100);
+                    for (int ii = 0; ii < 100; ++ii)
                     {
                         ApneaGraphPlotQueue.Dequeue();
                         ApneaGraphPlotQueue.Enqueue(arrayd[ii]);
@@ -996,8 +998,8 @@ namespace SleepCheckerApp
 
                     // 心拍除去後のデータをQueueに置く
                     getwav_heartbeat_remov_dc(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
-                    for (int ii = 0; ii < CalcDataNumApnea; ++ii)
+                    Marshal.Copy(pd, arrayd, 0, 100);
+                    for (int ii = 0; ii < 100; ++ii)
                     {
                         ApneaHeartBeatRemovQueue.Dequeue();
                         ApneaHeartBeatRemovQueue.Enqueue(arrayd[ii]);
@@ -1022,7 +1024,7 @@ namespace SleepCheckerApp
                 Marshal.FreeCoTaskMem(ptr2);
                 Marshal.FreeCoTaskMem(pi);
                 Marshal.FreeCoTaskMem(pd);
-//                Marshal.FreeHGlobal(pathptr);
+                //                Marshal.FreeHGlobal(pathptr);
             }
             catch (Exception ex)
             {
