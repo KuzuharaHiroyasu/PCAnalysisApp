@@ -131,6 +131,7 @@
             this.chartApnea.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartApnea.BackColor = System.Drawing.Color.Black;
+            chartArea1.AlignmentStyle = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentStyles.PlotPosition;
             customLabel1.FromPosition = 0.5D;
             customLabel1.Text = "100";
             customLabel1.ToPosition = -0.5D;
@@ -176,8 +177,7 @@
             chartArea1.AxisX.CustomLabels.Add(customLabel10);
             chartArea1.AxisX.CustomLabels.Add(customLabel11);
             chartArea1.AxisX.Interval = 1D;
-            chartArea1.AxisX.IsLabelAutoFit = false;
-            chartArea1.AxisX.LabelAutoFitMaxFontSize = 11;
+            chartArea1.AxisX.LabelAutoFitMaxFontSize = 12;
             chartArea1.AxisX.LabelAutoFitMinFontSize = 12;
             chartArea1.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
             chartArea1.AxisX.LabelStyle.Interval = 0D;
@@ -194,6 +194,7 @@
             chartArea1.AxisY.LineColor = System.Drawing.Color.White;
             chartArea1.AxisY.MajorGrid.Enabled = false;
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
+            chartArea1.AxisY.MajorTickMark.Enabled = false;
             chartArea1.AxisY.Maximum = 3D;
             chartArea1.AxisY.Minimum = 0D;
             chartArea1.BackColor = System.Drawing.Color.Black;
@@ -203,7 +204,7 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chartApnea.Legends.Add(legend1);
-            this.chartApnea.Location = new System.Drawing.Point(6, 366);
+            this.chartApnea.Location = new System.Drawing.Point(12, 366);
             this.chartApnea.Name = "chartApnea";
             series1.BorderWidth = 3;
             series1.ChartArea = "ChartAreaTime";
@@ -217,7 +218,7 @@
             series2.Name = "いびき";
             this.chartApnea.Series.Add(series1);
             this.chartApnea.Series.Add(series2);
-            this.chartApnea.Size = new System.Drawing.Size(1334, 290);
+            this.chartApnea.Size = new System.Drawing.Size(1322, 290);
             this.chartApnea.TabIndex = 11;
             this.chartApnea.Text = "いびき/無呼吸判定";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -232,8 +233,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chartRawData.BackColor = System.Drawing.Color.Black;
+            chartArea2.AlignmentStyle = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentStyles.PlotPosition;
             customLabel12.FromPosition = -100D;
-            customLabel12.LabelMark = System.Windows.Forms.DataVisualization.Charting.LabelMarkStyle.LineSideMark;
             customLabel12.Text = "100";
             customLabel12.ToPosition = 100D;
             customLabel13.FromPosition = 100D;
@@ -281,13 +282,14 @@
             chartArea2.AxisX.CustomLabels.Add(customLabel22);
             chartArea2.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.True;
             chartArea2.AxisX.Interval = 200D;
-            chartArea2.AxisX.IsLabelAutoFit = false;
-            chartArea2.AxisX.LabelAutoFitMinFontSize = 10;
+            chartArea2.AxisX.IntervalOffset = 1D;
+            chartArea2.AxisX.LabelAutoFitMaxFontSize = 12;
+            chartArea2.AxisX.LabelAutoFitMinFontSize = 12;
             chartArea2.AxisX.LabelStyle.ForeColor = System.Drawing.Color.White;
+            chartArea2.AxisX.LabelStyle.Interval = 0D;
             chartArea2.AxisX.LineColor = System.Drawing.Color.White;
             chartArea2.AxisX.MajorGrid.Enabled = false;
             chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.White;
-            chartArea2.AxisX.MajorTickMark.Enabled = false;
             chartArea2.AxisX.MajorTickMark.LineColor = System.Drawing.Color.White;
             chartArea2.AxisX.Maximum = 2000D;
             chartArea2.AxisX.Minimum = 0D;
@@ -318,7 +320,7 @@
             legend2.Enabled = false;
             legend2.Name = "Legend1";
             this.chartRawData.Legends.Add(legend2);
-            this.chartRawData.Location = new System.Drawing.Point(6, 59);
+            this.chartRawData.Location = new System.Drawing.Point(12, 68);
             this.chartRawData.Name = "chartRawData";
             series3.ChartArea = "ChartAreaTime";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
@@ -334,7 +336,7 @@
             series4.Name = "いびき音";
             this.chartRawData.Series.Add(series3);
             this.chartRawData.Series.Add(series4);
-            this.chartRawData.Size = new System.Drawing.Size(1334, 301);
+            this.chartRawData.Size = new System.Drawing.Size(1322, 301);
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "呼吸音";
             title2.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -706,7 +708,7 @@
             this.label3.BackColor = System.Drawing.Color.Black;
             this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label3.ForeColor = System.Drawing.Color.Yellow;
-            this.label3.Location = new System.Drawing.Point(12, 179);
+            this.label3.Location = new System.Drawing.Point(12, 188);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 27);
             this.label3.TabIndex = 31;
