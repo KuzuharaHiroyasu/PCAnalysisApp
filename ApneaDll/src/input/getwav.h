@@ -21,8 +21,8 @@
 /************************************************************/
 /* ƒ}ƒNƒ													*/
 /************************************************************/
-#define DATA_SIZE_APNEA		(200)
-#define SNORE_PARAM_SIZE	(10)
+#define DATA_SIZE_APNEA		(100)
+#define SNORE_PARAM_SIZE	(5)
 //#define SNORE_PARAM_THRE	(256)
 #define SNORE_PARAM_THRE	(350)
 
@@ -41,7 +41,7 @@
 // OFF”»’è‰ñ”
 #define SNORE_PARAM_OFF_CNT				(0)
 // ON”»’è‰ñ”
-#define SNORE_PARAM_ON_CNT				(8)
+#define SNORE_PARAM_ON_CNT				(4)
 // ‚¢‚Ñ‚«‚ ‚è -> ‚È‚µ‚Ö‚Ì”»’è‰ñ”
 //#define SNORE_PARAM_NORMAL_CNT			(290)
 #define SNORE_PARAM_NORMAL_CNT			(80)

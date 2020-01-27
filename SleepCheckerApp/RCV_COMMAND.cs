@@ -29,6 +29,7 @@ namespace SleepCheckerApp
             RCV_COM_SNORE_SUPPRESS_TIME_TEN,            // いびき抑制の連続時間（10分）
             RCV_COM_SNORE_SUPPRESS_TIME_NON,            // いびき抑制の連続時間（設定しない）
             RCV_COM_SUPPRESS_START_TIME          = 60,  // バイブ抑制開始時間変更
+            RCV_COM_SUPPRESS_START               = 70,  // バイブ動作
             RCV_COM_MAX,							    // 最大
         }
     }

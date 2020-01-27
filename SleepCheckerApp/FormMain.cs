@@ -943,6 +943,7 @@ namespace SleepCheckerApp
         {
             try
             {
+                byte[] param = new byte[1];
                 string path = CreateApneaDir(ApneaCalcCount_);
                 ApneaCalcCount_ += 1;
 
@@ -1009,6 +1010,22 @@ namespace SleepCheckerApp
                     int state = get_state();
                     snore = state & 0x01;
                     apnea = (state & 0xC0) >> 6;
+                    if (snore == 1)
+                    {
+                        if (formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE || formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE_APNEA)
+                        {
+                            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SUPPRESS_START;
+                            writeData(param);
+                        }
+                    }else if(apnea == 2)
+                    {
+                        if (formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_APNEA || formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE_APNEA)
+                        {
+                            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SUPPRESS_START;
+                            writeData(param);
+                        }
+                    }
+
                     if (ResultIbikiQueue.Count >= BufNumApneaGraph)
                     {
                         ResultIbikiQueue.Dequeue();

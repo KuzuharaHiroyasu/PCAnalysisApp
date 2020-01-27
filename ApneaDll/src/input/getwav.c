@@ -242,7 +242,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	getwav_apnea(movave_, len, ApneaParamBinThre_, APNEA_PARAM_APNEA_THRE);
 	
 	// (48) - (56)
-//	getwav_snore(raw_);
+	getwav_snore(raw_);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
 }

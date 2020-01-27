@@ -16,7 +16,7 @@ namespace SleepCheckerApp
 
         private byte[] param = new byte[1];
 
-        private int mode = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE;
+        public int mode = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE;
         private int snoreSens = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED;
         private int vib = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED;
 
