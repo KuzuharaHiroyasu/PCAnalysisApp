@@ -840,7 +840,7 @@ namespace SleepCheckerApp
         // For Apnea
         private void SetCalcData_Apnea(int data1, int data2)
         {
-
+            byte[] param = new byte[1];
             //計算用データ
             CalcDataList1.Add(data1);
             CalcDataList2.Add(data2);
@@ -878,6 +878,17 @@ namespace SleepCheckerApp
                 //データクリア
                 CalcDataList1.Clear();
                 CalcDataList2.Clear();
+            }
+            else if(CalcDataList1.Count == 50)
+            {
+                if (snore == 1 || apnea == 2)
+                {
+                    if (formset.vib == (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD)
+                    {
+                        param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD_LEVELUP;
+                        writeData(param);
+                    }
+                }
             }
         }
 
@@ -1022,6 +1033,14 @@ namespace SleepCheckerApp
                         if (formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_APNEA || formset.mode == (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE_APNEA)
                         {
                             param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SUPPRESS_START;
+                            writeData(param);
+                        }
+                    }
+                    else
+                    {
+                        if (formset.vib == (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD)
+                        {
+                            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD_LEVEL_INIT;
                             writeData(param);
                         }
                     }

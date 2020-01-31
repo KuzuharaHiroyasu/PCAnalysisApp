@@ -17,8 +17,8 @@ namespace SleepCheckerApp
         private byte[] param = new byte[1];
 
         public int mode = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE;
-        private int snoreSens = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED;
-        private int vib = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED;
+        public int snoreSens = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED;
+        public int vib = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED;
 
         public FormSetting()
         {
@@ -40,29 +40,34 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void radioButtonMode_CheckedChanged(object sender, EventArgs e)
         {
-/*
-            if( radioButtonMonitor.Checked == true )
+            if (form != null)
             {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_MONITORING;
-            }
-            else if( radioButtonSnore.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE;
-            }
-            else if( radioButtonApnea.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_APNEA;
-            }
-            else if( radioButtonSnoreApnea.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE_APNEA;
-            }
+                if (radioButtonMonitor.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_MONITORING;
+                }
+                else if (radioButtonSnore.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE;
+                }
+                else if (radioButtonApnea.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_APNEA;
+                }
+                else if (radioButtonSnoreApnea.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MODE_SUPPRESS_SNORE_APNEA;
+                }
 
-            if(!form.writeData(param))
-            {
-                System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                if (!form.writeData(param))
+                {
+                    System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                }
+                else
+                {
+                    mode = param[0];
+                }
             }
-*/
         }
 
         /************************************************************************/
@@ -73,25 +78,31 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void radioButtonSnoreDetect_CheckedChanged(object sender, EventArgs e)
         {
-/*
-            if( radioButtonSnoreDetectWeak.Checked == true )
+            if (form != null)
             {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_WEAK;
-            }
-            else if( radioButtonSnoreDetectMed.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED;
-            }
-            else if( radioButtonSnoreDetectStrong.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_STRONG;
-            }
+                if (radioButtonSnoreDetectWeak.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_WEAK;
+                }
+                else if (radioButtonSnoreDetectMed.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_MED;
+                }
+                else if (radioButtonSnoreDetectStrong.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_SNORE_SENS_STRONG;
+                }
 
-            if (!form.writeData(param))
-            {
-                System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                if (!form.writeData(param))
+                {
+                    System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                }
+                else
+                {
+                    snoreSens = param[0];
+                    form.setSnoreThreUpdate(snoreSens);
+                }
             }
-*/
         }
 
         /************************************************************************/
@@ -102,29 +113,34 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void radioButtonVib_CheckedChanged(object sender, EventArgs e)
         {
-/*
-            if( radioButtonVibWeak.Checked == true )
+            if (form != null)
             {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_WEAK;
-            }
-            else if( radioButtonVibMed.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED;
-            }
-            else if( radioButtonVibStrong.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_STRONG;
-            }
-            else if( radioButtonVibGrad.Checked == true )
-            {
-                param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD;
-            }
+                if (radioButtonVibWeak.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_WEAK;
+                }
+                else if (radioButtonVibMed.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_MED;
+                }
+                else if (radioButtonVibStrong.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_STRONG;
+                }
+                else if (radioButtonVibGrad.Checked == true)
+                {
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_VIB_GRAD;
+                }
 
-            if (!form.writeData(param))
-            {
-                System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                if (!form.writeData(param))
+                {
+                    System.Windows.Forms.MessageBox.Show("設定できませんでした。");
+                }
+                else
+                {
+                    vib = param[0];
+                }
             }
-*/
         }
 
         /************************************************************************/
@@ -135,6 +151,7 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void buttonClose_Click(object sender, EventArgs e)
         {
+/*
             // 動作モード
             if (radioButtonMonitor.Checked == true)
             {
@@ -200,7 +217,7 @@ namespace SleepCheckerApp
             {
                 vib = param[0];
             }
-
+*/
             this.Hide();
         }
 

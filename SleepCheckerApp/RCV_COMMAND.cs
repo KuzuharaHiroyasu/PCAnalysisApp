@@ -21,7 +21,9 @@ namespace SleepCheckerApp
             RCV_COM_VIB_MED,                            // バイブの強さ(中)
             RCV_COM_VIB_STRONG,                         // バイブの強さ(強)
             RCV_COM_VIB_GRAD,                           // バイブの強さ(徐々に強く)
-            RCV_COM_VIB_WEAK_CONF                = 40,  // バイブの強さ(弱)
+            RCV_COM_VIB_GRAD_LEVELUP,                   // バイブの強さ(徐々に強く)のレベルアップ
+            RCV_COM_VIB_GRAD_LEVEL_INIT,                // バイブの強さ(徐々に強く)のレベルを初期化
+            RCV_COM_VIB_WEAK_CONF = 40,  // バイブの強さ(弱)
             RCV_COM_VIB_MED_CONF,                       // バイブの強さ(中)
             RCV_COM_VIB_STRONG_CONF,                    // バイブの強さ(強)
             RCV_COM_VIB_GRAD_CONF,                      // バイブの強さ(徐々に強く)	
