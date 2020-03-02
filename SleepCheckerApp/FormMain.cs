@@ -55,13 +55,24 @@ namespace SleepCheckerApp
 
         private Boolean USB_OUTPUT = true;
         private Boolean C_DRIVE = true;
-//        private Boolean AUTO_ANALYSIS = true;
+        private Boolean AUTO_ANALYSIS = true;
+        private Boolean SOUND_RECORD = true;
 
         private ComPort com = null;
         private FormSetting formset = null;
+        private SoundRecord record = null;
+        private LattePanda panda = null;
 
         private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
+
+        enum request
+        {
+            LED_OFF = 0,    //解析スタート
+            LED_ERROR,      //エラー
+            SET_CLOCK,      //時刻設定
+            VIBRATION,      //バイブレーション
+        }
 
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
         private List<int> CalcDataList1 = new List<int>();
@@ -107,6 +118,8 @@ namespace SleepCheckerApp
         // 保存rootパス
         private string ApneaRootPath_;
         private string AcceRootPath_;
+        private string RecordRootPath_;
+        private string recordFilePath;
 
         private int ApneaCalcCount_;
 //        private int Acce_PhotoRefCalcCount_;
@@ -122,7 +135,8 @@ namespace SleepCheckerApp
         private int DiameterNext;           // エッジ強調移動平均の隣の倍率
         private double DiameterEnd;			// エッジ強調移動平均の端の倍率
 
-        private int snoreDataText;          // 呼吸データ表示用
+        private int snoreDataText;          // いびき音データ表示用
+        private int apneaDataText;          // 呼吸データ表示用
 
         private StripLine stripLineSnore;
 
@@ -209,14 +223,44 @@ namespace SleepCheckerApp
         {
             Boolean ret = true;
 
-            // ログ出力フォルダ作成
-//            CreateRootDir();
+            panda.setComPort_Lattepanda();
 
-            // 解析
-            ret = startAnalysis();
+            // ログ出力フォルダ作成
+            CreateRootDir();
+
+            // 解析スタートでLATTEPANDAのLEDを消灯。
+            panda.requestLattepanda((byte)request.LED_OFF);
+
+            if (AUTO_ANALYSIS)
+            {
+                if(SOUND_RECORD)
+                {
+                    // 録音開始
+                    ret = record.startRecordApnea();
+                }
+
+                if (ret)
+                {
+                    // 解析
+                    ret = startAnalysis();
+                    if (ret)
+                    {
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Text = "データ取得中";
+                        buttonStart.Enabled = false;
+                        log_output("[START]Analysis_Auto");
+                    }
+                    else
+                    {
+                        record.stopRecordApnea();
+                    }
+                }
+            }
 
             if (!ret)
             { //エラー処理
+                panda.requestLattepanda((byte)request.LED_ERROR); // LATTEPANDAのLEDを点灯（エラー）。
+                panda.closeComPort_Lattepanda();
                 log_output("[ERROR]");
                 Application.Exit();
             }
@@ -232,6 +276,8 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            record.stopRecordApnea();
+            panda.closeComPort_Lattepanda();
             com.Close();
         }
 
@@ -245,8 +291,11 @@ namespace SleepCheckerApp
         {
             com = new ComPort();
             formset = new FormSetting();
+            record = new SoundRecord();
+            panda = new LattePanda();
 
             formset.form = this;
+            record.form = this;
         }
 
         /************************************************************************/
@@ -305,13 +354,46 @@ namespace SleepCheckerApp
                 filePath);
             if (Path.GetFileName(sb.ToString()) == "ON")
             {
-//                AUTO_ANALYSIS = true;
+                AUTO_ANALYSIS = true;
             }
             else
             {
-//                AUTO_ANALYSIS = false;
+                AUTO_ANALYSIS = false;
             }
 
+            // iniファイルから音声録音設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "SOUND_RECORD",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                SOUND_RECORD = true;
+            }
+            else
+            {
+                SOUND_RECORD = false;
+            }
+
+            // iniファイルからラテパンダコマンド送信設定を取得
+            GetPrivateProfileString(
+                "FUNCTION",
+                "LATTEPANDA",
+                "ON",            // 値が取得できなかった場合に返される初期値
+                sb,
+                Convert.ToUInt32(sb.Capacity),
+                filePath);
+            if (Path.GetFileName(sb.ToString()) == "ON")
+            {
+                panda.setLattepandaFuncSetting(true);
+            }
+            else
+            {
+                panda.setLattepandaFuncSetting(false);
+            }
             // iniファイルから画面表示設定を取得
             GetPrivateProfileString(
                 "WINDOW_STATE",
@@ -465,7 +547,7 @@ namespace SleepCheckerApp
                 IntervalOffset = SnoreParamThre,    // いびきの閾値(SNORE_PARAM_THRE)
                 BorderWidth = 1,
                 BorderDashStyle = ChartDashStyle.Solid,
-                BorderColor = Color.Yellow,
+                BorderColor = Color.Red,
             };
             chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
 
@@ -532,12 +614,12 @@ namespace SleepCheckerApp
         /************************************************************************/
         private Boolean startAnalysis()
         {
-            Boolean ret = true;
+            Boolean ret = false;
             com.BaudRate = 19200;
             com.Parity = Parity.Even;
             com.DataBits = 8;
             com.StopBits = StopBits.One;
-/*
+
             for (int i = 0; i < comboBoxComport.Items.Count; i++)
             {
                 com.PortName = comboBoxComport.Items[i].ToString();
@@ -546,13 +628,13 @@ namespace SleepCheckerApp
                     comboBoxComport.SelectedIndex = i;
                     if (String.IsNullOrWhiteSpace(com.PortName) == false)
                     {
-//                        ret = com.Start();
+                        ret = com.Start();
                         break;
                     }
                 }
             }
             log_output("startAnalysis:" + ret);
-*/
+
             return ret;
         }
 
@@ -591,6 +673,17 @@ namespace SleepCheckerApp
             log_output("USBConnectConf:" + ret);
 
             return ret;
+        }
+
+        /************************************************************************/
+        /* 関数名   : getRecordFilePath    		                          		*/
+        /* 機能     : 録音ファイルのファイルパスを返す                          */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : [string] recordFilePath - ファイルパス         			*/
+        /************************************************************************/
+        public string getRecordFilePath()
+        {
+            return recordFilePath;
         }
 
         /************************************************************************/
@@ -787,6 +880,30 @@ namespace SleepCheckerApp
                     break;
                 }
             }
+            if (SOUND_RECORD)
+            {
+                // rootパス
+                RecordRootPath_ = drivePath + "\\ax\\record\\" + datestr + "\\";
+                temp = RecordRootPath_;
+                for (i = 1; i < 20; i++)
+                {
+                    if (Directory.Exists(temp))
+                    {
+                        temp = RecordRootPath_ + "(" + i + ")";
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(temp);
+                        recordFilePath = temp;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                RecordRootPath_ = null;
+                recordFilePath = RecordRootPath_;
+            }
         }
 
         /************************************************************************/
@@ -866,6 +983,7 @@ namespace SleepCheckerApp
             if((CalcDataList1.Count % 20) == 0)
             {//１秒毎に表示更新
                 snoreDataText = data2;
+                apneaDataText = data1;
                 Invoke(new DelegateUpdateText(snoreDataUpdate));
             }
 
@@ -889,6 +1007,7 @@ namespace SleepCheckerApp
         private void snoreDataUpdate()
         {
             labelSnoreData.Text = snoreDataText.ToString();
+            labelApneaData.Text = apneaDataText.ToString();
         }
 
         /************************************************************************/
@@ -1180,6 +1299,10 @@ namespace SleepCheckerApp
             if (buttonStart.Text == "測定開始")
             {
                 com.PortName = comboBoxComport.Text;
+                com.BaudRate = 19200;
+                com.Parity = Parity.Even;
+                com.DataBits = 8;
+                com.StopBits = StopBits.One;
                 Boolean ret = com.Start();
                 if (ret)
                 {
