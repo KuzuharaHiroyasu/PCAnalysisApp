@@ -306,7 +306,7 @@
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MajorTickMark.Enabled = false;
             chartArea2.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea2.AxisY.Maximum = 600D;
+            chartArea2.AxisY.Maximum = 1000D;
             chartArea2.AxisY.Minimum = 0D;
             chartArea2.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
@@ -325,7 +325,6 @@
             series3.ChartArea = "ChartAreaTime";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series3.EmptyPointStyle.Color = System.Drawing.Color.White;
-            series3.Enabled = false;
             series3.Legend = "Legend1";
             series3.Name = "呼吸音";
             series4.ChartArea = "ChartAreaTime";
