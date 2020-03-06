@@ -322,7 +322,7 @@
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MajorTickMark.Enabled = false;
             chartArea2.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea2.AxisY.Maximum = 100D;
+            chartArea2.AxisY.Maximum = 1000D;
             chartArea2.AxisY.Minimum = 0D;
             chartArea2.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
@@ -711,7 +711,7 @@
             this.label3.BackColor = System.Drawing.Color.Black;
             this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label3.ForeColor = System.Drawing.Color.Yellow;
-            this.label3.Location = new System.Drawing.Point(7, 377);
+            this.label3.Location = new System.Drawing.Point(-13, 442);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 27);
             this.label3.TabIndex = 31;
