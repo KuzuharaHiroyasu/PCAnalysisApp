@@ -259,12 +259,17 @@ namespace SleepCheckerApp
                         buttonStart.Text = "データ取得中";
                         buttonStart.Enabled = false;
                         log_output("[START]Analysis_Auto");
+                        buttonSetting.Enabled = true;
                     }
                     else
                     {
                         record.stopRecordApnea();
                     }
                 }
+            }
+            else
+            {
+                buttonSetting.Enabled = false;
             }
 
             if (!ret)
@@ -274,8 +279,6 @@ namespace SleepCheckerApp
                 log_output("[ERROR]");
                 Application.Exit();
             }
-
-            buttonSetting.Enabled = false;
         }
 
         /************************************************************************/

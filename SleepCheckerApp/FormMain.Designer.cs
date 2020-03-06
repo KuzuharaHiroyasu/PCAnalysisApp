@@ -221,7 +221,7 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chartApnea.Legends.Add(legend1);
-            this.chartApnea.Location = new System.Drawing.Point(12, 371);
+            this.chartApnea.Location = new System.Drawing.Point(12, 628);
             this.chartApnea.Name = "chartApnea";
             series1.BorderWidth = 3;
             series1.ChartArea = "ChartAreaTime";
@@ -235,7 +235,7 @@
             series2.Name = "いびき";
             this.chartApnea.Series.Add(series1);
             this.chartApnea.Series.Add(series2);
-            this.chartApnea.Size = new System.Drawing.Size(1322, 169);
+            this.chartApnea.Size = new System.Drawing.Size(1323, 169);
             this.chartApnea.TabIndex = 11;
             this.chartApnea.Text = "いびき/無呼吸判定(PCアプリ)";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -316,12 +316,13 @@
             chartArea2.AxisX.Title = "経過時間（秒）";
             chartArea2.AxisX.TitleAlignment = System.Drawing.StringAlignment.Far;
             chartArea2.AxisX.TitleForeColor = System.Drawing.Color.White;
+            chartArea2.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
             chartArea2.AxisY.LabelStyle.ForeColor = System.Drawing.Color.White;
             chartArea2.AxisY.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MajorTickMark.Enabled = false;
             chartArea2.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea2.AxisY.Maximum = 800D;
+            chartArea2.AxisY.Maximum = 100D;
             chartArea2.AxisY.Minimum = 0D;
             chartArea2.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
@@ -350,7 +351,7 @@
             series4.Name = "いびき音";
             this.chartRawData.Series.Add(series3);
             this.chartRawData.Series.Add(series4);
-            this.chartRawData.Size = new System.Drawing.Size(1359, 312);
+            this.chartRawData.Size = new System.Drawing.Size(1360, 569);
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "呼吸音";
             title2.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -710,7 +711,7 @@
             this.label3.BackColor = System.Drawing.Color.Black;
             this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label3.ForeColor = System.Drawing.Color.Yellow;
-            this.label3.Location = new System.Drawing.Point(7, 249);
+            this.label3.Location = new System.Drawing.Point(7, 377);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 27);
             this.label3.TabIndex = 31;
@@ -809,7 +810,7 @@
             legend6.Enabled = false;
             legend6.Name = "Legend1";
             this.chartG1DJudgeResult.Legends.Add(legend6);
-            this.chartG1DJudgeResult.Location = new System.Drawing.Point(12, 546);
+            this.chartG1DJudgeResult.Location = new System.Drawing.Point(12, 803);
             this.chartG1DJudgeResult.Name = "chartG1DJudgeResult";
             series11.BorderWidth = 3;
             series11.ChartArea = "ChartAreaTime";
@@ -823,7 +824,7 @@
             series12.Name = "いびき";
             this.chartG1DJudgeResult.Series.Add(series11);
             this.chartG1DJudgeResult.Series.Add(series12);
-            this.chartG1DJudgeResult.Size = new System.Drawing.Size(1322, 169);
+            this.chartG1DJudgeResult.Size = new System.Drawing.Size(1323, 169);
             this.chartG1DJudgeResult.TabIndex = 34;
             this.chartG1DJudgeResult.Text = "いびき/無呼吸判定(G1D)";
             title6.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -838,7 +839,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.ClientSize = new System.Drawing.Size(1347, 712);
+            this.ClientSize = new System.Drawing.Size(1348, 969);
             this.Controls.Add(this.chartG1DJudgeResult);
             this.Controls.Add(this.labelApneaData);
             this.Controls.Add(this.comboBoxComport);
