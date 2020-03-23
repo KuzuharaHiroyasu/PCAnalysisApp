@@ -1365,29 +1365,19 @@ namespace SleepCheckerApp
         }
 
         /************************************************************************/
-        /* 関数名   : buttonStop_Click                         	    	        */
-        /* 機能     : 停止ボタンクリック時のイベント                            */
+        /* 関数名   : buttonEnd_Click                        	    	        */
+        /* 機能     : 測定終了ボタンクリック時のイベント                        */
         /* 引数     : なし                                                      */
         /* 戻り値   : なし														*/
         /************************************************************************/
-        private void buttonStop_Click(object sender, EventArgs e)
+        private void buttonEnd_Click(object sender, EventArgs e)
         {
-            //            chartRawData.Series.Clear();
+            byte[] param = new byte[1];
+
+            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_END;
+            writeData(param);
+
             com.Close();
-
-            //グラフ初期化
-            initGraphShow();
-
-            //データクリア
-            CalcDataList1.Clear();
-            CalcDataList2.Clear();
-
-            ApneaCalcCount_ = 0;
-
-            // グラフ更新
-            GraphUpdate_Apnea();
-
-            calc_snore_init();
 
             labelState.Text = "待機中";
             buttonStart.Enabled = true;
@@ -1419,14 +1409,6 @@ namespace SleepCheckerApp
             chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
             stripLineSnore.IntervalOffset = SnoreParamThre;
             chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
-        }
-
-        private void buttonEnd_Click(object sender, EventArgs e)
-        {
-            byte[] param = new byte[1];
-
-            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_END;
-            writeData(param);
         }
     }
 }
