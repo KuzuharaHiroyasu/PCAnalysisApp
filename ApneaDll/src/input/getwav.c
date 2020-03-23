@@ -24,6 +24,7 @@
 #include "movave_param.h"
 
 extern void	debug_out( char *f , double d[] , int size , const char* ppath );
+extern void	debug_out_add(char *f, double d[], int size, const char* ppath);
 extern int	peak_modify	( const double in_data[] , int in_res[] , double ot_data[] , double ot_hz[] , int size , double delta, double th);	/* Åô */
 extern void peak_vallay	( const double in[] , int    ot[] , int size, int width , int peak );
 
@@ -45,6 +46,7 @@ DLLEXPORT void   __stdcall get_accelerometer(double data_x, double data_y, doubl
 DLLEXPORT void __stdcall get_photoreflector(double data, char* ppath);
 DLLEXPORT void __stdcall getwav_heartbeat_remov_dc(double* pdata);
 DLLEXPORT void __stdcall calc_snore_init(void);
+DLLEXPORT void __stdcall set_averageData(double kokyu, double ibiki, char* ppath);
 
 static int proc_on(int Pos);
 static int proc_off(int Pos);
@@ -810,6 +812,13 @@ DLLEXPORT void __stdcall set_g1d_judge_ret(int snore_g1d, int apnea_g1d)
 	debug_out("snore_g1d", &snore_g1d_, 1, path_);
 	debug_out("apnea_g1d", &apnea_g1d_, 1, path_);
 }
+
+DLLEXPORT void __stdcall set_averageData(double kokyu, double ibiki, char* ppath)
+{
+	debug_out_add("kokyu_ave", &kokyu, 1, ppath);
+	debug_out_add("ibiki_ave", &ibiki, 1, ppath);
+}
+
 /************************************************************/
 /* END OF TEXT												*/
 /************************************************************/

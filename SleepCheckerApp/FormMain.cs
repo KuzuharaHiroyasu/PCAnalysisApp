@@ -54,6 +54,8 @@ namespace SleepCheckerApp
         static extern void set_g1d_judge_ret(int snore_g1d, int apnea_g1d);
         [DllImport("Apnea.dll")]
         static extern void calc_snore_init();
+        [DllImport("Apnea.dll")]
+        static extern void set_averageData(double kokyu, double ibiki, IntPtr ppath);
 
         private Boolean USB_OUTPUT = true;
         private Boolean C_DRIVE = true;
@@ -65,7 +67,7 @@ namespace SleepCheckerApp
         private SoundRecord record = null;
         private LattePanda panda = null;
 
-        private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
+        private const int CalcDataNumApnea = 100;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
 
         enum request
@@ -142,9 +144,6 @@ namespace SleepCheckerApp
         private int DiameterNext;           // エッジ強調移動平均の隣の倍率
         private double DiameterEnd;			// エッジ強調移動平均の端の倍率
 
-        private int snoreDataText;          // いびき音データ表示用
-        private int apneaDataText;          // 呼吸データ表示用
-
         private StripLine stripLineSnore;
 
         public int snore = 0;
@@ -152,6 +151,14 @@ namespace SleepCheckerApp
 
         public int g1d_snore = 0;
         public int g1d_apnea = 0;
+
+        private const int averageNum = 200;
+        private int averageCnt = 0;
+        private double kokyuSum = 0;
+        private double ibikiSum = 0;
+        private double kokyuAve = 0;
+        private double ibikiAve = 0;
+        private int elapsedTime = 0;
 
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
@@ -212,7 +219,6 @@ namespace SleepCheckerApp
 
             // グラフ更新
             GraphUpdate_Apnea();
-            GraphUpdate_Acce();
 
             // インターバル処理
             Timer timer = new Timer();
@@ -562,7 +568,7 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Red,
             };
-            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
 
             // 無呼吸の閾値表示
             StripLine stripLineApnea = new StripLine
@@ -573,7 +579,6 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Blue,
             };
-            chartCalculation.ChartAreas[0].AxisY.StripLines.Add(stripLineApnea);
 
             // グラフ表示初期化
             // For Apnea
@@ -760,7 +765,7 @@ namespace SleepCheckerApp
 
                     //異常値チェック
                     string[] datas = lines[i].Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 4)
+                    if (datas.Length == 2)
                     {
                         //測定データ表示
                         //SetTextInput(lines[i] + "\r\n");
@@ -768,20 +773,9 @@ namespace SleepCheckerApp
                         int result;
                         if (!int.TryParse(datas[0], out result)) continue;      // マイク(呼吸)
                         if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
-                        if (!int.TryParse(datas[2], out result)) continue;      // いびき判定結果
-                        if (!int.TryParse(datas[3], out result)) continue;      // 無呼吸判定結果
 
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-
-                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99)
-                        {
-                            //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
-                            //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
-                        } else
-                        {
-                            SetJudgeResult(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]));
-                        }
                     }
                     else
                     {
@@ -993,34 +987,60 @@ namespace SleepCheckerApp
                 RawDataSnoreQueue.Enqueue(data2);
             }
 
-            if((CalcDataList1.Count % 20) == 0)
-            {//１秒毎に表示更新
-                snoreDataText = data2;
-                apneaDataText = data1;
-                Invoke(new DelegateUpdateText(snoreDataUpdate));
-            }
-
-            if (CalcDataList1.Count >= CalcDataNumApnea)
+            kokyuSum += data1;
+            ibikiSum += data2;
+            averageCnt++;
+            if (averageNum == averageCnt)
             {
-                //演算
-                Calc_Apnea();
-
-                //データクリア
-                CalcDataList1.Clear();
-                CalcDataList2.Clear();
+                kokyuAve = kokyuSum / averageNum;
+                ibikiAve = ibikiSum / averageNum;
+                averageCnt = 0;
+                kokyuSum = 0;
+                ibikiSum = 0;
+                Invoke(new DelegateUpdateText(averageTextUpDate));
             }
+
+            CalcDataList1.Clear();
+            CalcDataList2.Clear();
         }
 
-        /************************************************************************/
-        /* 関数名   : snoreDataUpdate                 			    			*/
-        /* 機能     : 呼吸データの表示                                          */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void snoreDataUpdate()
+        private void averageTextUpDate()
         {
-            labelSnoreData.Text = snoreDataText.ToString();
-            labelApneaData.Text = apneaDataText.ToString();
+            IntPtr pathptr = Marshal.StringToHGlobalAnsi(ApneaRootPath_);
+
+            Math.Round(kokyuAve, 2, MidpointRounding.AwayFromZero);
+            Math.Round(ibikiAve, 2, MidpointRounding.AwayFromZero);
+
+            set_averageData(kokyuAve, ibikiAve, pathptr);
+
+            switch (elapsedTime)
+            {
+                case 0:
+                    label_kokyuAve_1.Text = kokyuAve.ToString();
+                    label_ibikiAve_1.Text = ibikiAve.ToString();
+                    elapsedTime++;
+                    break;
+                case 1:
+                    label_kokyuAve_2.Text = kokyuAve.ToString();
+                    label_ibikiAve_2.Text = ibikiAve.ToString();
+                    elapsedTime++;
+                    break;
+                case 2:
+                    label_kokyuAve_3.Text = kokyuAve.ToString();
+                    label_ibikiAve_3.Text = ibikiAve.ToString();
+                    elapsedTime++;
+                    break;
+                case 3:
+                    label_kokyuAve_4.Text = kokyuAve.ToString();
+                    label_ibikiAve_4.Text = ibikiAve.ToString();
+                    elapsedTime++;
+                    break;
+                case 4:
+                    label_kokyuAve_5.Text = kokyuAve.ToString();
+                    label_ibikiAve_5.Text = ibikiAve.ToString();
+                    elapsedTime = 0;
+                    break;
+            }
         }
 
         /************************************************************************/
@@ -1202,26 +1222,9 @@ namespace SleepCheckerApp
 
             lock (lockData)
             {
-                // いびき、呼吸状態グラフを更新
-                Series srs_apnea = chartApnea.Series["無呼吸"]; //■
-                Series srs_snore = chartApnea.Series["いびき"]; //■
-                srs_apnea.Points.Clear();
-                srs_snore.Points.Clear();
-                foreach (int data in ApneaQueue)
-                {
-                    srs_apnea.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in ResultIbikiQueue)
-                {
-                    srs_snore.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
                 // 生データグラフを更新
-                Series srs_rawresp = chartRawData.Series["呼吸音"]; //■
-                Series srs_rawsnore = chartRawData.Series["いびき音"]; //■
+                Series srs_rawresp = chart_kokyuRowData.Series["呼吸音"]; //■
+                Series srs_rawsnore = chart_ibikiRawData.Series["いびき音"]; //■
                 srs_rawresp.Points.Clear();
                 srs_rawsnore.Points.Clear();
                 srs_rawsnore.Color = Color.GreenYellow;
@@ -1237,102 +1240,11 @@ namespace SleepCheckerApp
                     srs_rawsnore.Points.AddXY(cnt, data);
                     cnt++;
                 }
-                
-                // 演算途中データグラフを更新
-                Series srs_apnea_rms = chartCalculation.Series["無呼吸(rms)"];
-                Series srs_apnea_point = chartCalculation.Series["無呼吸(point)"];
-                srs_apnea_rms.Points.Clear();
-                srs_apnea_point.Points.Clear();
                 cnt = 0;
-                foreach (double data in ApneaRmsQueue)
-                {
-                    srs_apnea_rms.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in ApneaPointQueue)
-                {
-                    srs_apnea_point.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
-                // 心拍除去後の呼吸データグラフを更新
-                Series srs_apnea_heart_beat_remov = chartHeartBeatRemov.Series["心拍除去後呼吸"];
-                srs_apnea_heart_beat_remov.Points.Clear();
-                cnt = 0;
-                foreach (double data in ApneaHeartBeatRemovQueue)
-                {
-                    srs_apnea_heart_beat_remov.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-
-                // G1D判定結果グラフの更新
-                //chartG1DJudgeResult
-                Series srs_g1d_apnea_judge_result = chartG1DJudgeResult.Series["無呼吸"];
-                Series srs_g1d_snore_judge_result = chartG1DJudgeResult.Series["いびき"];
-                srs_g1d_apnea_judge_result.Points.Clear();
-                srs_g1d_snore_judge_result.Points.Clear();
-                cnt = 0;
-                foreach (double data in ResultG1DSnoreQueue)
-                {
-                    srs_g1d_snore_judge_result.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in ResultG1DApneaQueue)
-                {
-                    srs_g1d_apnea_judge_result.Points.AddXY(cnt, data);
-                    cnt++;
-                }
             }
             // 更新実行
-            chartApnea.Invalidate();
-            chartRawData.Invalidate();
-            chartCalculation.Invalidate();
-            chartHeartBeatRemov.Invalidate();
-            chartG1DJudgeResult.Invalidate();
-        }
-
-        /************************************************************************/
-        /* 関数名   : GraphUpdate_Acce               			    			*/
-        /* 機能     : 加速度センサーのグラフを更新                              */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void GraphUpdate_Acce()
-        {
-            int cnt = 0;
-
-            lock (lockData_Acce)
-            {
-                // 加速度センサーのグラフを更新
-                Series accelerometer_x = chartAccelerometer.Series["X軸"]; //■
-                Series accelerometer_y = chartAccelerometer.Series["Y軸"]; //■
-                Series accelerometer_z = chartAccelerometer.Series["Z軸"]; //■
-
-                accelerometer_x.Points.Clear();
-                accelerometer_y.Points.Clear();
-                accelerometer_z.Points.Clear();
-
-                foreach (int data in AccelerometerXQueue)
-                {
-                    accelerometer_x.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in AccelerometerYQueue)
-                {
-                    accelerometer_y.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-                cnt = 0;
-                foreach (double data in AccelerometerZQueue)
-                {
-                    accelerometer_z.Points.AddXY(cnt, data);
-                    cnt++;
-                }
-            }
-            chartAccelerometer.Invalidate();
+            chart_ibikiRawData.Invalidate();
+            chart_ibikiRawData.Invalidate();
         }
 
         /************************************************************************/
@@ -1344,7 +1256,6 @@ namespace SleepCheckerApp
         public void Interval(object sender, EventArgs e)
         {
             GraphUpdate_Apnea();
-            GraphUpdate_Acce();
         }
 
 /* ボタンクリックイベント */
@@ -1356,6 +1267,8 @@ namespace SleepCheckerApp
         /************************************************************************/
         private void buttonStart_Click(object sender, EventArgs e)
         {
+            byte[] param = new byte[1];
+
             if (buttonStart.Text == "測定開始")
             {
                 com.PortName = comboBoxComport.Text;
@@ -1368,108 +1281,13 @@ namespace SleepCheckerApp
                 {
                     com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
                     buttonStart.Enabled = false;
-                    buttonStop.Enabled = true;
                     buttonSetting.Enabled = true;
-                    labelState.Text = "測定中";
+                    labelState.Text = "検査中";
                     log_output("[START]Analysis(button)");
+
+                    param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_START;
+                    writeData(param);
                 }
-            }
-        }
-
-/* チェックボックスイベント */
-/* 呼吸切替 */
-        /************************************************************************/
-        /* 関数名   : checkBox_apnearms_CheckedChanged        		    		*/
-        /* 機能     : 無呼吸(rms)チェック時のイベント                           */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_apnearms_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartCalculation.Series["無呼吸(rms)"];
-            if (checkBox_apnearms.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_apneapoint_CheckedChanged     	        		*/
-        /* 機能     : 無呼吸(point)チェック時のイベント                         */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_apneapoint_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartCalculation.Series["無呼吸(point)"];
-            if (checkBox_apneapoint.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_acl_x_CheckedChanged     	        		    */
-        /* 機能     : X軸チェック時のイベント                                   */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_acl_x_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartAccelerometer.Series["X軸"];
-            if (checkBox_acl_x.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_acl_y_CheckedChanged           	        		*/
-        /* 機能     : Y軸チェック時のイベント                                   */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_acl_y_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartAccelerometer.Series["Y軸"];
-            if (checkBox_acl_y.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
-            }
-        }
-
-        /************************************************************************/
-        /* 関数名   : checkBox_acl_z_CheckedChanged         	        		*/
-        /* 機能     : Z軸チェック時のイベント                                   */
-        /* 引数     : なし                                                      */
-        /* 戻り値   : なし														*/
-        /************************************************************************/
-        private void checkBox_acl_z_CheckedChanged(object sender, EventArgs e)
-        {
-            Series srs = chartAccelerometer.Series["Z軸"];
-            if (checkBox_acl_z.Checked)
-            {
-                srs.Enabled = true;
-            }
-            else
-            {
-                srs.Enabled = false;
             }
         }
 
@@ -1568,12 +1386,10 @@ namespace SleepCheckerApp
 
             // グラフ更新
             GraphUpdate_Apnea();
-            GraphUpdate_Acce();
 
             calc_snore_init();
 
             labelState.Text = "待機中";
-            buttonStop.Enabled = false;
             buttonStart.Enabled = true;
         }
 
@@ -1600,9 +1416,17 @@ namespace SleepCheckerApp
             setThreshold(SnoreParamThre, SnoreParamNormalCnt, ApneaJudgeCnt, ApneaParamBinThre);
 
             // いびきの閾値表示
-            chartRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
+            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
             stripLineSnore.IntervalOffset = SnoreParamThre;
-            chartRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+        }
+
+        private void buttonEnd_Click(object sender, EventArgs e)
+        {
+            byte[] param = new byte[1];
+
+            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_END;
+            writeData(param);
         }
     }
 }
