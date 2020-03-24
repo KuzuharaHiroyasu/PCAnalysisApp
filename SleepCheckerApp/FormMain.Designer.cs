@@ -392,7 +392,7 @@
             chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MajorTickMark.Enabled = false;
             chartArea2.AxisY.MajorTickMark.LineColor = System.Drawing.Color.White;
-            chartArea2.AxisY.Maximum = 1000D;
+            chartArea2.AxisY.Maximum = 100D;
             chartArea2.AxisY.Minimum = 0D;
             chartArea2.AxisY.MinorGrid.LineColor = System.Drawing.Color.White;
             chartArea2.AxisY.MinorTickMark.LineColor = System.Drawing.Color.White;
