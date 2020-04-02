@@ -57,7 +57,7 @@ static void Judge(void);
 /************************************************************/
 /* マクロ													*/
 /************************************************************/
-#define DATA_SIZE		(200)	// 10秒間、50msに1回データ取得した数
+#define DATA_SIZE		(100)	// 10秒間、50msに1回データ取得した数
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
 #define RIREKI			3
@@ -187,7 +187,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			movave_[ii] /= (double)N;
 		}
 	}
-	debug_out("edge_movave", movave_, len, path_);
+//	debug_out("edge_movave", movave_, len, path_);
 
 	// 心拍除去
 	for (i = 0; i < len; i++)
@@ -222,6 +222,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			}
 		}
 	}
+/*
 	debug_out("raw_heartBeatRemov", dcHBR_, len, path_);
 
 	// 除去後の呼吸音の移動平均
@@ -238,6 +239,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			movave_[ii] /= APNEA_PARAM_RAW;	// 生データ補正
 		}
 	}
+
 	debug_out("movave", movave_, len, path_);
 
 	// (35) - (47)
@@ -247,6 +249,7 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	getwav_snore(raw_);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
+*/
 }
 
 /************************************************************************/

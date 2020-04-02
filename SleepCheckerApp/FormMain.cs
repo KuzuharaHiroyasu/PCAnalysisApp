@@ -972,13 +972,14 @@ namespace SleepCheckerApp
             //グラフ用データ追加
             lock (lockData)
             {
+/*
                 // 呼吸データ
                 if (RawDataRespQueue.Count >= ApneaGraphDataNum)
                 {
                     RawDataRespQueue.Dequeue();
                 }
                 RawDataRespQueue.Enqueue(data1);
-                
+*/                
                 // いびきデータ
                 if (RawDataSnoreQueue.Count >= ApneaGraphDataNum)
                 {
@@ -1000,8 +1001,15 @@ namespace SleepCheckerApp
                 Invoke(new DelegateUpdateText(averageTextUpDate));
             }
 
-            CalcDataList1.Clear();
-            CalcDataList2.Clear();
+            if (CalcDataList1.Count >= CalcDataNumApnea)
+            {
+                //演算
+                Calc_Apnea();
+
+                //データクリア
+                CalcDataList1.Clear();
+                CalcDataList2.Clear();
+            }
         }
 
         private void averageTextUpDate()
@@ -1126,7 +1134,7 @@ namespace SleepCheckerApp
                 int num = CalcDataNumApnea;
                 IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+//                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
                 int[] arrayi = new int[num];
                 double[] arrayd = new double[num];
@@ -1136,6 +1144,7 @@ namespace SleepCheckerApp
                 getwav_init(ptr, num, pathptr, ptr2);
                 lock (lockData)
                 {
+/*
                     // DC成分除去データをQueueに置く
                     getwav_movave(pd);
                     Marshal.Copy(pd, arrayd, 0, num);
@@ -1171,7 +1180,7 @@ namespace SleepCheckerApp
                         ApneaGraphPlotQueue.Dequeue();
                         ApneaGraphPlotQueue.Enqueue(arrayd[ii]);
                     }
-
+*/
                     // 心拍除去後のデータをQueueに置く
                     getwav_heartbeat_remov_dc(pd);
                     Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
@@ -1180,7 +1189,7 @@ namespace SleepCheckerApp
                         ApneaHeartBeatRemovQueue.Dequeue();
                         ApneaHeartBeatRemovQueue.Enqueue(arrayd[ii]);
                     }
-
+/*
                     // 演算結果データ
                     int state = get_state();
                     snore = state & 0x01;
@@ -1196,10 +1205,11 @@ namespace SleepCheckerApp
                     }
                     ApneaQueue.Enqueue(apnea);
                     set_g1d_judge_ret(g1d_snore, g1d_apnea);
+*/
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
-                Marshal.FreeCoTaskMem(pi);
+//                Marshal.FreeCoTaskMem(pi);
                 Marshal.FreeCoTaskMem(pd);
 //                Marshal.FreeHGlobal(pathptr);
             }
@@ -1229,7 +1239,7 @@ namespace SleepCheckerApp
                 srs_rawsnore.Points.Clear();
                 srs_rawsnore.Color = Color.GreenYellow;
                 cnt = 0;
-                foreach (double data in RawDataRespQueue)
+                foreach (double data in ApneaHeartBeatRemovQueue)
                 {
                     srs_rawresp.Points.AddXY(cnt, data);
                     cnt++;
@@ -1243,7 +1253,7 @@ namespace SleepCheckerApp
                 cnt = 0;
             }
             // 更新実行
-            chart_ibikiRawData.Invalidate();
+            chart_kokyuRowData.Invalidate();
             chart_ibikiRawData.Invalidate();
         }
 
