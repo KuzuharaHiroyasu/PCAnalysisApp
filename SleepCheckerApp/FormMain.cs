@@ -43,6 +43,8 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern int get_state();
         [DllImport("Apnea.dll")]
+        static extern double get_heartBeatRemoveAve();
+        [DllImport("Apnea.dll")]
         static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
         [DllImport("Apnea.dll")]
         static extern void get_photoreflector(double data, IntPtr ppath);
@@ -67,7 +69,7 @@ namespace SleepCheckerApp
         private SoundRecord record = null;
         private LattePanda panda = null;
 
-        private const int CalcDataNumApnea = 100;           // 6秒間、50msに1回データ取得した数
+        private const int CalcDataNumApnea = 200;           // 6秒間、50msに1回データ取得した数
         private const int CalcDataNumCalculationApnea = 10;
 
         enum request
@@ -85,7 +87,7 @@ namespace SleepCheckerApp
 
         // グラフ用
         // 生データ
-        private const int ApneaGraphDataNum = CalcDataNumApnea * 10 + 1;
+        private const int ApneaGraphDataNum = CalcDataNumApnea + 1;
         Queue<double> RawDataRespQueue = new Queue<double>();
         Queue<double> RawDataSnoreQueue = new Queue<double>();
         Queue<double> RawDataDcQueue = new Queue<double>();
@@ -167,7 +169,9 @@ namespace SleepCheckerApp
         // ログ出力パス
         string logPath = "C:\\log";
         string iniFileName = "setting.ini";
-
+        static int periodCnt = 0;
+        static bool stopFlg = false;
+        
         public FormMain()
         {
             string icon = AppDomain.CurrentDomain.BaseDirectory + "analysis.ico";
@@ -223,7 +227,7 @@ namespace SleepCheckerApp
             // インターバル処理
             Timer timer = new Timer();
             timer.Tick += new EventHandler(Interval);
-            timer.Interval = 100;           // ms単位
+            timer.Interval = 10;           // ms単位
             timer.Start();
 
             calc_snore_init();
@@ -568,7 +572,7 @@ namespace SleepCheckerApp
                 BorderDashStyle = ChartDashStyle.Solid,
                 BorderColor = Color.Red,
             };
-            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+            chart_hertBeatRemoveRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
 
             // 無呼吸の閾値表示
             StripLine stripLineApnea = new StripLine
@@ -775,7 +779,18 @@ namespace SleepCheckerApp
                         if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
 
                         // For Apnea
-                        SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
+                        if (labelState.Text == "検査中")
+                        {
+                            if (periodCnt == 5)
+                            {
+                                SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
+                                periodCnt = 0;
+                            }
+                            else
+                            {
+                                periodCnt++;
+                            }
+                        }
                     }
                     else
                     {
@@ -972,20 +987,20 @@ namespace SleepCheckerApp
             //グラフ用データ追加
             lock (lockData)
             {
-/*
                 // 呼吸データ
                 if (RawDataRespQueue.Count >= ApneaGraphDataNum)
                 {
                     RawDataRespQueue.Dequeue();
                 }
                 RawDataRespQueue.Enqueue(data1);
-*/                
+
                 // いびきデータ
                 if (RawDataSnoreQueue.Count >= ApneaGraphDataNum)
                 {
                     RawDataSnoreQueue.Dequeue();
                 }
                 RawDataSnoreQueue.Enqueue(data2);
+
             }
 
             kokyuSum += data1;
@@ -1009,12 +1024,20 @@ namespace SleepCheckerApp
                 //データクリア
                 CalcDataList1.Clear();
                 CalcDataList2.Clear();
+
+                Invoke(new DelegateUpdateText(apneaRetShow));
+
+                Invoke(new DelegateUpdateText(measStop));
+
+                
             }
         }
 
         private void averageTextUpDate()
         {
             IntPtr pathptr = Marshal.StringToHGlobalAnsi(ApneaRootPath_);
+
+            ibikiAve = get_heartBeatRemoveAve();
 
             Math.Round(kokyuAve, 2, MidpointRounding.AwayFromZero);
             Math.Round(ibikiAve, 2, MidpointRounding.AwayFromZero);
@@ -1026,8 +1049,9 @@ namespace SleepCheckerApp
                 case 0:
                     label_kokyuAve_1.Text = kokyuAve.ToString();
                     label_ibikiAve_1.Text = ibikiAve.ToString();
-                    elapsedTime++;
+                    elapsedTime = 0;
                     break;
+/*
                 case 1:
                     label_kokyuAve_2.Text = kokyuAve.ToString();
                     label_ibikiAve_2.Text = ibikiAve.ToString();
@@ -1048,6 +1072,7 @@ namespace SleepCheckerApp
                     label_ibikiAve_5.Text = ibikiAve.ToString();
                     elapsedTime = 0;
                     break;
+*/
             }
         }
 
@@ -1134,7 +1159,6 @@ namespace SleepCheckerApp
                 int num = CalcDataNumApnea;
                 IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
-//                IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
                 int[] arrayi = new int[num];
                 double[] arrayd = new double[num];
@@ -1144,43 +1168,6 @@ namespace SleepCheckerApp
                 getwav_init(ptr, num, pathptr, ptr2);
                 lock (lockData)
                 {
-/*
-                    // DC成分除去データをQueueに置く
-                    getwav_movave(pd);
-                    Marshal.Copy(pd, arrayd, 0, num);
-                    for (int ii = 0; ii < num; ++ii)
-                    {
-                        RawDataDcQueue.Dequeue();
-                        RawDataDcQueue.Enqueue(arrayd[ii]);
-                    }
-
-                    // 無呼吸(rms)データをQueueに置く
-                    get_apnea_rms(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumCalculationApnea);
-                    for (int ii = 0; ii < CalcDataNumCalculationApnea; ++ii)
-                    {
-                        ApneaRmsQueue.Dequeue();
-                        ApneaRmsQueue.Enqueue(arrayd[ii]);
-                    }
-
-                    // 無呼吸(point)データをQueueに置く
-                    get_apnea_point(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumCalculationApnea);
-                    for (int ii = 0; ii < CalcDataNumCalculationApnea; ++ii)
-                    {
-                        ApneaPointQueue.Dequeue();
-                        ApneaPointQueue.Enqueue(arrayd[ii]);
-                    }
-
-                    // 呼吸データをQueueに置く
-                    getwav_dc(pd);
-                    Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
-                    for (int ii = 0; ii < CalcDataNumApnea; ++ii)
-                    {
-                        ApneaGraphPlotQueue.Dequeue();
-                        ApneaGraphPlotQueue.Enqueue(arrayd[ii]);
-                    }
-*/
                     // 心拍除去後のデータをQueueに置く
                     getwav_heartbeat_remov_dc(pd);
                     Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
@@ -1189,29 +1176,10 @@ namespace SleepCheckerApp
                         ApneaHeartBeatRemovQueue.Dequeue();
                         ApneaHeartBeatRemovQueue.Enqueue(arrayd[ii]);
                     }
-/*
-                    // 演算結果データ
-                    int state = get_state();
-                    snore = state & 0x01;
-                    apnea = (state & 0xC0) >> 6;
-                    if (ResultIbikiQueue.Count >= BufNumApneaGraph)
-                    {
-                        ResultIbikiQueue.Dequeue();
-                    }
-                    ResultIbikiQueue.Enqueue(snore);
-                    if (ApneaQueue.Count >= BufNumApneaGraph)
-                    {
-                        ApneaQueue.Dequeue();
-                    }
-                    ApneaQueue.Enqueue(apnea);
-                    set_g1d_judge_ret(g1d_snore, g1d_apnea);
-*/
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
-//                Marshal.FreeCoTaskMem(pi);
                 Marshal.FreeCoTaskMem(pd);
-//                Marshal.FreeHGlobal(pathptr);
             }
             catch (Exception ex)
             {
@@ -1234,14 +1202,22 @@ namespace SleepCheckerApp
             {
                 // 生データグラフを更新
                 Series srs_rawresp = chart_kokyuRowData.Series["呼吸音"]; //■
-                Series srs_rawsnore = chart_ibikiRawData.Series["いびき音"]; //■
+                Series srs_rawhertBeatRemove = chart_hertBeatRemoveRawData.Series["心拍除去後の呼吸音"]; //■
+                Series srs_rawsnore = chart_snoreRow.Series["いびき音"]; //■
                 srs_rawresp.Points.Clear();
+                srs_rawhertBeatRemove.Points.Clear();
                 srs_rawsnore.Points.Clear();
                 srs_rawsnore.Color = Color.GreenYellow;
                 cnt = 0;
-                foreach (double data in ApneaHeartBeatRemovQueue)
+                foreach (double data in RawDataRespQueue)
                 {
                     srs_rawresp.Points.AddXY(cnt, data);
+                    cnt++;
+                }
+                cnt = 0;
+                foreach (double data in ApneaHeartBeatRemovQueue)
+                {
+                    srs_rawhertBeatRemove.Points.AddXY(cnt, data);
                     cnt++;
                 }
                 cnt = 0;
@@ -1250,11 +1226,11 @@ namespace SleepCheckerApp
                     srs_rawsnore.Points.AddXY(cnt, data);
                     cnt++;
                 }
-                cnt = 0;
             }
             // 更新実行
             chart_kokyuRowData.Invalidate();
-            chart_ibikiRawData.Invalidate();
+            chart_hertBeatRemoveRawData.Invalidate();
+            chart_snoreRow.Invalidate();
         }
 
         /************************************************************************/
@@ -1281,15 +1257,31 @@ namespace SleepCheckerApp
 
             if (buttonStart.Text == "測定開始")
             {
-                com.PortName = comboBoxComport.Text;
-                com.BaudRate = 19200;
-                com.Parity = Parity.Even;
-                com.DataBits = 8;
-                com.StopBits = StopBits.One;
-                Boolean ret = com.Start();
-                if (ret)
+                if (stopFlg == false)
                 {
-                    com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                    com.PortName = comboBoxComport.Text;
+                    com.BaudRate = 19200;
+                    com.Parity = Parity.Even;
+                    com.DataBits = 8;
+                    com.StopBits = StopBits.One;
+                    Boolean ret = com.Start();
+                    if (ret)
+                    {
+
+                        com.DataReceived += ComPort_DataReceived;   // コールバックイベント追加
+                        buttonStart.Enabled = false;
+                        buttonSetting.Enabled = true;
+                        labelState.Text = "検査中";
+                        log_output("[START]Analysis(button)");
+
+                        param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_START;
+                        writeData(param);
+                    }
+                }
+                else
+                {
+                    initGraphShow();
+
                     buttonStart.Enabled = false;
                     buttonSetting.Enabled = true;
                     labelState.Text = "検査中";
@@ -1297,6 +1289,8 @@ namespace SleepCheckerApp
 
                     param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_START;
                     writeData(param);
+
+                    stopFlg = false;
                 }
             }
         }
@@ -1416,9 +1410,157 @@ namespace SleepCheckerApp
             setThreshold(SnoreParamThre, SnoreParamNormalCnt, ApneaJudgeCnt, ApneaParamBinThre);
 
             // いびきの閾値表示
-            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
+            chart_hertBeatRemoveRawData.ChartAreas[0].AxisY.StripLines.Remove(stripLineSnore);
             stripLineSnore.IntervalOffset = SnoreParamThre;
-            chart_ibikiRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
+            chart_hertBeatRemoveRawData.ChartAreas[0].AxisY.StripLines.Add(stripLineSnore);
         }
+
+        /************************************************************************/
+        /* 関数名   : measStop                               	    	        */
+        /* 機能     : 測定停止                                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void measStop()
+        {
+            byte[] param = new byte[1];
+
+            param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_END;
+            writeData(param);
+
+            //            com.Close();
+
+            stopFlg = true;
+
+            labelState.Text = "待機中";
+            buttonStart.Enabled = true;
+            buttonEnd.Enabled = false;
+
+        }
+
+        /************************************************************************/
+        /* 関数名   : apneaRetShow                            	    	        */
+        /* 機能     : 無呼吸判定結果を表示する                                  */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void apneaRetShow()
+        {
+            int state = get_state();
+            int snore;
+            int apnea;
+
+            snore = state & 0x01;
+            apnea = (state & 0xC0) >> 6;
+
+//            rmsRetShow();
+
+            if (apnea == 2)
+            {
+                label_apnea.Text = "無呼吸";
+            }
+            else if(snore == 1)
+            {
+                label_apnea.Text = "いびき";
+            }
+            else
+            {
+                label_apnea.Text = "通常呼吸";
+            }
+        }
+
+        /************************************************************************/
+        /* 関数名   : rmsRetShow                            	    	        */
+        /* 機能     : rmsを表示する                                             */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
+        private void rmsRetShow()
+        {
+            try
+            {
+                double[] arrayRmsData = new double[10];
+                IntPtr rmsData = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * 10);
+
+                get_apnea_rms(rmsData);
+                Marshal.Copy(rmsData, arrayRmsData, 0, 10);
+
+                lock (lockData)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Math.Round(arrayRmsData[i], 3, MidpointRounding.AwayFromZero);
+                    }
+                }
+                Marshal.FreeCoTaskMem(rmsData);
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.Message, "内部エラー(Calc)");
+                Console.WriteLine(ex.Message);
+            }
+
+    /*
+                label_rms1.Text = arrayRmsData[0].ToString();
+                if(arrayRmsData[0] >= 0.002)
+                {
+                    label_rms1.ForeColor = Color.Red;
+                }
+
+                label_rms2.Text = arrayRmsData[1].ToString();
+                if (arrayRmsData[1] >= 0.002)
+                {
+                    label_rms2.ForeColor = Color.Red;
+                }
+
+                label_rms3.Text = arrayRmsData[2].ToString();
+                if (arrayRmsData[2] >= 0.002)
+                {
+                    label_rms3.ForeColor = Color.Red;
+                }
+
+                label_rms4.Text = arrayRmsData[3].ToString();
+                if (arrayRmsData[3] >= 0.002)
+                {
+                    label_rms4.ForeColor = Color.Red;
+                }
+
+                label_rms5.Text = arrayRmsData[4].ToString();
+                if (arrayRmsData[4] >= 0.002)
+                {
+                    label_rms5.ForeColor = Color.Red;
+                }
+
+                label_rms6.Text = arrayRmsData[5].ToString();
+                if (arrayRmsData[5] >= 0.002)
+                {
+                    label_rms6.ForeColor = Color.Red;
+                }
+
+                label_rms7.Text = arrayRmsData[6].ToString();
+                if (arrayRmsData[6] >= 0.002)
+                {
+                    label_rms7.ForeColor = Color.Red;
+                }
+
+                label_rms8.Text = arrayRmsData[7].ToString();
+                if (arrayRmsData[7] >= 0.002)
+                {
+                    label_rms8.ForeColor = Color.Red;
+                }
+
+                label_rms9.Text = arrayRmsData[8].ToString();
+                if (arrayRmsData[8] >= 0.002)
+                {
+                    label_rms9.ForeColor = Color.Red;
+                }
+
+                label_rms10.Text = arrayRmsData[9].ToString();
+                if (arrayRmsData[9] >= 0.002)
+                {
+                    label_rms10.ForeColor = Color.Red;
+                }
+                */
+}
     }
 }

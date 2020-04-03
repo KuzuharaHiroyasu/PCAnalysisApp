@@ -57,7 +57,7 @@ static void Judge(void);
 /************************************************************/
 /* マクロ													*/
 /************************************************************/
-#define DATA_SIZE		(100)	// 10秒間、50msに1回データ取得した数
+#define DATA_SIZE		(200)	// 10秒間、50msに1回データ取得した数
 #define BUF_SIZE		(256)	// DATA_SIZE + 予備
 #define BUF_SIZE_APNEA	(20)	// 無呼吸・低呼吸の結果は生データの100分の1
 #define RIREKI			3
@@ -107,6 +107,8 @@ static int	SnoreCnt_; // ON連続回数, OFF連続回数 兼用
 int temp_int_buf0[BUF_SIZE];
 
 int cont_apnea_point = 0;
+
+double heartBertRemoveAve;
 
 /************************************************************/
 /* ＲＯＭ定義												*/
@@ -222,8 +224,14 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			}
 		}
 	}
-/*
-	debug_out("raw_heartBeatRemov", dcHBR_, len, path_);
+
+	for (i = 0; i < DATA_SIZE; i++)
+	{
+		heartBertRemoveAve += dcHBR_[i];
+	}
+	heartBertRemoveAve = heartBertRemoveAve / DATA_SIZE;
+
+//	debug_out("raw_heartBeatRemov", dcHBR_, len, path_);
 
 	// 除去後の呼吸音の移動平均
 	for (int ii = 0; ii < len; ++ii) {
@@ -249,7 +257,6 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	getwav_snore(raw_);
 	double tmpsnore = (double)snore_;
 	debug_out("snore_", &tmpsnore, 1, path_);
-*/
 }
 
 /************************************************************************/
@@ -756,6 +763,12 @@ DLLEXPORT int __stdcall get_state(void)
 	
 	return ret;
 }
+
+DLLEXPORT double __stdcall get_heartBeatRemoveAve(void)
+{
+	return heartBertRemoveAve;
+}
+
 
 // 加速度センサーの値を取得
 DLLEXPORT void __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath)

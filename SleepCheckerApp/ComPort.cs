@@ -68,7 +68,7 @@ namespace SleepCheckerApp
             {
                 myPort.Close();
                 //receiveThread.Join();     // これだけだとブロックし続けて終わらない
-                //receiveThread.Join(1000);   // 1秒終了を待機して
+                receiveThread.Join(1000);   // 1秒終了を待機して
                 receiveThread.Abort();      // スレッドを強制終了
                 receiveThread = null;
             }
@@ -117,7 +117,7 @@ namespace SleepCheckerApp
                 try
                 {
 //                    int rbyte = myPort.BytesToRead;
-                    int rbyte = 100;    // 500バイトまとめて取得する
+                    int rbyte = 200;    // 500バイトまとめて取得する
                     byte[] buffer = new byte[rbyte];
                     int read = 0;
                     while (read < rbyte)
