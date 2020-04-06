@@ -764,12 +764,6 @@ DLLEXPORT int __stdcall get_state(void)
 	return ret;
 }
 
-DLLEXPORT double __stdcall get_heartBeatRemoveAve(void)
-{
-	return heartBertRemoveAve;
-}
-
-
 // 加速度センサーの値を取得
 DLLEXPORT void __stdcall get_accelerometer(double data_x, double data_y, double data_z, char* ppath)
 {

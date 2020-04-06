@@ -43,8 +43,6 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern int get_state();
         [DllImport("Apnea.dll")]
-        static extern double get_heartBeatRemoveAve();
-        [DllImport("Apnea.dll")]
         static extern void get_accelerometer(double data1, double data2, double data3, IntPtr path);
         [DllImport("Apnea.dll")]
         static extern void get_photoreflector(double data, IntPtr ppath);
@@ -155,12 +153,10 @@ namespace SleepCheckerApp
         public int g1d_apnea = 0;
 
         private const int averageNum = 200;
-        private int averageCnt = 0;
         private double kokyuSum = 0;
         private double ibikiSum = 0;
         private double kokyuAve = 0;
         private double ibikiAve = 0;
-        private int elapsedTime = 0;
 
         // 情報取得コマンド
         static ManagementObjectSearcher MyOCS = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity");
@@ -171,7 +167,8 @@ namespace SleepCheckerApp
         string iniFileName = "setting.ini";
         static int periodCnt = 0;
         static bool stopFlg = false;
-        
+        static double heartBertRemoveAve;
+
         public FormMain()
         {
             string icon = AppDomain.CurrentDomain.BaseDirectory + "analysis.ico";
@@ -1005,21 +1002,17 @@ namespace SleepCheckerApp
 
             kokyuSum += data1;
             ibikiSum += data2;
-            averageCnt++;
-            if (averageNum == averageCnt)
-            {
-                kokyuAve = kokyuSum / averageNum;
-                ibikiAve = ibikiSum / averageNum;
-                averageCnt = 0;
-                kokyuSum = 0;
-                ibikiSum = 0;
-                Invoke(new DelegateUpdateText(averageTextUpDate));
-            }
 
             if (CalcDataList1.Count >= CalcDataNumApnea)
             {
                 //演算
                 Calc_Apnea();
+
+                kokyuAve = kokyuSum / CalcDataNumApnea;
+                ibikiAve = ibikiSum / CalcDataNumApnea;
+                kokyuSum = 0;
+                ibikiSum = 0;
+                Invoke(new DelegateUpdateText(averageTextUpDate));
 
                 //データクリア
                 CalcDataList1.Clear();
@@ -1029,51 +1022,32 @@ namespace SleepCheckerApp
 
                 Invoke(new DelegateUpdateText(measStop));
 
-                
+                heartBertRemoveAve = 0;
+
+                Invoke(new DelegateUpdateText(rmsRetShow));
             }
         }
 
+        /************************************************************************/
+        /* 関数名   : averageTextUpDate                        			    	*/
+        /* 機能     : 呼吸音の平均データを表示    　                            */
+        /* 引数     : なし                                                      */
+        /* 戻り値   : なし														*/
+        /************************************************************************/
         private void averageTextUpDate()
         {
             IntPtr pathptr = Marshal.StringToHGlobalAnsi(ApneaRootPath_);
-
-            ibikiAve = get_heartBeatRemoveAve();
 
             Math.Round(kokyuAve, 2, MidpointRounding.AwayFromZero);
             Math.Round(ibikiAve, 2, MidpointRounding.AwayFromZero);
 
             set_averageData(kokyuAve, ibikiAve, pathptr);
+            label_ibikiAve_1.Text = heartBertRemoveAve.ToString();
+            label_kokyuAve_1.Text = kokyuAve.ToString();
 
-            switch (elapsedTime)
-            {
-                case 0:
-                    label_kokyuAve_1.Text = kokyuAve.ToString();
-                    label_ibikiAve_1.Text = ibikiAve.ToString();
-                    elapsedTime = 0;
-                    break;
-/*
-                case 1:
-                    label_kokyuAve_2.Text = kokyuAve.ToString();
-                    label_ibikiAve_2.Text = ibikiAve.ToString();
-                    elapsedTime++;
-                    break;
-                case 2:
-                    label_kokyuAve_3.Text = kokyuAve.ToString();
-                    label_ibikiAve_3.Text = ibikiAve.ToString();
-                    elapsedTime++;
-                    break;
-                case 3:
-                    label_kokyuAve_4.Text = kokyuAve.ToString();
-                    label_ibikiAve_4.Text = ibikiAve.ToString();
-                    elapsedTime++;
-                    break;
-                case 4:
-                    label_kokyuAve_5.Text = kokyuAve.ToString();
-                    label_ibikiAve_5.Text = ibikiAve.ToString();
-                    elapsedTime = 0;
-                    break;
-*/
-            }
+            Console.WriteLine("呼吸音平均" + kokyuAve + " 心拍除去後呼吸音平均:" + heartBertRemoveAve);
+            heartBertRemoveAve = 0;
+            kokyuAve = 0;
         }
 
         /************************************************************************/
@@ -1173,9 +1147,11 @@ namespace SleepCheckerApp
                     Marshal.Copy(pd, arrayd, 0, CalcDataNumApnea);
                     for (int ii = 0; ii < CalcDataNumApnea; ++ii)
                     {
+                        heartBertRemoveAve += arrayd[ii];
                         ApneaHeartBeatRemovQueue.Dequeue();
                         ApneaHeartBeatRemovQueue.Enqueue(arrayd[ii]);
                     }
+                    heartBertRemoveAve = heartBertRemoveAve / CalcDataNumApnea;
                 }
                 Marshal.FreeCoTaskMem(ptr);
                 Marshal.FreeCoTaskMem(ptr2);
@@ -1203,9 +1179,11 @@ namespace SleepCheckerApp
                 // 生データグラフを更新
                 Series srs_rawresp = chart_kokyuRowData.Series["呼吸音"]; //■
                 Series srs_rawhertBeatRemove = chart_hertBeatRemoveRawData.Series["心拍除去後の呼吸音"]; //■
+                Series srs_rawhertBeatRemove2 = chart_hertBeatRemoveRawData1000.Series["心拍除去後の呼吸音"]; //■
                 Series srs_rawsnore = chart_snoreRow.Series["いびき音"]; //■
                 srs_rawresp.Points.Clear();
                 srs_rawhertBeatRemove.Points.Clear();
+                srs_rawhertBeatRemove2.Points.Clear();
                 srs_rawsnore.Points.Clear();
                 srs_rawsnore.Color = Color.GreenYellow;
                 cnt = 0;
@@ -1218,6 +1196,7 @@ namespace SleepCheckerApp
                 foreach (double data in ApneaHeartBeatRemovQueue)
                 {
                     srs_rawhertBeatRemove.Points.AddXY(cnt, data);
+                    srs_rawhertBeatRemove2.Points.AddXY(cnt, data);
                     cnt++;
                 }
                 cnt = 0;
@@ -1428,8 +1407,6 @@ namespace SleepCheckerApp
             param[0] = (int)RCV_COMMAND.Rcv_command.RCV_COM_MIC_DIAG_MODE_END;
             writeData(param);
 
-            //            com.Close();
-
             stopFlg = true;
 
             labelState.Text = "待機中";
@@ -1452,8 +1429,6 @@ namespace SleepCheckerApp
 
             snore = state & 0x01;
             apnea = (state & 0xC0) >> 6;
-
-//            rmsRetShow();
 
             if (apnea == 2)
             {
@@ -1479,88 +1454,118 @@ namespace SleepCheckerApp
         {
             try
             {
-                double[] arrayRmsData = new double[10];
-                IntPtr rmsData = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * 10);
+                double[] arrayRmsData = new double[CalcDataNumApnea];
+                IntPtr rmsData = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * CalcDataNumApnea);
 
                 get_apnea_rms(rmsData);
-                Marshal.Copy(rmsData, arrayRmsData, 0, 10);
-
-                lock (lockData)
-                {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Math.Round(arrayRmsData[i], 3, MidpointRounding.AwayFromZero);
-                    }
-                }
+                Marshal.Copy(rmsData, arrayRmsData, 0, CalcDataNumApnea);
                 Marshal.FreeCoTaskMem(rmsData);
+
+                label_rms1.Text = arrayRmsData[0].ToString("0.0000");
+                if (arrayRmsData[0] >= 0.002)
+                {
+                    label_rms1.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms1.ForeColor = Color.Red;
+                }
+
+                label_rms2.Text = arrayRmsData[1].ToString("0.0000");
+                if (arrayRmsData[1] >= 0.002)
+                {
+                    label_rms2.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms2.ForeColor = Color.Red;
+                }
+
+                label_rms3.Text = arrayRmsData[2].ToString("0.0000");
+                if (arrayRmsData[2] >= 0.002)
+                {
+                    label_rms3.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms3.ForeColor = Color.Red;
+                }
+
+                label_rms4.Text = arrayRmsData[3].ToString("0.0000");
+                if (arrayRmsData[3] >= 0.002)
+                {
+                    label_rms4.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms4.ForeColor = Color.Red;
+                }
+
+                label_rms5.Text = arrayRmsData[4].ToString("0.0000");
+                if (arrayRmsData[4] >= 0.002)
+                {
+                    label_rms5.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms5.ForeColor = Color.Red;
+                }
+
+                label_rms6.Text = arrayRmsData[5].ToString("0.0000");
+                if (arrayRmsData[5] >= 0.002)
+                {
+                    label_rms6.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms6.ForeColor = Color.Red;
+                }
+
+                label_rms7.Text = arrayRmsData[6].ToString("0.0000");
+                if (arrayRmsData[6] >= 0.002)
+                {
+                    label_rms7.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms7.ForeColor = Color.Red;
+                }
+
+                label_rms8.Text = arrayRmsData[7].ToString("0.0000");
+                if (arrayRmsData[7] >= 0.002)
+                {
+                    label_rms8.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms8.ForeColor = Color.Red;
+                }
+
+                label_rms9.Text = arrayRmsData[8].ToString("0.0000");
+                if (arrayRmsData[8] >= 0.002)
+                {
+                    label_rms9.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms9.ForeColor = Color.Red;
+                }
+
+                label_rms10.Text = arrayRmsData[9].ToString("0.0000");
+                if (arrayRmsData[9] >= 0.002)
+                {
+                    label_rms10.ForeColor = Color.White;
+                }
+                else
+                {
+                    label_rms10.ForeColor = Color.Red;
+                }
             }
             catch (Exception ex)
             {
                 //MessageBox.Show(ex.Message, "内部エラー(Calc)");
                 Console.WriteLine(ex.Message);
             }
-
-    /*
-                label_rms1.Text = arrayRmsData[0].ToString();
-                if(arrayRmsData[0] >= 0.002)
-                {
-                    label_rms1.ForeColor = Color.Red;
-                }
-
-                label_rms2.Text = arrayRmsData[1].ToString();
-                if (arrayRmsData[1] >= 0.002)
-                {
-                    label_rms2.ForeColor = Color.Red;
-                }
-
-                label_rms3.Text = arrayRmsData[2].ToString();
-                if (arrayRmsData[2] >= 0.002)
-                {
-                    label_rms3.ForeColor = Color.Red;
-                }
-
-                label_rms4.Text = arrayRmsData[3].ToString();
-                if (arrayRmsData[3] >= 0.002)
-                {
-                    label_rms4.ForeColor = Color.Red;
-                }
-
-                label_rms5.Text = arrayRmsData[4].ToString();
-                if (arrayRmsData[4] >= 0.002)
-                {
-                    label_rms5.ForeColor = Color.Red;
-                }
-
-                label_rms6.Text = arrayRmsData[5].ToString();
-                if (arrayRmsData[5] >= 0.002)
-                {
-                    label_rms6.ForeColor = Color.Red;
-                }
-
-                label_rms7.Text = arrayRmsData[6].ToString();
-                if (arrayRmsData[6] >= 0.002)
-                {
-                    label_rms7.ForeColor = Color.Red;
-                }
-
-                label_rms8.Text = arrayRmsData[7].ToString();
-                if (arrayRmsData[7] >= 0.002)
-                {
-                    label_rms8.ForeColor = Color.Red;
-                }
-
-                label_rms9.Text = arrayRmsData[8].ToString();
-                if (arrayRmsData[8] >= 0.002)
-                {
-                    label_rms9.ForeColor = Color.Red;
-                }
-
-                label_rms10.Text = arrayRmsData[9].ToString();
-                if (arrayRmsData[9] >= 0.002)
-                {
-                    label_rms10.ForeColor = Color.Red;
-                }
-                */
-}
+        }
     }
 }
