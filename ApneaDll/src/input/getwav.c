@@ -244,7 +244,6 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 			movave_[ii] += dcHBR_[ii + 1];
 			movave_[ii] += dcHBR_[ii + 2];
 			movave_[ii] /= (double)N;
-			movave_[ii] /= APNEA_PARAM_RAW;	// ê∂ÉfÅ[É^ï‚ê≥
 		}
 	}
 
