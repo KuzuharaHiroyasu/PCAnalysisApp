@@ -36,7 +36,7 @@ void getwav_snore(const double* pData);
 
 DLLEXPORT void __stdcall setThreshold(int SnoreParamThre, int SnoreParamNormalCnt, int ApneaJudgeCnt, double ApneaParamBinThre);
 DLLEXPORT void __stdcall setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, int MinBreathThre, int DiameterCenter, int DiameterNext, double DiameterEnd);
-DLLEXPORT void __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore);
+DLLEXPORT void __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore, int* photo);
 DLLEXPORT int	__stdcall get_result_snore(double* data);
 DLLEXPORT int	__stdcall get_result_peak(double* data);
 DLLEXPORT int	__stdcall get_result_apnea(double* data);
@@ -85,6 +85,7 @@ double	DiameterEnd_;			// エッジ強調移動平均の端の倍率
 
 // 演算途中データ
 double	raw_[DATA_SIZE];
+double	photo_[DATA_SIZE];
 double	dc_[DATA_SIZE];
 double	dcHBR_[DATA_SIZE];
 double	movave_[DATA_SIZE];
@@ -141,7 +142,7 @@ DLLEXPORT void    __stdcall setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, 
 /* 注意事項 :															*/
 /* なし																	*/
 /************************************************************************/
-DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore)
+DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* psnore, int* photo)
 {
 	BOOL before_under = FALSE;
 	BOOL after_under = FALSE;
@@ -161,9 +162,11 @@ DLLEXPORT void    __stdcall getwav_init(int* pdata, int len, char* ppath, int* p
 	for(int ii=0;ii<len;++ii){
 		dc_[ii] = (double)pdata[ii];
 		raw_[ii] = (double)psnore[ii];
+		photo_[ii] = (double)photo[ii];
 	}
 	debug_out("raw", dc_, len, path_);
 	debug_out("rawsnore", raw_, len, path_);
+	debug_out("photo", photo_, len, path_);
 
 	memcpy_s(dcHBR_, sizeof(double) * DATA_SIZE, dc_, sizeof(double) * DATA_SIZE);
 

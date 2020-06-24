@@ -25,7 +25,7 @@ namespace SleepCheckerApp
         [DllImport("Apnea.dll")]
         static extern void setEdgeThreshold(int MaxEdgeThre, int MinSnoreThre, int MinBreathThre, int DiameterCenter, int DiameterNext, double DiameterEnd);
         [DllImport("Apnea.dll")]
-        static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore);
+        static extern void getwav_init(IntPtr data, int len, IntPtr path, IntPtr snore, IntPtr photo);
         [DllImport("Apnea.dll")]
         static extern void getwav_movave(IntPtr data);
         [DllImport("Apnea.dll")]
@@ -66,6 +66,7 @@ namespace SleepCheckerApp
         private int[] CalcData1 = new int[CalcDataNumApnea];          // 1回の演算に使用するデータ
         private List<int> CalcDataList1 = new List<int>();
         private List<int> CalcDataList2 = new List<int>();
+        private List<int> CalcDataList3 = new List<int>();
         private string amari = "";
 
         // グラフ用
@@ -210,7 +211,7 @@ namespace SleepCheckerApp
             Boolean ret = true;
 
             // ログ出力フォルダ作成
-//            CreateRootDir();
+            CreateRootDir();
 
             // 解析
             ret = startAnalysis();
@@ -650,7 +651,7 @@ namespace SleepCheckerApp
 
                     //異常値チェック
                     string[] datas = lines[i].Split(new string[] { "," }, StringSplitOptions.None);
-                    if (datas.Length == 6)
+                    if (datas.Length == 3)
                     {
                         //測定データ表示
                         //SetTextInput(lines[i] + "\r\n");
@@ -658,14 +659,14 @@ namespace SleepCheckerApp
                         int result;
                         if (!int.TryParse(datas[0], out result)) continue;      // マイク(呼吸)
                         if (!int.TryParse(datas[1], out result)) continue;      // マイク(いびき)
-                        if (!int.TryParse(datas[2], out result)) continue;      // 加速度センサ(X)
-                        if (!int.TryParse(datas[3], out result)) continue;      // 加速度センサ(Y)
-                        if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(Z)
-                        if (!int.TryParse(datas[5], out result)) continue;      // フォトセンサ
+//                        if (!int.TryParse(datas[2], out result)) continue;      // 加速度センサ(X)
+//                        if (!int.TryParse(datas[3], out result)) continue;      // 加速度センサ(Y)
+//                        if (!int.TryParse(datas[4], out result)) continue;      // 加速度センサ(Z)
+                        if (!int.TryParse(datas[2], out result)) continue;      // フォトセンサ
 
                         // For Apnea
-                        SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
-
+                        SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]), Convert.ToInt32(datas[2]));
+/*
                         if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99 && Convert.ToInt32(datas[5]) == 0)
                         {
                             //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
@@ -676,6 +677,7 @@ namespace SleepCheckerApp
                             SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
                             //Console.WriteLine("[DataReceived] X軸:" + Convert.ToInt32(datas[2]) + " Y軸:" + Convert.ToInt32(datas[3]) + " Z軸:" + Convert.ToInt32(datas[4]));
                         }
+*/
                     }
                     else
                     {
@@ -803,7 +805,7 @@ namespace SleepCheckerApp
             }
             else
             {
-//                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(path);
             }
 
             return path;
@@ -838,12 +840,13 @@ namespace SleepCheckerApp
         /* 戻り値   : なし														*/
         /************************************************************************/
         // For Apnea
-        private void SetCalcData_Apnea(int data1, int data2)
+        private void SetCalcData_Apnea(int data1, int data2, int data3)
         {
             byte[] param = new byte[1];
             //計算用データ
             CalcDataList1.Add(data1);
             CalcDataList2.Add(data2);
+            CalcDataList3.Add(data3);
 
             //グラフ用データ追加
             lock (lockData)
@@ -878,6 +881,7 @@ namespace SleepCheckerApp
                 //データクリア
                 CalcDataList1.Clear();
                 CalcDataList2.Clear();
+                CalcDataList3.Clear();
             }
             else if(CalcDataList1.Count == 50)
             {
@@ -962,6 +966,7 @@ namespace SleepCheckerApp
                 int num = listCnt;
                 IntPtr ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr ptr2 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
+                IntPtr ptr3 = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr pathptr = Marshal.StringToHGlobalAnsi(path);
                 IntPtr pi = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)) * num);
                 IntPtr pd = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(double)) * num);
@@ -969,7 +974,8 @@ namespace SleepCheckerApp
                 double[] arrayd = new double[num];
                 Marshal.Copy(CalcDataList1.ToArray(), 0, ptr, num);
                 Marshal.Copy(CalcDataList2.ToArray(), 0, ptr2, num);
-                getwav_init(ptr, num, pathptr, ptr2);
+                Marshal.Copy(CalcDataList3.ToArray(), 0, ptr3, num);
+                getwav_init(ptr, num, pathptr, ptr2, ptr3);
                 lock (lockData)
                 {
                     // DC成分除去データをQueueに置く

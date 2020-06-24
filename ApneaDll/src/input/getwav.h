@@ -58,7 +58,7 @@
 /* 外部参照宣言												*/
 /************************************************************/
 // 演算実行
-DLLEXPORT void __stdcall getwav_init(int* data, int len, char* ppath, int* psnore);
+DLLEXPORT void __stdcall getwav_init(int* data, int len, char* ppath, int* psnore, int* photo);
 // DC成分除去データ
 DLLEXPORT void __stdcall getwav_movave(double* pdata);
 

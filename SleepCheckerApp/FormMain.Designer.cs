@@ -328,7 +328,6 @@
             series3.ChartArea = "ChartAreaTime";
             series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series3.EmptyPointStyle.Color = System.Drawing.Color.White;
-            series3.Enabled = false;
             series3.Legend = "Legend1";
             series3.Name = "呼吸音";
             series4.ChartArea = "ChartAreaTime";
