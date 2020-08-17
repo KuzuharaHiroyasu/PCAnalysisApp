@@ -100,7 +100,6 @@
             this.buttonStop = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.labelSnoreData = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chartApnea)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartRawData)).BeginInit();
@@ -207,7 +206,7 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chartApnea.Legends.Add(legend1);
-            this.chartApnea.Location = new System.Drawing.Point(12, 366);
+            this.chartApnea.Location = new System.Drawing.Point(12, 776);
             this.chartApnea.Name = "chartApnea";
             series1.BorderWidth = 3;
             series1.ChartArea = "ChartAreaTime";
@@ -221,7 +220,7 @@
             series2.Name = "いびき";
             this.chartApnea.Series.Add(series1);
             this.chartApnea.Series.Add(series2);
-            this.chartApnea.Size = new System.Drawing.Size(1322, 290);
+            this.chartApnea.Size = new System.Drawing.Size(1315, 290);
             this.chartApnea.TabIndex = 11;
             this.chartApnea.Text = "いびき/無呼吸判定";
             title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -339,7 +338,7 @@
             series4.Name = "いびき音";
             this.chartRawData.Series.Add(series3);
             this.chartRawData.Series.Add(series4);
-            this.chartRawData.Size = new System.Drawing.Size(1322, 301);
+            this.chartRawData.Size = new System.Drawing.Size(1315, 324);
             this.chartRawData.TabIndex = 15;
             this.chartRawData.Text = "呼吸音";
             title2.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F);
@@ -391,11 +390,15 @@
             // 
             // chartAccelerometer
             // 
+            this.chartAccelerometer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea4.AlignmentStyle = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentStyles.PlotPosition;
             chartArea4.AxisX.Interval = 20D;
             chartArea4.AxisX.Maximum = 200D;
             chartArea4.AxisX.Minimum = 0D;
-            chartArea4.AxisY.Maximum = 127D;
-            chartArea4.AxisY.Minimum = -128D;
+            chartArea4.AxisY.Maximum = 2500D;
+            chartArea4.AxisY.Minimum = -2500D;
             chartArea4.Name = "ChartAreaTime";
             chartArea4.Position.Auto = false;
             chartArea4.Position.Height = 85F;
@@ -403,6 +406,7 @@
             chartArea4.Position.X = 1F;
             chartArea4.Position.Y = 13F;
             this.chartAccelerometer.ChartAreas.Add(chartArea4);
+            legend4.Enabled = false;
             legend4.Name = "Legend1";
             legend4.Position.Auto = false;
             legend4.Position.Height = 27.08333F;
@@ -410,7 +414,7 @@
             legend4.Position.X = 80F;
             legend4.Position.Y = 12.98242F;
             this.chartAccelerometer.Legends.Add(legend4);
-            this.chartAccelerometer.Location = new System.Drawing.Point(984, 7);
+            this.chartAccelerometer.Location = new System.Drawing.Point(12, 407);
             this.chartAccelerometer.Name = "chartAccelerometer";
             series7.BorderWidth = 2;
             series7.ChartArea = "ChartAreaTime";
@@ -433,13 +437,12 @@
             this.chartAccelerometer.Series.Add(series7);
             this.chartAccelerometer.Series.Add(series8);
             this.chartAccelerometer.Series.Add(series9);
-            this.chartAccelerometer.Size = new System.Drawing.Size(45, 41);
+            this.chartAccelerometer.Size = new System.Drawing.Size(1316, 317);
             this.chartAccelerometer.TabIndex = 21;
             this.chartAccelerometer.Text = "加速度センサー";
             title4.Name = "Title";
             title4.Text = "加速度センサー";
             this.chartAccelerometer.Titles.Add(title4);
-            this.chartAccelerometer.Visible = false;
             // 
             // groupBox2
             // 
@@ -685,7 +688,7 @@
             this.label1.BackColor = System.Drawing.Color.Black;
             this.label1.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label1.ForeColor = System.Drawing.Color.DodgerBlue;
-            this.label1.Location = new System.Drawing.Point(12, 467);
+            this.label1.Location = new System.Drawing.Point(12, 885);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(93, 27);
             this.label1.TabIndex = 29;
@@ -698,24 +701,11 @@
             this.label2.BackColor = System.Drawing.Color.Black;
             this.label2.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.label2.ForeColor = System.Drawing.Color.Yellow;
-            this.label2.Location = new System.Drawing.Point(29, 538);
+            this.label2.Location = new System.Drawing.Point(29, 956);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(76, 27);
             this.label2.TabIndex = 30;
             this.label2.Text = "いびき";
-            // 
-            // label3
-            // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.Color.Black;
-            this.label3.Font = new System.Drawing.Font("MS UI Gothic", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label3.ForeColor = System.Drawing.Color.Yellow;
-            this.label3.Location = new System.Drawing.Point(12, 188);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(135, 27);
-            this.label3.TabIndex = 31;
-            this.label3.Text = "いびきライン";
             // 
             // labelSnoreData
             // 
@@ -725,7 +715,7 @@
             this.labelSnoreData.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.labelSnoreData.Font = new System.Drawing.Font("MS UI Gothic", 70F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.labelSnoreData.ForeColor = System.Drawing.Color.Lime;
-            this.labelSnoreData.Location = new System.Drawing.Point(984, 7);
+            this.labelSnoreData.Location = new System.Drawing.Point(1035, 8);
             this.labelSnoreData.Name = "labelSnoreData";
             this.labelSnoreData.Size = new System.Drawing.Size(234, 96);
             this.labelSnoreData.TabIndex = 32;
@@ -737,10 +727,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.ClientSize = new System.Drawing.Size(1347, 660);
+            this.ClientSize = new System.Drawing.Size(1321, 1095);
             this.Controls.Add(this.comboBoxComport);
             this.Controls.Add(this.labelSnoreData);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonStop);
@@ -798,7 +787,6 @@
         private System.Windows.Forms.Button buttonStop;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label labelSnoreData;
     }
 }

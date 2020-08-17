@@ -666,16 +666,8 @@ namespace SleepCheckerApp
                         // For Apnea
                         SetCalcData_Apnea(Convert.ToInt32(datas[0]), Convert.ToInt32(datas[1]));
 
-                        if (Convert.ToInt32(datas[2]) == 99 && Convert.ToInt32(datas[3]) == 99 && Convert.ToInt32(datas[4]) == 99 && Convert.ToInt32(datas[5]) == 0)
-                        {
-                            //log_output("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[3]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
-                            //Console.WriteLine("[DataReceived]呼吸:" + Convert.ToInt32(datas[2]) + " いびき:" + Convert.ToInt32(datas[1]) + " X軸:" + Convert.ToInt32(datas[4]) + " Y軸:" + Convert.ToInt32(datas[5]) + " Z軸:" + Convert.ToInt32(datas[6]));
-                        } else
-                        {
-                            // For 加速度
-                            SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
-                            //Console.WriteLine("[DataReceived] X軸:" + Convert.ToInt32(datas[2]) + " Y軸:" + Convert.ToInt32(datas[3]) + " Z軸:" + Convert.ToInt32(datas[4]));
-                        }
+                        // For 加速度
+                        SetCalcData_Acce(Convert.ToInt32(datas[2]), Convert.ToInt32(datas[3]), Convert.ToInt32(datas[4]));
                     }
                     else
                     {
